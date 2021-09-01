@@ -43,6 +43,10 @@ vec3 phong_model_lights( vec3 N, vec3 vertex_worldspace ){
     return result;
 }
 
+
+varying vec2 f_tex_coord;
+uniform sampler2D texture;
+
 void main(){
     // Sample the texture image in the correct place:
     vec4 tex_color = texture2D( texture, f_tex_coord );
@@ -53,5 +57,5 @@ void main(){
     gl_FragColor = vec4( ( tex_color.xyz + shape_color.xyz ) * ambient, shape_color.w * tex_color.w ); 
     // Compute the final color with contributions from lights:
     gl_FragColor.xyz += phong_model_lights( normalize( bumped_N ), vertex_worldspace );
-  } 
+}  
 `;

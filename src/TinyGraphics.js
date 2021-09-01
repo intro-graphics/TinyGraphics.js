@@ -20,4 +20,4 @@ export {Keyboard_Manager} from './activities/Keyboard_Manager.js';
 export {Shader} from './shaders/Shader.js';
 export {BasicShader} from './shaders/BasicShader.js';
 export {PhongShader} from './shaders/PhongShader.js';
-
+export {TexturedPhong, FakeBumpMap} from "./shaders/TexturedPhong.js"

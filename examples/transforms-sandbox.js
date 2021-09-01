@@ -1,13 +1,17 @@
-// import {defs} from './common.js';
-
 // Pull these names into this module's scope for convenience:
 import {
-    vec3, vec4, color, hex_color, Mat4, Light, Shape, Material, Shader, Texture, Scene,
-    Triangle, Square, Tetrahedron, Windmill, Cube, SubdivisionSphere, PhongShader, MovementControls
+    color,
+    Cube,
+    hex_color,
+    Light,
+    Mat4,
+    Material,
+    MovementControls,
+    PhongShader,
+    Scene,
+    SubdivisionSphere,
+    vec4
 } from "../src/TinyGraphics.js";
-
-// const {} = defs;
-
 
 export class TransformsSandboxBase extends Scene {
     // **TransformsSandboxBase** is a Scene that can be added to any display canvas.

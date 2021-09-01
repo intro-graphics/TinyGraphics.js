@@ -1,6 +1,6 @@
 // import {defs, tiny} from './examples/common.js';
 // import {defs} from './examples/common.js';
-// import {Axes_Viewer, Axes_Viewer_Test_Scene} from "./examples/axes-viewer.js"
+import {Axes_Viewer, Axes_Viewer_Test_Scene} from "./examples/axes-viewer.js"
 // import {Collision_Demo, Inertia_Demo} from "./examples/collisions-demo.js"
 // import {Many_Lights_Demo} from "./examples/many-lights-demo.js"
 // import {Obj_File_Demo} from "./examples/obj-file-demo.js"
@@ -41,7 +41,7 @@ const {
 
 // (Can define Main_Scene's class here)
 
-const Main_Scene = TransformsSandbox;
+const Main_Scene = Axes_Viewer_Test_Scene;
 const Additional_Scenes = [];
 
 export {Main_Scene, Additional_Scenes, Canvas_Widget, Code_Widget, Text_Widget}

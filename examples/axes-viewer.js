@@ -1,31 +1,43 @@
-import {defs, tiny} from './common.js';
 // Pull these names into this module's scope for convenience:
-const {vec3, vec4, color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
+import {
+    AxisArrows,
+    color,
+    Cube,
+    FakeBumpMap,
+    Light,
+    Mat4,
+    Material,
+    MovementControls,
+    PhongShader,
+    Scene,
+    Texture, TexturedPhong,
+    vec4
+} from "../src/TinyGraphics.js";
 
 export class Axes_Viewer extends Scene {
     /**
      **Axes_Viewer** is a helper scene (a secondary Scene Component) for helping you
-    visualize the coordinate bases that are used in your real scene.  Your scene
-    can feed this object a list of bases to draw as axis arrows.  Pressing the
-    buttons of this helper scene cycles through a list of each basis you have added,
-    drawing the selected one.  Call insert() and pass it a basis to add one to the
-    list.
-    Always reset the data structure by calling reset() before each frame in your scene.
+     visualize the coordinate bases that are used in your real scene.  Your scene
+     can feed this object a list of bases to draw as axis arrows.  Pressing the
+     buttons of this helper scene cycles through a list of each basis you have added,
+     drawing the selected one.  Call insert() and pass it a basis to add one to the
+     list.
+     Always reset the data structure by calling reset() before each frame in your scene.
 
-    Bases at the same level in your scene's hierarchy can be grouped together and
-    displayed all at once; just store them at the same index in "this.groups" by
-    passing the same ID number into insert().  Normally passing an ID is optional;
-    omitting it inserts your basis in the next empty group.  To re-use IDs easily,
-    obtain the next unused ID by calling next_group_id(), so you can re-use it for
-    all bases that you want to appear at the same level.
-    **/
+     Bases at the same level in your scene's hierarchy can be grouped together and
+     displayed all at once; just store them at the same index in "this.groups" by
+     passing the same ID number into insert().  Normally passing an ID is optional;
+     omitting it inserts your basis in the next empty group.  To re-use IDs easily,
+     obtain the next unused ID by calling next_group_id(), so you can re-use it for
+     all bases that you want to appear at the same level.
+     **/
     constructor() {
         super();
 
         this.selected_basis_id = 0;
         this.reset();
-        this.shapes = {axes: new defs.Axis_Arrows()};
-        const bump = new defs.Fake_Bump_Map();
+        this.shapes = {axes: new AxisArrows()};
+        const bump = new TexturedPhong();
         this.material = new Material(bump, {
             color: color(0, 0, 0, 1), ambient: 1,
             texture: new Texture("assets/rgb.jpg")
@@ -86,8 +98,8 @@ export class Axes_Viewer_Test_Scene extends Scene {
         super();
         this.children.push(this.axes_viewer = new Axes_Viewer());
         // Scene defaults:
-        this.shapes = {box: new defs.Cube()};
-        const phong = new defs.Phong_Shader();
+        this.shapes = {box: new Cube()};
+        const phong = new PhongShader();
         this.material = new Material(phong, {color: color(.8, .4, .8, 1)});
     }
 
@@ -100,7 +112,7 @@ export class Axes_Viewer_Test_Scene extends Scene {
         program_state.lights = [new Light(vec4(0, 0, 1, 0), color(0, 1, 1, 1), 100000)];
 
         if (!context.scratchpad.controls) {
-            this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
+            this.children.push(context.scratchpad.controls = new MovementControls());
 
             program_state.set_camera(Mat4.translation(-1, -1, -20));
             // Locate the camera here (inverted matrix).
