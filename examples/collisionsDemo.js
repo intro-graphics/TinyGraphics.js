@@ -181,19 +181,19 @@ export class TestData {
         this.textures = {
             rgb: new Texture("assets/rgb.jpg"),
             earth: new Texture("assets/earth.gif"),
-            grid: new Texture("assets/grid.png"),
             stars: new Texture("assets/stars.png"),
             text: new Texture("assets/text.png"),
         };
+        // TODO: Fix the flat shading version
         this.shapes = {
             donut: new Torus(15, 15, [[0, 2], [0, 1]]),
             cone: new ClosedCone(4, 10, [[0, 2], [0, 1]]),
             capped: new CappedCylinder(4, 12, [[0, 2], [0, 1]]),
             ball: new SubdivisionSphere(3, [[0, 1], [0, 1]]),
             cube: new Cube(),
-            prism: new (CappedCylinder.prototype.make_flat_shaded_version())(10, 10, [[0, 2], [0, 1]]),
-            gem: new (SubdivisionSphere.prototype.make_flat_shaded_version())(2),
-            donut2: new (Torus.prototype.make_flat_shaded_version())(20, 20, [[0, 2], [0, 1]]),
+            prism: new CappedCylinder(10, 10, [[0, 2], [0, 1]]),
+            gem: new SubdivisionSphere(2),
+            donut2: new Torus(20, 20, [[0, 2], [0, 1]]),
         };
     }
 
