@@ -4,18 +4,18 @@ import {BasicShader, Mat4, Material, MinimalShape, Scene} from "../TinyGraphics.
  * **Minimal Scene** is an extremely simple example of a Scene class.
  */
 class MinimalScene extends Scene {
-    constructor(webgl_manager, control_panel) {
-        super(webgl_manager, control_panel);
+    constructor(webglManager, controlPanel) {
+        super(webglManager, controlPanel);
         // Don't create any DOM elements to control this scene:
-        this.widget_options = {make_controls: false, show_explanation: false};
+        this.widget_options = {make_controls: false, showExplanation: false};
         // Send a Triangle's vertices to the GPU buffers:
         this.shapes = {triangle: new MinimalShape()};
         this.shader = new BasicShader();
     }
 
-    display(context, graphics_state) {
+    display(context, graphicsState) {
         // Every frame, simply draw the Triangle at its default location.
-        this.shapes.triangle.draw(context, graphics_state, Mat4.identity(), new Material(this.shader));
+        this.shapes.triangle.draw(context, graphicsState, Mat4.identity(), new Material(this.shader));
     }
 }
 

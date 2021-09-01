@@ -86,6 +86,7 @@ class Shape extends VertexBuffer {
      */
     duplicate_the_shared_vertices() {
         const arrays = {};
+        console.log(this.arrays)
         for (let arr in this.arrays) arrays[arr] = [];
         for (let index of this.indices)
             for (let arr in this.arrays)

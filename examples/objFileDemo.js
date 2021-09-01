@@ -96,10 +96,10 @@ export class Shape_From_File extends Shape {                                   /
         this.ready = true;
     }
 
-    draw(context, program_state, model_transform, material) {               // draw(): Same as always for shapes, but cancel all
+    draw(context, programState, model_transform, material) {               // draw(): Same as always for shapes, but cancel all
         // attempts to draw the shape before it loads:
         if (this.ready)
-            super.draw(context, program_state, model_transform, material);
+            super.draw(context, programState, model_transform, material);
     }
 }
 
@@ -120,22 +120,22 @@ export class Obj_File_Demo extends Scene {                           // **Obj_Fi
         // Non bump mapped:
         this.stars = new Material(new defs.Textured_Phong(1), {
             color: color(.5, .5, .5, 1),
-            ambient: .3, diffusivity: .5, specularity: .5, texture: new Texture("assets/stars.png")
+            ambient: .3, diffusivity: .5, specularity: .5, texture: new Texture("assets/stars.png"),
         });
         // Bump mapped:
         this.bumps = new Material(new defs.Fake_Bump_Map(1), {
             color: color(.5, .5, .5, 1),
-            ambient: .3, diffusivity: .5, specularity: .5, texture: new Texture("assets/stars.png")
+            ambient: .3, diffusivity: .5, specularity: .5, texture: new Texture("assets/stars.png"),
         });
     }
 
-    display(context, program_state) {
-        const t = program_state.animation_time;
+    display(context, programState) {
+        const t = programState.animationTime;
 
-        program_state.set_camera(Mat4.translation(0, 0, -5));    // Locate the camera here (inverted matrix).
-        program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 500);
+        programState.setCamera(Mat4.translation(0, 0, -5));    // Locate the camera here (inverted matrix).
+        programState.projectionTransform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 500);
         // A spinning light to show off the bump map:
-        program_state.lights = [new Light(
+        programState.lights = [new Light(
             Mat4.rotation(t / 300, 1, 0, 0).times(vec4(3, 2, 10, 1)),
             color(1, .7, .7, 1), 100000)];
 
@@ -144,12 +144,12 @@ export class Obj_File_Demo extends Scene {                           // **Obj_Fi
                 .times(Mat4.translation(2 * i, 0, 0))
                 .times(Mat4.rotation(t / 1500, -1, 2, 0))
                 .times(Mat4.rotation(-Math.PI / 2, 1, 0, 0));
-            this.shapes.teapot.draw(context, program_state, model_transform, i == 1 ? this.stars : this.bumps);
+            this.shapes.teapot.draw(context, programState, model_transform, i == 1 ? this.stars : this.bumps);
         }
     }
 
-    show_explanation(document_element) {
-        document_element.innerHTML += "<p>This demo loads an external 3D model file of a teapot.  It uses a condensed version of the \"webgl-obj-loader.js\" "
+    showExplanation(documentElement) {
+        documentElement.innerHTML += "<p>This demo loads an external 3D model file of a teapot.  It uses a condensed version of the \"webgl-obj-loader.js\" "
             + "open source library, though this version is not guaranteed to be complete and may not handle some .OBJ files.  It is contained in the class \"Shape_From_File\". "
             + "</p><p>One of these teapots is lit with bump mapping.  Can you tell which one?</p>";
     }

@@ -7,28 +7,28 @@
 
 // Pull these names into this module's scope for convenience.
 // const {color, Scene} = tiny;
-import {color, Scene} from "./TinyGraphics.js";
-import * as tiny from './TinyGraphics.js';
+import * as tiny from "./TinyGraphics.js";
+import {color} from "./TinyGraphics.js";
 import {WebglManager} from "./utils.js";
 
 export const widgets = {};
 
-const Canvas_Widget = widgets.Canvas_Widget =
-    class Canvas_Widget {
-        // **Canvas_Widget** embeds a WebGL demo onto a website in place of the given placeholder document
+widgets.CanvasWidget =
+    class CanvasWidget {
+        // **CanvasWidget** embeds a WebGL demo onto a website in place of the given placeholder document
         // element.  It creates a WebGL canvas and loads onto it any initial Scene objects in the
-        // arguments.  Optionally spawns a Text_Widget and Controls_Widget for showing more information
+        // arguments.  Optionally spawns a TextWidget and ControlsWidget for showing more information
         // or interactive UI buttons, divided into one panel per each loaded Scene.  You can use up to
         // 16 Canvas_Widgets; browsers support up to 16 WebGL contexts per page.
-        constructor(element, initial_scenes, options = {}) {
+        constructor(element, initialScenes, options = {}) {
             this.element = element;
 
             const defaults = {
-                show_canvas: true, make_controls: true, show_explanation: true,
-                make_editor: false, make_code_nav: true
+                show_canvas: true, make_controls: true, showExplanation: true,
+                make_editor: false, make_code_nav: true,
             };
-            if (initial_scenes && initial_scenes[0])
-                Object.assign(options, initial_scenes[0].widget_options);
+            if (initialScenes && initialScenes[0])
+                Object.assign(options, initialScenes[0].widget_options);
             Object.assign(this, defaults, options)
 
             const rules = [".canvas-widget { width: 1080px; background: White; margin:auto }",
@@ -38,7 +38,7 @@ const Canvas_Widget = widgets.Canvas_Widget =
             for (const r of rules) document.styleSheets[document.styleSheets.length - 1].insertRule(r, 0)
 
             // Fill in the document elements:
-            if (this.show_explanation) {
+            if (this.showExplanation) {
                 this.embedded_explanation_area = this.element.appendChild(document.createElement("div"));
                 this.embedded_explanation_area.className = "text-widget";
             }
@@ -63,36 +63,36 @@ const Canvas_Widget = widgets.Canvas_Widget =
             if (!this.show_canvas)
                 canvas.style.display = "none";
 
-            this.webgl_manager = new WebglManager(canvas, color(0, 0, 0, 1));
+            this.webglManager = new WebglManager(canvas, color(0, 0, 0, 1));
             // Second parameter sets background color.
 
 
             // Add scenes and child widgets
-            if (initial_scenes)
-                this.webgl_manager.scenes.push(...initial_scenes);
+            if (initialScenes)
+                this.webglManager.scenes.push(...initialScenes);
 
-            const primary_scene = initial_scenes ? initial_scenes[0] : undefined;
-            const additional_scenes = initial_scenes ? initial_scenes.slice(1) : [];
-            const primary_scene_definition = primary_scene ? primary_scene.constructor : undefined;
-            if (this.show_explanation)
-                this.embedded_explanation = new Text_Widget(this.embedded_explanation_area, this.webgl_manager.scenes, this.webgl_manager);
+            const primaryScene = initialScenes ? initialScenes[0] : undefined;
+            const additionalScenes = initialScenes ? initialScenes.slice(1) : [];
+            const primarySceneDefinition = primaryScene ? primaryScene.constructor : undefined;
+            if (this.showExplanation)
+                this.embedded_explanation = new TextWidget(this.embedded_explanation_area, this.webglManager.scenes, this.webglManager);
             if (this.make_controls)
-                this.embedded_controls = new Controls_Widget(this.embedded_controls_area, this.webgl_manager.scenes);
+                this.embedded_controls = new ControlsWidget(this.embedded_controls_area, this.webglManager.scenes);
             if (this.make_editor)
-                this.embedded_editor = new Editor_Widget(this.embedded_editor_area, primary_scene_definition, this);
+                this.embedded_editor = new EditorWidget(this.embedded_editor_area, primarySceneDefinition, this);
             if (this.make_code_nav)
-                this.embedded_code_nav = new Code_Widget(this.embedded_code_nav_area, primary_scene_definition,
-                    additional_scenes, {associated_editor: this.embedded_editor});
+                this.embedded_code_nav = new CodeWidget(this.embedded_code_nav_area, primarySceneDefinition,
+                    additionalScenes, {associated_editor: this.embedded_editor});
 
             // Start WebGL initialization.  Note that render() will re-queue itself for continuous calls.
-            this.webgl_manager.render();
+            this.webglManager.render();
         }
     }
 
 
-const Controls_Widget = widgets.Controls_Widget =
-    class Controls_Widget {
-        // **Controls_Widget** adds an array of panels to the document, one per loaded
+const ControlsWidget = widgets.ControlsWidget =
+    class ControlsWidget {
+        // **ControlsWidget** adds an array of panels to the document, one per loaded
         // Scene object, each providing interactive elements such as buttons with key
         // bindings, live readouts of Scene data members, etc.
         constructor(element, scenes) {
@@ -107,7 +107,7 @@ const Controls_Widget = widgets.Controls_Widget =
                 ".controls-widget table.control-box td * { background:transparent }",
                 ".controls-widget table.control-box .control-div td { border-radius:unset }",
                 ".controls-widget table.control-box .control-title { padding:7px 40px; color:white; background:#252424;}",
-                ".controls-widget *.live_string { display:inline-block; background:unset }",
+                ".controls-widget *.liveString { display:inline-block; background:unset }",
                 ".dropdown { display:inline-block }",
                 ".dropdown-content { display:inline-block; transition:.2s; transform: scaleY(0); overflow:hidden; position: absolute; \
                                       z-index: 1; background:#E8F6FF; padding: 16px; margin-left:30px; min-width: 100px; \
@@ -134,63 +134,63 @@ const Controls_Widget = widgets.Controls_Widget =
             this.render();
         }
 
-        make_panels(time) {
+        makePanels(time) {
             this.timestamp = time;
             this.row.innerHTML = "";
             // Traverse all scenes and their children, recursively:
-            const open_list = [...this.scenes];
-            while (open_list.length) {
-                open_list.push(...open_list[0].children);
-                const scene = open_list.shift();
+            const openList = [...this.scenes];
+            while (openList.length) {
+                openList.push(...openList[0].children);
+                const scene = openList.shift();
 
-                const control_box = this.row.insertCell();
-                this.panels.push(control_box);
+                const controlBox = this.row.insertCell();
+                this.panels.push(controlBox);
                 // Draw top label bar:
-                control_box.appendChild(Object.assign(document.createElement("div"), {
-                    textContent: scene.constructor.name, className: "control-title"
-                }))
+                controlBox.appendChild(Object.assign(document.createElement("div"), {
+                    textContent: scene.constructor.name, className: "control-title",
+                }));
 
-                const control_panel = control_box.appendChild(document.createElement("div"));
-                control_panel.className = "control-div";
-                scene.control_panel = control_panel;
+                const controlPanel = controlBox.appendChild(document.createElement("div"));
+                controlPanel.className = "control-div";
+                scene.controlPanel = controlPanel;
                 scene.timestamp = time;
                 // Draw each registered animation:
-                scene.make_control_panel();
+                scene.makeControlPanel();
             }
         }
 
         render(time = 0) {
             // Check to see if we need to re-create the panels due to any scene being new.
             // Traverse all scenes and their children, recursively:
-            const open_list = [...this.scenes];
-            while (open_list.length) {
-                open_list.push(...open_list[0].children);
-                const scene = open_list.shift();
+            const openList = [...this.scenes];
+            while (openList.length) {
+                openList.push(...openList[0].children);
+                const scene = openList.shift();
                 if (!scene.timestamp || scene.timestamp > this.timestamp) {
-                    this.make_panels(time);
+                    this.makePanels(time);
                     break;
                 }
 
                 // TODO: Check for updates to each scene's desired_controls_position, including if the
-                // scene just appeared in the tree, in which case call make_control_panel().
+                // scene just appeared in the tree, in which case call makeControlPanel().
             }
 
             for (let panel of this.panels)
-                for (let live_string of panel.querySelectorAll(".live_string")) live_string.onload(live_string);
+                for (let liveString of panel.querySelectorAll(".liveString")) liveString.onload(liveString);
             // TODO: Cap this so that it can't be called faster than a human can read?
             this.event = window.requestAnimFrame(this.render.bind(this));
         }
     }
 
 
-const Code_Manager = widgets.Code_Manager =
-    class Code_Manager {
-        // **Code_Manager** breaks up a string containing code (any ES6 JavaScript).  The RegEx being used
+const CodeManager = widgets.CodeManager =
+    class CodeManager {
+        // **CodeManager** breaks up a string containing code (any ES6 JavaScript).  The RegEx being used
         // to parse is from https://github.com/lydell/js-tokens which states the following limitation:
         // "If the end of a statement looks like a regex literal (even if it isn’t), it will be treated
         // as one."  (This can miscolor lines of code containing divisions and comments).
         constructor(code) {
-            const es6_tokens_parser = RegExp([
+            const esSixTokensParser = RegExp([
                 /((['"])(?:(?!\2|\\).|\\(?:\r\n|[\s\S]))*(\2)?|`(?:[^`\\$]|\\[\s\S]|\$(?!{)|\${(?:[^{}]|{[^}]*}?)*}?)*(`)?)/,    // Any string.
                 /(\/\/.*)|(\/\*(?:[^*]|\*(?!\/))*(\*\/)?)/,                                                                           // Any comment (2 forms).  And next, any regex:
                 /(\/(?!\*)(?:\[(?:(?![\]\\]).|\\.)*]|(?![\/\]\\]).|\\.)+\/(?:(?!\s*(?:\b|[\u0080-\uFFFF$\\'"~({]|[+\-!](?!=)|\.?\d))|[gmiyu]{1,5}\b(?![\u0080-\uFFFF$\\]|\s*(?:[+\-*%&|^<>!=?({]|\/(?![\/*])))))/,
@@ -202,21 +202,21 @@ const Code_Manager = widgets.Code_Manager =
 
             this.tokens = [];
             this.no_comments = [];
-            let single_token = null;
-            while ((single_token = es6_tokens_parser.exec(code)) !== null) {
-                let token = {type: "invalid", value: single_token[0]}
-                if (single_token[1]) {
+            let singleToken = null;
+            while ((singleToken = esSixTokensParser.exec(code)) !== null) {
+                let token = {type: "invalid", value: singleToken[0]}
+                if (singleToken[1]) {
                     token.type = "string";
-                    token.closed = !!(single_token[3] || single_token[4]);
-                } else if (single_token[5]) token.type = "comment"
-                else if (single_token[6]) {
+                    token.closed = !!(singleToken[3] || singleToken[4]);
+                } else if (singleToken[5]) token.type = "comment"
+                else if (singleToken[6]) {
                     token.type = "comment";
-                    token.closed = !!single_token[7];
-                } else if (single_token[8]) token.type = "regex"
-                else if (single_token[9]) token.type = "number"
-                else if (single_token[10]) token.type = "name"
-                else if (single_token[11]) token.type = "punctuator"
-                else if (single_token[12]) token.type = "whitespace"
+                    token.closed = !!singleToken[7];
+                } else if (singleToken[8]) token.type = "regex"
+                else if (singleToken[9]) token.type = "number"
+                else if (singleToken[10]) token.type = "name"
+                else if (singleToken[11]) token.type = "punctuator"
+                else if (singleToken[12]) token.type = "whitespace"
                 this.tokens.push(token)
                 if (token.type !== "whitespace" && token.type !== "comment") this.no_comments.push(token.value);
             }
@@ -224,10 +224,10 @@ const Code_Manager = widgets.Code_Manager =
     }
 
 
-const Code_Widget = widgets.Code_Widget =
-    class Code_Widget {
-        // **Code_Widget** draws a code navigator panel with inline links to the entire program source code.
-        constructor(element, main_scene, additional_scenes, options = {}) {
+const CodeWidget = widgets.CodeWidget =
+    class CodeWidget {
+        // **CodeWidget** draws a code navigator panel with inline links to the entire program source code.
+        constructor(element, mainScene, additionalScenes, options = {}) {
             // TODO: Update color and board here
             const rules = [".code-widget .code-panel { margin:auto; background:white; overflow:auto; font-family:monospace; \
                 width:1058px; padding:10px; padding-bottom:40px; max-height: 500px; \
@@ -246,113 +246,113 @@ const Code_Widget = widgets.Code_Widget =
 
             this.associated_editor_widget = options.associated_editor;
 
-            if (!main_scene)
+            if (!mainScene)
                 return;
 
             import( '../main-scene.js' )
                 .then(module => {
-                    this.build_reader(element, main_scene, additional_scenes, module);
+                    this.buildReader(element, mainScene, additionalScenes, module);
                     if (!options.hide_navigator)
-                        this.build_navigator(element, main_scene, additional_scenes, module);
+                        this.buildNavigator(element, mainScene, additionalScenes, module);
                 })
         }
 
-        build_reader(element, main_scene, additional_scenes, definitions) {
+        buildReader(element, mainScene, additionalScenes, definitions) {
             // (Internal helper function)
             this.definitions = definitions;
-            const code_panel = element.appendChild(document.createElement("div"));
-            code_panel.className = "code-panel";
-            // const text        = code_panel.appendChild( document.createElement( "p" ) );
+            const codePanel = element.appendChild(document.createElement("div"));
+            codePanel.className = "code-panel";
+            // const text        = codePanel.appendChild( document.createElement( "p" ) );
             // text.textContent  = "Code for the above scene:";
-            this.code_display = code_panel.appendChild(document.createElement("div"));
+            this.code_display = codePanel.appendChild(document.createElement("div"));
             this.code_display.className = "code-display";
             // Default textbox contents:
-            this.display_code(main_scene);
+            this.displayCode(mainScene);
         }
 
-        build_navigator(element, main_scene, additional_scenes, definitions) {
+        buildNavigator(element, mainScene, additionalScenes, definitions) {
             // (Internal helper function)
-            const class_list = element.appendChild(document.createElement("table"));
-            class_list.className = "class-list";
-            const top_cell = class_list.insertRow(-1).insertCell(-1);
-            top_cell.colSpan = 2;
-            top_cell.appendChild(document.createTextNode("Click below to navigate through all classes that are defined."));
-            const content = top_cell.appendChild(document.createElement("p"));
+            const classList = element.appendChild(document.createElement("table"));
+            classList.className = "class-list";
+            const topCell = classList.insertRow(-1).insertCell(-1);
+            topCell.colSpan = 2;
+            topCell.appendChild(document.createTextNode("Click below to navigate through all classes that are defined."));
+            const content = topCell.appendChild(document.createElement("p"));
             content.style = "text-align:center; margin:0; font-weight:bold";
             content.innerHTML = "main-scene.js<br>Main Scene: ";
-            const main_scene_link = content.appendChild(document.createElement("a"));
-            main_scene_link.href = "javascript:void(0);"
-            main_scene_link.addEventListener('click', () => this.display_code(main_scene));
-            main_scene_link.textContent = main_scene.name;
+            const mainSceneLink = content.appendChild(document.createElement("a"));
+            mainSceneLink.href = "javascript:void(0);"
+            mainSceneLink.addEventListener('click', () => this.displayCode(mainScene));
+            mainSceneLink.textContent = mainScene.name;
 
-            const second_cell = class_list.insertRow(-1).insertCell(-1);
-            second_cell.colSpan = 2;
-            second_cell.style = "text-align:center; font-weight:bold";
-            const index_src_link = second_cell.appendChild(document.createElement("a"));
-            index_src_link.href = "javascript:void(0);"
-            index_src_link.addEventListener('click', () => this.display_code());
-            index_src_link.textContent = "This page's complete HTML source";
+            const secondCell = classList.insertRow(-1).insertCell(-1);
+            secondCell.colSpan = 2;
+            secondCell.style = "text-align:center; font-weight:bold";
+            const indexSrcLink = secondCell.appendChild(document.createElement("a"));
+            indexSrcLink.href = "javascript:void(0);"
+            indexSrcLink.addEventListener('click', () => this.displayCode());
+            indexSrcLink.textContent = "This page's complete HTML source";
 
-            const third_row = class_list.insertRow(-1);
-            third_row.style = "text-align:center";
-            third_row.innerHTML = "<td><b>TinyGraphics.js</b><br>(Always the same)</td> \
+            const thirdRow = classList.insertRow(-1);
+            thirdRow.style = "text-align:center";
+            thirdRow.innerHTML = "<td><b>TinyGraphics.js</b><br>(Always the same)</td> \
                              <td><b>All other class definitions from dependencies:</td>";
 
-            const fourth_row = class_list.insertRow(-1);
+            const fourthRow = classList.insertRow(-1);
             // Generate the navigator table of links:
             for (let list of [tiny, definitions]) {
-                const cell = fourth_row.appendChild(document.createElement("td"));
+                const cell = fourthRow.appendChild(document.createElement("td"));
                 // List all class names except the main one, which we'll display separately:
-                const class_names = Object.keys(list).filter(x => x != main_scene.name);
+                const classNames = Object.keys(list).filter(x => x !== mainScene.name);
                 cell.style = "white-space:normal";
-                for (let name of class_names) {
-                    const class_link = cell.appendChild(document.createElement("a"));
-                    class_link.style["margin-right"] = "80px";
-                    class_link.href = "javascript:void(0);";
-                    class_link.addEventListener('click', () => this.display_code(tiny[name] || definitions[name]));
-                    class_link.textContent = name;
+                for (let name of classNames) {
+                    const classLink = cell.appendChild(document.createElement("a"));
+                    classLink.style["margin-right"] = "80px";
+                    classLink.href = "javascript:void(0);";
+                    classLink.addEventListener('click', () => this.displayCode(tiny[name] || definitions[name]));
+                    classLink.textContent = name;
                     cell.appendChild(document.createTextNode(" "));
                 }
             }
         }
 
-        display_code(class_to_display) {
-            // display_code():  Populate the code textbox.
+        displayCode(classToDisplay) {
+            // displayCode():  Populate the code textbox.
             // Pass undefined to choose index.html source.
             if (this.associated_editor_widget)
-                this.associated_editor_widget.select_class(class_to_display);
-            if (class_to_display) this.format_code(class_to_display.toString());
+                this.associated_editor_widget.selectClass(classToDisplay);
+            if (classToDisplay) this.formatCode(classToDisplay.toString());
             else fetch(document.location.href)
                 .then(response => response.text())
-                .then(pageSource => this.format_code(pageSource));
+                .then(pageSource => this.formatCode(pageSource));
         }
 
-        format_code(code_string) {
+        formatCode(codeString) {
             // (Internal helper function)
             this.code_display.innerHTML = "";
-            const color_map = {
+            const colorMap = {
                 string: "chocolate", comment: "green", regex: "blue", number: "magenta",
                 name: "black", punctuator: "red", whitespace: "black"
             };
 
-            for (let t of new Code_Manager(code_string).tokens)
+            for (let t of new CodeManager(codeString).tokens)
                 if (t.type === "name" && [...Object.keys(tiny), ...Object.keys(this.definitions)].includes(t.value)) {
                     const link = this.code_display.appendChild(document.createElement('a'));
                     link.href = "javascript:void(0);"
-                    link.addEventListener('click', () => this.display_code(tiny[t.value] || this.definitions[t.value]));
+                    link.addEventListener('click', () => this.displayCode(tiny[t.value] || this.definitions[t.value]));
                     link.textContent = t.value;
                 } else {
                     const span = this.code_display.appendChild(document.createElement('span'));
-                    span.style.color = color_map[t.type];
+                    span.style.color = colorMap[t.type];
                     span.textContent = t.value;
                 }
         }
     }
 
 
-const Editor_Widget = widgets.Editor_Widget =
-    class Editor_Widget {
-        constructor(element, initially_selected_class, canvas_widget, options = {}) {
+const EditorWidget = widgets.EditorWidget =
+    class EditorWidget {
+        constructor(element, initiallySelectedClass, canvasWidget, options = {}) {
             let rules = [".editor-widget { margin:auto; background:white; overflow:auto; font-family:monospace; width:1060px; padding:10px; \
                                       border-radius:10px; box-shadow: 20px 20px 90px 0px powderblue inset, 5px 5px 30px 0px blue inset }",
                 ".editor-widget button { background: #4C9F50; color: white; padding: 6px; border-radius:10px; margin-right:5px; \
@@ -364,14 +364,14 @@ const Editor_Widget = widgets.Editor_Widget =
 
             for (const r of rules) document.styleSheets[0].insertRule(r, 1);
 
-            this.associated_canvas = canvas_widget;
+            this.associated_canvas = canvasWidget;
             this.options = options;
 
             const form = this.form = element.appendChild(document.createElement("form"));
             // Don't refresh the page on submit:
             form.addEventListener('submit', event => {
                 event.preventDefault();
-                this.submit_demo()
+                this.submitDemo()
             }, false);
 
             const explanation = form.appendChild(document.createElement("p"));
@@ -379,46 +379,46 @@ const Editor_Widget = widgets.Editor_Widget =
                 A JavaScript class, with any valid JavaScript inside.  Your code can use classes from this demo,
                 <br>or from ANY demo on Demopedia --  the dependencies will automatically be pulled in to run your demo!<br>`;
 
-            const run_button = this.run_button = form.appendChild(document.createElement("button"));
-            run_button.type = "button";
-            run_button.style = "background:maroon";
-            run_button.textContent = "Run with Changes";
+            const runButton = this.runButton = form.appendChild(document.createElement("button"));
+            runButton.type = "button";
+            runButton.style = "background:maroon";
+            runButton.textContent = "Run with Changes";
 
             const submit = this.submit = form.appendChild(document.createElement("button"));
             submit.type = "submit";
             submit.textContent = "Save as New Webpage";
 
-            const author_box = this.author_box = form.appendChild(document.createElement("input"));
-            author_box.name = "author";
-            author_box.type = "text";
-            author_box.placeholder = "Author name";
+            const authorBox = this.authorBox = form.appendChild(document.createElement("input"));
+            authorBox.name = "author";
+            authorBox.type = "text";
+            authorBox.placeholder = "Author name";
 
-            const password_box = this.password_box = form.appendChild(document.createElement("input"));
-            password_box.name = "password";
-            password_box.type = "text";
-            password_box.placeholder = "Password";
-            password_box.style = "display:none";
+            const passwordBox = this.passwordBox = form.appendChild(document.createElement("input"));
+            passwordBox.name = "password";
+            passwordBox.type = "text";
+            passwordBox.placeholder = "Password";
+            passwordBox.style = "display:none";
 
-            const overwrite_panel = this.overwrite_panel = form.appendChild(document.createElement("span"));
-            overwrite_panel.style = "display:none";
-            overwrite_panel.innerHTML = "<label>Overwrite?<input type='checkbox' name='overwrite' autocomplete='off'></label>";
+            const overwritePanel = this.overwritePanel = form.appendChild(document.createElement("span"));
+            overwritePanel.style = "display:none";
+            overwritePanel.innerHTML = "<label>Overwrite?<input type='checkbox' name='overwrite' autocomplete='off'></label>";
 
-            const submit_result = this.submit_result = form.appendChild(document.createElement("div"));
-            submit_result.style = "margin: 10px 0";
+            const submitResult = this.submitResult = form.appendChild(document.createElement("div"));
+            submitResult.style = "margin: 10px 0";
 
-            const new_demo_code = this.new_demo_code = form.appendChild(document.createElement("textarea"));
-            new_demo_code.name = "new_demo_code";
-            new_demo_code.rows = this.options.rows || 25;
-            new_demo_code.cols = 140;
-            if (initially_selected_class)
-                this.select_class(initially_selected_class);
+            const newDemoCode = this.newDemoCode = form.appendChild(document.createElement("textarea"));
+            newDemoCode.name = "newDemoCode";
+            newDemoCode.rows = this.options.rows || 25;
+            newDemoCode.cols = 140;
+            if (initiallySelectedClass)
+                this.selectClass(initiallySelectedClass);
         }
 
-        select_class(class_definition) {
-            this.new_demo_code.value = class_definition.toString();
+        selectClass(classDefinition) {
+            this.newDemoCode.value = classDefinition.toString();
         }
 
-        fetch_handler(url, body) {
+        fetchHandler(url, body) {
             // A general utility function for sending / receiving JSON, with error handling.
             return fetch(url,
                 {
@@ -430,32 +430,32 @@ const Editor_Widget = widgets.Editor_Widget =
             })
         }
 
-        submit_demo() {
+        submitDemo() {
             const form_fields = Array.from(this.form.elements).reduce((accum, elem) => {
                 if (elem.value && !(['checkbox', 'radio'].includes(elem.type) && !elem.checked))
                     accum[elem.name] = elem.value;
                 return accum;
             }, {});
 
-            this.submit_result.innerHTML = "";
-            return this.fetch_handler("/submit-demo?Unapproved", JSON.stringify(form_fields))
+            this.submitResult.innerHTML = "";
+            return this.fetchHandler("/submit-demo?Unapproved", JSON.stringify(form_fields))
                 .then(response => {
-                    if (response.show_password) this.password_box.style.display = "inline";
-                    if (response.show_overwrite) this.overwrite_panel.style.display = "inline";
-                    this.submit_result.innerHTML += response.message + "<br>";
+                    if (response.show_password) this.passwordBox.style.display = "inline";
+                    if (response.show_overwrite) this.overwritePanel.style.display = "inline";
+                    this.submitResult.innerHTML += response.message + "<br>";
                 })
                 .catch(error => {
-                    this.submit_result.innerHTML += "Error " + error + " when trying to upload.<br>"
+                    this.submitResult.innerHTML += "Error " + error + " when trying to upload.<br>"
                 })
         }
     }
 
 
-const Text_Widget = widgets.Text_Widget =
-    class Text_Widget {
-        // **Text_Widget** generates HTML documentation and fills a panel with it.  This
+const TextWidget = widgets.TextWidget =
+    class TextWidget {
+        // **TextWidget** generates HTML documentation and fills a panel with it.  This
         // documentation is extracted from whichever Scene object gets loaded first.
-        constructor(element, scenes, webgl_manager) {
+        constructor(element, scenes, webglManager) {
             const rules = [".text-widget { background: white; width:1060px;\
                              padding:0 10px; overflow:auto; transition:1s; \
                              overflow-y:scroll; box-shadow: 10px 10px 90px 0 inset LightGray}",
@@ -464,13 +464,13 @@ const Text_Widget = widgets.Text_Widget =
             if (document.styleSheets.length === 0) document.head.appendChild(document.createElement("style"));
             for (const r of rules) document.styleSheets[document.styleSheets.length - 1].insertRule(r, 0)
 
-            Object.assign(this, {element, scenes, webgl_manager});
+            Object.assign(this, {element, scenes, webglManager});
             this.render();
         }
 
         render(time = 0) {
             if (this.scenes[0])
-                this.scenes[0].show_explanation(this.element, this.webgl_manager)
+                this.scenes[0].showExplanation(this.element, this.webglManager);
             else
                 this.event = window.requestAnimFrame(this.render.bind(this))
         }

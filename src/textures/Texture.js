@@ -20,17 +20,17 @@ class Texture extends GraphicsCardObject {
         // texture image onto one of your GPU contexts for its first time.
 
         // Define what this object should store in each new WebGL Context:
-        const initial_gpu_representation = {texture_buffer_pointer: undefined};
+        const initialGpuRepresentation = {texture_buffer_pointer: undefined};
         // Our object might need to register to multiple GPU contexts in the case of
         // multiple drawing areas.  If this is a new GPU context for this object,
         // copy the object to the GPU.  Otherwise, this object already has been
         // copied over, so get a pointer to the existing instance.
-        const gpu_instance = super.copyOntoGraphicsCard(context, initial_gpu_representation);
+        const gpuInstance = super.copyOntoGraphicsCard(context, initialGpuRepresentation);
 
-        if (!gpu_instance.texture_buffer_pointer) gpu_instance.texture_buffer_pointer = context.createTexture();
+        if (!gpuInstance.texture_buffer_pointer) gpuInstance.texture_buffer_pointer = context.createTexture();
 
         const gl = context;
-        gl.bindTexture(gl.TEXTURE_2D, gpu_instance.texture_buffer_pointer);
+        gl.bindTexture(gl.TEXTURE_2D, gpuInstance.texture_buffer_pointer);
 
         if (need_initial_settings) {
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -46,7 +46,7 @@ class Texture extends GraphicsCardObject {
             gl.generateMipmap(gl.TEXTURE_2D);
         // If the user picked tri-linear sampling (the default) then generate
         // the necessary "mips" of the texture and store them on the GPU with it.
-        return gpu_instance;
+        return gpuInstance;
     }
 
     activate(context, texture_unit = 0) {
@@ -55,9 +55,9 @@ class Texture extends GraphicsCardObject {
         // Terminate draw requests until the image file is actually loaded over the network:
         if (!this.ready)
             return;
-        const gpu_instance = super.activate(context);
+        const gpuInstance = super.activate(context);
         context.activeTexture(context["TEXTURE" + texture_unit]);
-        context.bindTexture(context.TEXTURE_2D, gpu_instance.texture_buffer_pointer);
+        context.bindTexture(context.TEXTURE_2D, gpuInstance.texture_buffer_pointer);
     }
 }
 

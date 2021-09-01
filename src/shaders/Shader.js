@@ -7,7 +7,7 @@ import {GraphicsAddresses, GraphicsCardObject} from "../utils.js";
  * every shape that is drawn onscreen.
  *
  * Extend the class and fill in the abstract functions, some of which define GLSL strings, and others
- * (update_GPU) which define the extra custom JavaScript code needed to populate your particular shader
+ * (updateGPU) which define the extra custom JavaScript code needed to populate your particular shader
  * program with all the data values it is expecting, such as matrices.  The shader pulls these values
  * from two places in your JavaScript:  A Material object, for values pertaining to the current shape
  * only, and a ProgramState object, for values pertaining to your entire Scene or program.
@@ -21,29 +21,29 @@ class Shader extends GraphicsCardObject {
      */
     copyOntoGraphicsCard(context) {
         // Define what this object should store in each new WebGL Context:
-        const initial_gpu_representation = {
-            program: undefined, gpu_addresses: undefined,
+        const initialGpuRepresentation = {
+            program: undefined, gpuAddresses: undefined,
             vertShdr: undefined, fragShdr: undefined
         };
         // Our object might need to register to multiple GPU contexts in the case of
         // multiple drawing areas.  If this is a new GPU context for this object,
         // copy the object to the GPU.  Otherwise, this object already has been
         // copied over, so get a pointer to the existing instance.
-        const gpu_instance = super.copyOntoGraphicsCard(context, initial_gpu_representation);
+        const gpuInstance = super.copyOntoGraphicsCard(context, initialGpuRepresentation);
 
         const gl = context;
-        const program = gpu_instance.program || context.createProgram();
-        const vertShdr = gpu_instance.vertShdr || gl.createShader(gl.VERTEX_SHADER);
-        const fragShdr = gpu_instance.fragShdr || gl.createShader(gl.FRAGMENT_SHADER);
+        const program = gpuInstance.program || context.createProgram();
+        const vertShdr = gpuInstance.vertShdr || gl.createShader(gl.VERTEX_SHADER);
+        const fragShdr = gpuInstance.fragShdr || gl.createShader(gl.FRAGMENT_SHADER);
 
-        if (gpu_instance.vertShdr) gl.detachShader(program, vertShdr);
-        if (gpu_instance.fragShdr) gl.detachShader(program, fragShdr);
-        gl.shaderSource(vertShdr, this.vertex_glsl_code());
+        if (gpuInstance.vertShdr) gl.detachShader(program, vertShdr);
+        if (gpuInstance.fragShdr) gl.detachShader(program, fragShdr);
+        gl.shaderSource(vertShdr, this.vertexGlslCode());
         gl.compileShader(vertShdr);
         if (!gl.getShaderParameter(vertShdr, gl.COMPILE_STATUS))
             throw "Vertex shader compile error: " + gl.getShaderInfoLog(vertShdr);
 
-        gl.shaderSource(fragShdr, this.fragment_glsl_code());
+        gl.shaderSource(fragShdr, this.fragmentGlslCode());
         gl.compileShader(fragShdr);
         if (!gl.getShaderParameter(fragShdr, gl.COMPILE_STATUS))
             throw "Fragment shader compile error: " + gl.getShaderInfoLog(fragShdr);
@@ -54,39 +54,39 @@ class Shader extends GraphicsCardObject {
         if (!gl.getProgramParameter(program, gl.LINK_STATUS))
             throw "Shader linker error: " + gl.getProgramInfoLog(this.program);
 
-        Object.assign(gpu_instance, {
+        Object.assign(gpuInstance, {
             program,
             vertShdr,
             fragShdr,
-            gpu_addresses: new GraphicsAddresses(program, gl)
+            gpuAddresses: new GraphicsAddresses(program, gl)
         });
-        return gpu_instance;
+        return gpuInstance;
     }
 
     /**
      * Selects this Shader in GPU memory so the next shape draws using it.
      * @param context
-     * @param buffer_pointers
-     * @param program_state
+     * @param bufferPointers
+     * @param programState
      * @param model_transform
      * @param material
      */
-    activate(context, buffer_pointers, program_state, model_transform, material) {
-        const gpu_instance = super.activate(context);
+    activate(context, bufferPointers, programState, model_transform, material) {
+        const gpuInstance = super.activate(context);
 
-        context.useProgram(gpu_instance.program);
+        context.useProgram(gpuInstance.program);
 
         // --- Send over all the values needed by this particular shader to the GPU: ---
-        this.update_GPU(context, gpu_instance.gpu_addresses, program_state, model_transform, material);
+        this.updateGPU(context, gpuInstance.gpuAddresses, programState, model_transform, material);
 
         // --- Turn on all the correct attributes and make sure they're pointing to the correct ranges in GPU memory. ---
-        for (let [attr_name, attribute] of Object.entries(gpu_instance.gpu_addresses.shader_attributes)) {
+        for (let [attrName, attribute] of Object.entries(gpuInstance.gpuAddresses.shader_attributes)) {
             if (!attribute.enabled) {
                 if (attribute.index >= 0) context.disableVertexAttribArray(attribute.index);
                 continue;
             }
             context.enableVertexAttribArray(attribute.index);
-            context.bindBuffer(context.ARRAY_BUFFER, buffer_pointers[attr_name]);
+            context.bindBuffer(context.ARRAY_BUFFER, bufferPointers[attrName]);
             // Activate the correct buffer.
             context.vertexAttribPointer(attribute.index, attribute.size, attribute.type,
                 attribute.normalized, attribute.stride, attribute.pointer);
@@ -106,17 +106,17 @@ class Shader extends GraphicsCardObject {
 
 
     // Your custom Shader has to override the following functions:
-    vertex_glsl_code() {
+    vertexGlslCode() {
     }
 
-    fragment_glsl_code() {
+    fragmentGlslCode() {
     }
 
-    update_GPU() {
+    updateGPU() {
     }
 
     // *** How those four functions work (and how GPU shader programs work in general):
-    // vertex_glsl_code() and fragment_glsl_code() should each return strings that contain
+    // vertexGlslCode() and fragmentGlslCode() should each return strings that contain
     // code for a custom vertex shader and fragment shader, respectively.
 
     // The "Vertex Shader" is code that is sent to the graphics card at runtime, where on each
@@ -153,7 +153,7 @@ class Shader extends GraphicsCardObject {
     // new triangle is closer to the camera, and even if so, blending settings may interpolate some
     // of the old color into the result.  Finally, an image is displayed onscreen.
 
-    // You must define an update_GPU() function that includes the extra custom JavaScript code
+    // You must define an updateGPU() function that includes the extra custom JavaScript code
     // needed to populate your particular shader program with all the data values it is expecting.
 }
 

@@ -1,11 +1,11 @@
 export default /* glsl */ `
 precision mediump float;
 
-uniform float animation_time;
+uniform float animationTime;
 varying vec2 f_tex_coord;
 
 void main(){
-    float a = animation_time, u = f_tex_coord.x, v = f_tex_coord.y;
+    float a = animationTime, u = f_tex_coord.x, v = f_tex_coord.y;
     // Use an arbitrary math function to color in all pixels as a complex
     gl_FragColor = vec4(
     // function of the UV texture coordintaes of the pixel and of time.

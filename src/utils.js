@@ -7,7 +7,7 @@ import {Mat4, Matrix} from "./math/Matrix.js";
 
 class GraphicsCardObject {
     constructor() {
-        this.gpu_instances = new Map()
+        this.gpu_instances = new Map();
     }
 
     /**
@@ -20,17 +20,17 @@ class GraphicsCardObject {
      * GPU.  GPU-bound objects should override this function, which builds an
      * initial instance, so as to populate it with finished pointers.
      * @param context GPU contexts this object has copied itself onto.
-     * @param initial_gpu_representation
+     * @param initialGpuRepresentation
      * @returns {any}
      */
-    copyOntoGraphicsCard(context, initial_gpu_representation) {
-        const existing_instance = this.gpu_instances.get(context);
+    copyOntoGraphicsCard(context, initialGpuRepresentation) {
+        const existingInstance = this.gpu_instances.get(context);
         // Warn the user if they are avoidably making too many GPU objects.  Beginner
         // WebGL programs typically only need to call copyOntoGraphicsCard once
         // per object; doing it more is expensive, so warn them with an "idiot
         // alarm". Don't trigger the idiot alarm if the user is correctly re-using
         // an existing GPU context and merely overwriting parts of itself.
-        if (!existing_instance) {
+        if (!existingInstance) {
             GraphicsCardObject.idiot_alarm |= 0;     // Start a program-wide counter.
             if (GraphicsCardObject.idiot_alarm++ > 200)
                 throw `Error: You are sending a lot of object definitions to the GPU, probably by mistake!  
@@ -45,7 +45,7 @@ class GraphicsCardObject {
         }
         // Check if this object already exists on that GPU context.
         // If necessary, start a new object associated with the context.
-        return existing_instance || this.gpu_instances.set(context, initial_gpu_representation).get(context);
+        return existingInstance || this.gpu_instances.set(context, initialGpuRepresentation).get(context);
     }
 
     /**
@@ -57,7 +57,7 @@ class GraphicsCardObject {
      * @returns {any}
      */
     activate(context, ...args) {
-        return this.gpu_instances.get(context) || this.copyOntoGraphicsCard(context, ...args)
+        return this.gpu_instances.get(context) || this.copyOntoGraphicsCard(context, ...args);
     }
 }
 
@@ -73,13 +73,13 @@ class GraphicsCardObject {
  * triangles, expressed as triples of vertex indices.
  */
 class VertexBuffer extends GraphicsCardObject {
-    constructor(...array_names) {
+    constructor(...arrayNames) {
         // This superclass constructor expects a list of names of arrays that you plan for.
         super();
         this.arrays = {};
         this.indices = [];
         // Initialize a blank array member of the Shape with each of the names provided:
-        for (let name of array_names) this.arrays[name] = [];
+        for (let name of arrayNames) this.arrays[name] = [];
     }
 
     /**
@@ -89,51 +89,51 @@ class VertexBuffer extends GraphicsCardObject {
      * allow calling this again to overwrite the GPU buffers related to this shape's arrays, or
      * subsets of them as needed (if only some fields of your shape have changed).
      * @param context
-     * @param selection_of_arrays
-     * @param write_to_indices
+     * @param selectionOfArrays
+     * @param writeToIndices
      * @returns {*}
      */
-    copyOntoGraphicsCard(context, selection_of_arrays = Object.keys(this.arrays), write_to_indices = true) {
+    copyOntoGraphicsCard(context, selectionOfArrays = Object.keys(this.arrays), writeToIndices = true) {
         // Define what this object should store in each new WebGL Context:
-        const initial_gpu_representation = {webGL_buffer_pointers: {}};
+        const initialGpuRepresentation = {webGL_buffer_pointers: {}};
         // Our object might need to register to multiple GPU contexts in the case of
         // multiple drawing areas.  If this is a new GPU context for this object,
         // copy the object to the GPU.  Otherwise, this object already has been
         // copied over, so get a pointer to the existing instance.
-        const did_exist = this.gpu_instances.get(context);
-        const gpu_instance = super.copyOntoGraphicsCard(context, initial_gpu_representation);
+        const didExist = this.gpu_instances.get(context);
+        const gpuInstance = super.copyOntoGraphicsCard(context, initialGpuRepresentation);
 
         const gl = context;
 
-        const write = did_exist ? (target, data) => gl.bufferSubData(target, 0, data)
+        const write = didExist ? (target, data) => gl.bufferSubData(target, 0, data)
             : (target, data) => gl.bufferData(target, data, gl.STATIC_DRAW);
 
-        for (let name of selection_of_arrays) {
-            if (!did_exist)
-                gpu_instance.webGL_buffer_pointers[name] = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, gpu_instance.webGL_buffer_pointers[name]);
+        for (let name of selectionOfArrays) {
+            if (!didExist)
+                gpuInstance.webGL_buffer_pointers[name] = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, gpuInstance.webGL_buffer_pointers[name]);
             write(gl.ARRAY_BUFFER, Matrix.flatten_2D_to_1D(this.arrays[name]));
         }
-        if (this.indices.length && write_to_indices) {
-            if (!did_exist)
-                gpu_instance.index_buffer = gl.createBuffer();
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gpu_instance.index_buffer);
+        if (this.indices.length && writeToIndices) {
+            if (!didExist)
+                gpuInstance.index_buffer = gl.createBuffer();
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gpuInstance.index_buffer);
             write(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(this.indices));
         }
-        return gpu_instance;
+        return gpuInstance;
     }
 
     /**
      * Draws this shape's entire vertex buffer.
      * @param gl
-     * @param gpu_instance
+     * @param gpuInstance
      * @param type
      */
-    executeShaders(gl, gpu_instance, type) {
+    executeShaders(gl, gpuInstance, type) {
         // Draw shapes using indices if they exist.  Otherwise, assume the vertices are arranged as triples.
         if (this.indices.length) {
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gpu_instance.index_buffer);
-            gl.drawElements(gl[type], this.indices.length, gl.UNSIGNED_INT, 0)
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gpuInstance.index_buffer);
+            gl.drawElements(gl[type], this.indices.length, gl.UNSIGNED_INT, 0);
         } else gl.drawArrays(gl[type], 0, Object.values(this.arrays)[0].length);
     }
 
@@ -141,17 +141,17 @@ class VertexBuffer extends GraphicsCardObject {
      * To appear onscreen, a shape of any variety goes through this function,
      * which executes the shader programs.  The shaders draw the right shape due to
      * pre-selecting the correct buffer region in the GPU that holds that shape's data.
-     * @param webgl_manager
-     * @param program_state
+     * @param webglManager
+     * @param programState
      * @param model_transform
      * @param material
      * @param type
      */
-    draw(webgl_manager, program_state, model_transform, material, type = "TRIANGLES") {
-        const gpu_instance = this.activate(webgl_manager.context);
-        material.shader.activate(webgl_manager.context, gpu_instance.webGL_buffer_pointers, program_state, model_transform, material);
+    draw(webglManager, programState, model_transform, material, type = "TRIANGLES") {
+        const gpuInstance = this.activate(webglManager.context);
+        material.shader.activate(webglManager.context, gpuInstance.webGL_buffer_pointers, programState, model_transform, material);
         // Run the shaders to draw every triangle now:
-        this.executeShaders(webgl_manager.context, gpu_instance, type);
+        this.executeShaders(webglManager.context, gpuInstance, type);
     }
 }
 
@@ -163,8 +163,8 @@ class VertexBuffer extends GraphicsCardObject {
  */
 class GraphicsAddresses {
     constructor(program, gl) {
-        const num_uniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
-        for (let i = 0; i < num_uniforms; ++i) {
+        const numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+        for (let i = 0; i < numUniforms; ++i) {
             // Retrieve the GPU addresses of each uniform variable in the shader
             // based on their names, and store these pointers for later.
             let u = gl.getActiveUniform(program, i).name.split('[')[0];
@@ -173,7 +173,7 @@ class GraphicsAddresses {
 
         this.shader_attributes = {};
         // Assume per-vertex attributes will each be a set of 1 to 4 floats:
-        const type_to_size_mapping = {0x1406: 1, 0x8B50: 2, 0x8B51: 3, 0x8B52: 4};
+        const typeToSizeMapping = {0x1406: 1, 0x8B50: 2, 0x8B51: 3, 0x8B52: 4};
         const numAttribs = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
         for (let i = 0; i < numAttribs; i++) {
             // https://github.com/greggman/twgl.js/blob/master/dist/twgl-full.js for another example:
@@ -181,9 +181,9 @@ class GraphicsAddresses {
             // Pointers to all shader attribute variables:
             this.shader_attributes[attribInfo.name] = {
                 index: gl.getAttribLocation(program, attribInfo.name),
-                size: type_to_size_mapping[attribInfo.type],
+                size: typeToSizeMapping[attribInfo.type],
                 enabled: true, type: gl.FLOAT,
-                normalized: false, stride: 0, pointer: 0
+                normalized: false, stride: 0, pointer: 0,
             };
         }
     }
@@ -204,7 +204,7 @@ class Container {
      * @returns {(*)|*}
      */
     override(replacement) {
-        return this.helper(replacement, Object.create(this.constructor.prototype))
+        return this.helper(replacement, Object.create(this.constructor.prototype));
     }
 
     /**
@@ -213,7 +213,7 @@ class Container {
      * @returns {(*)|*}
      */
     replace(replacement) {
-        return this.helper(replacement, this)
+        return this.helper(replacement, this);
     }
 
     /**
@@ -228,9 +228,10 @@ class Container {
         if (replacement.constructor === Object)
             return Object.assign(target, replacement);
         // Otherwise we'll try to guess the key to override by type:
-        const matching_keys_by_type = Object.entries(this).filter(([key, value]) => replacement instanceof value.constructor);
-        if (!matching_keys_by_type[0]) throw "Container: Can't figure out which value you're trying to replace; nothing matched by type.";
-        return Object.assign(target, {[matching_keys_by_type[0][0]]: replacement});
+        const matchingKeysByType = Object.entries(this).filter(([key, value
+                                                                ]) => replacement instanceof value.constructor);
+        if (!matchingKeysByType[0]) throw "Container: Can't figure out which value you're trying to replace; nothing matched by type.";
+        return Object.assign(target, {[matchingKeysByType[0][0]]: replacement});
     }
 }
 
@@ -238,14 +239,14 @@ class Container {
  * **ProgramState** stores any values that affect how your whole scene is drawn,
  * such as its current lights and the camera position.  Class Shader uses whatever
  * values are wrapped here as inputs to your custom shader program.  Your Shader
- * subclass must override its method "update_GPU()" to define how to send your
+ * subclass must override its method "updateGPU()" to define how to send your
  * ProgramState's particular values over to your custom shader program.
  */
 class ProgramState extends Container {
-    constructor(camera_transform = Mat4.identity(), projection_transform = Mat4.identity()) {
+    constructor(cameraTransform = Mat4.identity(), projectionTransform = Mat4.identity()) {
         super();
-        this.set_camera(camera_transform);
-        const defaults = {projection_transform, animate: true, animation_time: 0, animation_delta_time: 0};
+        this.setCamera(cameraTransform);
+        const defaults = {projectionTransform, animate: true, animationTime: 0, animationDeltaTime: 0};
         Object.assign(this, defaults);
     }
 
@@ -257,8 +258,8 @@ class ProgramState extends Container {
      * so that's the one this function expects to receive; it automatically sets the other.
      * @param matrix
      */
-    set_camera(matrix) {
-        Object.assign(this, {camera_transform: Mat4.inverse(matrix), camera_inverse: matrix})
+    setCamera(matrix) {
+        Object.assign(this, {cameraTransform: Mat4.inverse(matrix), camera_inverse: matrix});
     }
 }
 
@@ -267,14 +268,14 @@ class ProgramState extends Container {
  * textures, shapes, shaders, and scenes.  It requests a WebGL context and stores Scenes.
  */
 class WebglManager {
-    constructor(canvas, background_color, dimensions) {
+    constructor(canvas, backgroundColor, dimensions) {
         const members = {
             instances: new Map(),
             scenes: [],
             prev_time: 0,
             canvas,
             scratchpad: {},
-            program_state: new ProgramState()
+            programState: new ProgramState(),
         };
         Object.assign(this, members);
         // Get the GPU ready, creating a new WebGL context for this canvas:
@@ -287,7 +288,7 @@ class WebglManager {
 
         this.setSize(dimensions);
 
-        gl.clearColor.apply(gl, background_color);           // Tell the GPU which color to clear the canvas with each frame.
+        gl.clearColor.apply(gl, backgroundColor);           // Tell the GPU which color to clear the canvas with each frame.
         gl.getExtension("OES_element_index_uint");           // Load an extension to allow shapes with more than 65535 vertices.
         gl.enable(gl.DEPTH_TEST);                            // Enable Z-Buffering test.
         // Specify an interpolation method for blending "transparent" triangles over the existing pixels:
@@ -323,20 +324,20 @@ class WebglManager {
     render(time = 0) {
         // render(): Draw a single frame of animation, using all loaded Scene objects.  Measure
         // how much real time has transpired in order to animate shapes' movements accordingly.
-        this.program_state.animation_delta_time = time - this.prev_time;
-        if (this.program_state.animate) this.program_state.animation_time += this.program_state.animation_delta_time;
+        this.programState.animationDeltaTime = time - this.prev_time;
+        if (this.programState.animate) this.programState.animationTime += this.programState.animationDeltaTime;
         this.prev_time = time;
 
         const gl = this.context;
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         // Clear the canvas's pixels and z-buffer.
 
-        const open_list = [...this.scenes];
-        while (open_list.length) {
+        const openList = [...this.scenes];
+        while (openList.length) {
             // Traverse all Scenes and their children, recursively.
-            open_list.push(...open_list[0].children);
+            openList.push(...openList[0].children);
             // Call display() to draw each registered animation:
-            open_list.shift().display(this, this.program_state);
+            openList.shift().display(this, this.programState);
         }
         // Now that this frame is drawn, request that render() happen
         // again as soon as all other web page events are processed:
@@ -344,4 +345,4 @@ class WebglManager {
     }
 }
 
-export {GraphicsCardObject, VertexBuffer, GraphicsAddresses, Container, ProgramState, WebglManager}
+export {GraphicsCardObject, VertexBuffer, GraphicsAddresses, Container, ProgramState, WebglManager};

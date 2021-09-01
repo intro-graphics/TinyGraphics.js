@@ -46,41 +46,41 @@ export class Many_Lights_Demo extends Scene {
     /**
      * Draw each frame to animate the scene.
      * @param context
-     * @param program_state
+     * @param programState
      */
-    display(context, program_state) {
-        program_state.set_camera(Mat4.look_at(vec3(this.rows / 2, 5, 5), vec3(this.rows / 2, 0, -4), vec3(0, 1, 0)));
-        program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 500);
+    display(context, programState) {
+        programState.setCamera(Mat4.look_at(vec3(this.rows / 2, 5, 5), vec3(this.rows / 2, 0, -4), vec3(0, 1, 0)));
+        programState.projectionTransform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 500);
 
         // To draw each individual box, select the two lights sharing
         // a row and column with it, and draw using those.
         this.box_positions.forEach((p, i, a) => {
-            program_state.lights = [new Light(this.row_lights   [~~p[2]].to4(1), color(p[2] % 1, 1, 1, 1), 9),
+            programState.lights = [new Light(this.row_lights   [~~p[2]].to4(1), color(p[2] % 1, 1, 1, 1), 9),
                 new Light(this.column_lights[~~p[0]].to4(1), color(1, 1, p[0] % 1, 1), 9)];
             // Draw the box:
-            this.shapes.cube.draw(context, program_state, Mat4.translation(...p).times(Mat4.scale(.3, 1, .3)), this.brick)
+            this.shapes.cube.draw(context, programState, Mat4.translation(...p).times(Mat4.scale(.3, 1, .3)), this.brick);
         });
-        if (!program_state.animate || program_state.animation_delta_time > 500)
+        if (!programState.animate || programState.animationDeltaTime > 500)
             return;
         // Move some lights forward along columns, then bound them to a range.
         for (const [key, val] of Object.entries(this.column_lights)) {
-            this.column_lights[key][2] -= program_state.animation_delta_time / 50;
+            this.column_lights[key][2] -= programState.animationDeltaTime / 50;
             this.column_lights[key][2] %= this.columns * 2;
         }
         // Move other lights forward along rows, then bound them to a range.
         for (const [key, val] of Object.entries(this.row_lights)) {
-            this.row_lights[key][0] += program_state.animation_delta_time / 50;
+            this.row_lights[key][0] += programState.animationDeltaTime / 50;
             this.row_lights[key][0] %= this.rows * 2;
         }
         // Move the boxes backwards, then bound them to a range.
         this.box_positions.forEach((p, i, a) => {
-            a[i] = p.plus(vec3(0, 0, program_state.animation_delta_time / 1000));
+            a[i] = p.plus(vec3(0, 0, programState.animationDeltaTime / 1000));
             if (a[i][2] > 1) a[i][2] = -this.columns + .001;
         });
     }
 
-    show_explanation(document_element) {
-        document_element.innerHTML += `<p>This demo shows how to make the illusion that there are many lights, despite the shader only being aware of two. The shader used here (class Phong_Shader) is told to take only two lights into account when coloring in a shape. This has the benefit of fewer lights that have to be looped through in the fragment shader, which has to run hundreds of thousands of times.
+    showExplanation(documentElement) {
+        documentElement.innerHTML += `<p>This demo shows how to make the illusion that there are many lights, despite the shader only being aware of two. The shader used here (class Phong_Shader) is told to take only two lights into account when coloring in a shape. This has the benefit of fewer lights that have to be looped through in the fragment shader, which has to run hundreds of thousands of times.
 
     </p><p>You can get away with seemingly having more lights in your overall scene by having the lights only affect certain shapes, such that only two are influencing any given shape at a time.   We re-locate the lights in between individual shape draws. For this to look right, it helps for shapes to be aware of which lights are nearby versus which are too far away or too small for their effects to matter, so the best pair can be chosen.
 

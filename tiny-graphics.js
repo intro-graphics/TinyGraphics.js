@@ -456,7 +456,7 @@
 //         //  "M.times(b)" (where the post-multiplied b can be a scalar, a Vector4, or another Matrix) returns a
 //         //               new Matrix or Vector4 holding the product.
 //         //  "M.pre_multiply(b)"  overwrites the Matrix M with the product of b * M where b must be another Matrix.
-//         //  "M.post_multiply(b)" overwrites the Matrix M with the product of M * b where b can be a Matrix or scalar.
+//         //  "M.postMultiply(b)" overwrites the Matrix M with the product of M * b where b can be a Matrix or scalar.
 //         //  "Matrix.flatten_2D_to_1D( M )" flattens input (a Matrix or any array of Vectors or float arrays)
 //         //                                 into a row-major 1D array of raw floats.
 //         //  "M.to_string()" where M contains the 4x4 identity returns "[[1, 0, 0, 0] [0, 1, 0, 0] [0, 0, 1, 0] [0, 0, 0, 1]]".
@@ -541,7 +541,7 @@
 //             return this;
 //         }
 //
-//         post_multiply(b) {
+//         postMultiply(b) {
 //             const new_value = this.times(b);
 //             this.length = 0;
 //             this.push(...new_value);
@@ -660,19 +660,19 @@
 //     }
 
 
-// const Keyboard_Manager = tiny.Keyboard_Manager =
-    // class Keyboard_Manager {
-    //     // **Keyboard_Manager** maintains a running list of which keys are depressed.  You can map combinations of
+// const KeyboardManager = tiny.KeyboardManager =
+    // class KeyboardManager {
+    //     // **KeyboardManager** maintains a running list of which keys are depressed.  You can map combinations of
     //     // shortcut keys to trigger callbacks you provide by calling add().  See add()'s arguments.  The shortcut
     //     // list is indexed by convenient strings showing each bound shortcut combination.  The constructor
     //     // optionally takes "target", which is the desired DOM element for keys to be pressed inside of, and
-    //     // "callback_behavior", which will be called for every key action and allows extra behavior on each event
+    //     // "callbackBehavior", which will be called for every key action and allows extra behavior on each event
     //     // -- giving an opportunity to customize their bubbling, preventDefault, and more.  It defaults to no
     //     // additional behavior besides the callback itself on each assigned key action.
-    //     constructor(target = document, callback_behavior = (callback, event) => callback(event)) {
+    //     constructor(target = document, callbackBehavior = (callback, event) => callback(event)) {
     //         this.saved_controls = {};
     //         this.actively_pressed_keys = new Set();
-    //         this.callback_behavior = callback_behavior;
+    //         this.callbackBehavior = callbackBehavior;
     //         target.addEventListener("keydown", this.key_down_handler.bind(this));
     //         target.addEventListener("keyup", this.key_up_handler.bind(this));
     //         window.addEventListener("focus", () => this.actively_pressed_keys.clear());
@@ -687,13 +687,13 @@
     //         // Track the pressed key.
     //         for (let saved of Object.values(this.saved_controls)) {
     //             // Re-check all the keydown handlers.
-    //             if (saved.shortcut_combination.every(s => this.actively_pressed_keys.has(s))
-    //                 && event.ctrlKey == saved.shortcut_combination.includes("Control")
-    //                 && event.shiftKey == saved.shortcut_combination.includes("Shift")
-    //                 && event.altKey == saved.shortcut_combination.includes("Alt")
-    //                 && event.metaKey == saved.shortcut_combination.includes("Meta"))
+    //             if (saved.shortcutCombination.every(s => this.actively_pressed_keys.has(s))
+    //                 && event.ctrlKey == saved.shortcutCombination.includes("Control")
+    //                 && event.shiftKey == saved.shortcutCombination.includes("Shift")
+    //                 && event.altKey == saved.shortcutCombination.includes("Alt")
+    //                 && event.metaKey == saved.shortcutCombination.includes("Meta"))
     //                 // Modifiers must exactly match.
-    //                 this.callback_behavior(saved.callback, event);
+    //                 this.callbackBehavior(saved.callback, event);
     //             // The keys match, so fire the callback.
     //         }
     //     }
@@ -706,17 +706,17 @@
     //             lower_symbols[upper_symbols.indexOf(event.key)]];
     //         // Call keyup for any shortcuts
     //         for (let saved of Object.values(this.saved_controls))                          // that depended on the released
-    //             if (lifted_key_symbols.some(s => saved.shortcut_combination.includes(s)))  // key or its shift-key counterparts.
-    //                 this.callback_behavior(saved.keyup_callback, event);                  // The keys match, so fire the callback.
+    //             if (lifted_key_symbols.some(s => saved.shortcutCombination.includes(s)))  // key or its shift-key counterparts.
+    //                 this.callbackBehavior(saved.keyup_callback, event);                  // The keys match, so fire the callback.
     //         lifted_key_symbols.forEach(k => this.actively_pressed_keys.delete(k));
     //     }
     //
-    //     add(shortcut_combination, callback = () => {
+    //     add(shortcutCombination, callback = () => {
     //     }, keyup_callback = () => {
-    //     }) {                                 // add(): Creates a keyboard operation.  The argument shortcut_combination wants an
+    //     }) {                                 // add(): Creates a keyboard operation.  The argument shortcutCombination wants an
     //         // array of strings that follow standard KeyboardEvent key names. Both the keyup
     //         // and keydown callbacks for any key combo are optional.
-    //         this.saved_controls[shortcut_combination.join('+')] = {shortcut_combination, callback, keyup_callback};
+    //         this.saved_controls[shortcutCombination.join('+')] = {shortcutCombination, callback, keyup_callback};
     //     }
     // }
 
@@ -788,7 +788,7 @@
 //             for (let name of array_names) this.arrays[name] = [];
 //         }
 //
-//         copyOntoGraphicsCard(context, selection_of_arrays = Object.keys(this.arrays), write_to_indices = true) {
+//         copyOntoGraphicsCard(context, selectionOfArrays = Object.keys(this.arrays), writeToIndices = true) {
 //             // copyOntoGraphicsCard():  Called automatically as needed to load this vertex array set onto
 //             // one of your GPU contexts for its first time.  Send the completed vertex and index lists to
 //             // their own buffers within any of your existing graphics card contexts.  Optional arguments
@@ -796,50 +796,50 @@
 //             // subsets of them as needed (if only some fields of your shape have changed).
 //
 //             // Define what this object should store in each new WebGL Context:
-//             const initial_gpu_representation = {webGL_buffer_pointers: {}};
+//             const initialGpuRepresentation = {webGL_buffer_pointers: {}};
 //             // Our object might need to register to multiple GPU contexts in the case of
 //             // multiple drawing areas.  If this is a new GPU context for this object,
 //             // copy the object to the GPU.  Otherwise, this object already has been
 //             // copied over, so get a pointer to the existing instance.
-//             const did_exist = this.gpu_instances.get(context);
-//             const gpu_instance = super.copyOntoGraphicsCard(context, initial_gpu_representation);
+//             const didExist = this.gpu_instances.get(context);
+//             const gpuInstance = super.copyOntoGraphicsCard(context, initialGpuRepresentation);
 //
 //             const gl = context;
 //
-//             const write = did_exist ? (target, data) => gl.bufferSubData(target, 0, data)
+//             const write = didExist ? (target, data) => gl.bufferSubData(target, 0, data)
 //                 : (target, data) => gl.bufferData(target, data, gl.STATIC_DRAW);
 //
-//             for (let name of selection_of_arrays) {
-//                 if (!did_exist)
-//                     gpu_instance.webGL_buffer_pointers[name] = gl.createBuffer();
-//                 gl.bindBuffer(gl.ARRAY_BUFFER, gpu_instance.webGL_buffer_pointers[name]);
+//             for (let name of selectionOfArrays) {
+//                 if (!didExist)
+//                     gpuInstance.webGL_buffer_pointers[name] = gl.createBuffer();
+//                 gl.bindBuffer(gl.ARRAY_BUFFER, gpuInstance.webGL_buffer_pointers[name]);
 //                 write(gl.ARRAY_BUFFER, Matrix.flatten_2D_to_1D(this.arrays[name]));
 //             }
-//             if (this.indices.length && write_to_indices) {
-//                 if (!did_exist)
-//                     gpu_instance.index_buffer = gl.createBuffer();
-//                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gpu_instance.index_buffer);
+//             if (this.indices.length && writeToIndices) {
+//                 if (!didExist)
+//                     gpuInstance.index_buffer = gl.createBuffer();
+//                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gpuInstance.index_buffer);
 //                 write(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(this.indices));
 //             }
-//             return gpu_instance;
+//             return gpuInstance;
 //         }
 //
-//         executeShaders(gl, gpu_instance, type)     // executeShaders(): Draws this shape's entire vertex buffer.
+//         executeShaders(gl, gpuInstance, type)     // executeShaders(): Draws this shape's entire vertex buffer.
 //         {       // Draw shapes using indices if they exist.  Otherwise, assume the vertices are arranged as triples.
 //             if (this.indices.length) {
-//                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gpu_instance.index_buffer);
+//                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gpuInstance.index_buffer);
 //                 gl.drawElements(gl[type], this.indices.length, gl.UNSIGNED_INT, 0)
 //             } else gl.drawArrays(gl[type], 0, Object.values(this.arrays)[0].length);
 //         }
 //
-//         draw(webgl_manager, program_state, model_transform, material, type = "TRIANGLES") {
+//         draw(webglManager, programState, model_transform, material, type = "TRIANGLES") {
 //             // draw():  To appear onscreen, a shape of any variety goes through this function,
 //             // which executes the shader programs.  The shaders draw the right shape due to
 //             // pre-selecting the correct buffer region in the GPU that holds that shape's data.
-//             const gpu_instance = this.activate(webgl_manager.context);
-//             material.shader.activate(webgl_manager.context, gpu_instance.webGL_buffer_pointers, program_state, model_transform, material);
+//             const gpuInstance = this.activate(webglManager.context);
+//             material.shader.activate(webglManager.context, gpuInstance.webGL_buffer_pointers, programState, model_transform, material);
 //             // Run the shaders to draw every triangle now:
-//             this.executeShaders(webgl_manager.context, gpu_instance, type);
+//             this.executeShaders(webglManager.context, gpuInstance, type);
 //         }
 //     }
 
@@ -868,8 +868,8 @@
 //         // the memory addresses it will use for uniform variables, and the types and indices of its per-
 //         // vertex attributes.  We'll need those for building vertex buffers.
 //         constructor(program, gl) {
-//             const num_uniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
-//             for (let i = 0; i < num_uniforms; ++i) {
+//             const numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+//             for (let i = 0; i < numUniforms; ++i) {
 //                 // Retrieve the GPU addresses of each uniform variable in the shader
 //                 // based on their names, and store these pointers for later.
 //                 let u = gl.getActiveUniform(program, i).name.split('[')[0];
@@ -878,7 +878,7 @@
 //
 //             this.shader_attributes = {};
 //             // Assume per-vertex attributes will each be a set of 1 to 4 floats:
-//             const type_to_size_mapping = {0x1406: 1, 0x8B50: 2, 0x8B51: 3, 0x8B52: 4};
+//             const typeToSizeMapping = {0x1406: 1, 0x8B50: 2, 0x8B51: 3, 0x8B52: 4};
 //             const numAttribs = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
 //             for (let i = 0; i < numAttribs; i++) {
 //                 // https://github.com/greggman/twgl.js/blob/master/dist/twgl-full.js for another example:
@@ -886,7 +886,7 @@
 //                 // Pointers to all shader attribute variables:
 //                 this.shader_attributes[attribInfo.name] = {
 //                     index: gl.getAttribLocation(program, attribInfo.name),
-//                     size: type_to_size_mapping[attribInfo.type],
+//                     size: typeToSizeMapping[attribInfo.type],
 //                     enabled: true, type: gl.FLOAT,
 //                     normalized: false, stride: 0, pointer: 0
 //                 };
@@ -920,9 +920,9 @@
 //             if (replacement.constructor === Object)
 //                 return Object.assign(target, replacement);
 //             // Otherwise we'll try to guess the key to override by type:
-//             const matching_keys_by_type = Object.entries(this).filter(([key, value]) => replacement instanceof value.constructor);
-//             if (!matching_keys_by_type[0]) throw "Container: Can't figure out which value you're trying to replace; nothing matched by type.";
-//             return Object.assign(target, {[matching_keys_by_type[0][0]]: replacement});
+//             const matchingKeysByType = Object.entries(this).filter(([key, value]) => replacement instanceof value.constructor);
+//             if (!matchingKeysByType[0]) throw "Container: Can't figure out which value you're trying to replace; nothing matched by type.";
+//             return Object.assign(target, {[matchingKeysByType[0][0]]: replacement});
 //         }
 //     }
 
@@ -948,7 +948,7 @@
     //     // every shape that is drawn onscreen.
     //
     //     // Extend the class and fill in the abstract functions, some of which define GLSL strings, and others
-    //     // (update_GPU) which define the extra custom JavaScript code needed to populate your particular shader
+    //     // (updateGPU) which define the extra custom JavaScript code needed to populate your particular shader
     //     // program with all the data values it is expecting, such as matrices.  The shader pulls these values
     //     // from two places in your JavaScript:  A Material object, for values pertaining to the current shape
     //     // only, and a ProgramState object, for values pertaining to your entire Scene or program.
@@ -957,30 +957,30 @@
     //         // shader program onto one of your GPU contexts for its first time.
     //
     //         // Define what this object should store in each new WebGL Context:
-    //         const initial_gpu_representation = {
-    //             program: undefined, gpu_addresses: undefined,
+    //         const initialGpuRepresentation = {
+    //             program: undefined, gpuAddresses: undefined,
     //             vertShdr: undefined, fragShdr: undefined
     //         };
     //         // Our object might need to register to multiple GPU contexts in the case of
     //         // multiple drawing areas.  If this is a new GPU context for this object,
     //         // copy the object to the GPU.  Otherwise, this object already has been
     //         // copied over, so get a pointer to the existing instance.
-    //         const gpu_instance = super.copyOntoGraphicsCard(context, initial_gpu_representation);
+    //         const gpuInstance = super.copyOntoGraphicsCard(context, initialGpuRepresentation);
     //
     //         const gl = context;
-    //         const program = gpu_instance.program || context.createProgram();
-    //         const vertShdr = gpu_instance.vertShdr || gl.createShader(gl.VERTEX_SHADER);
-    //         const fragShdr = gpu_instance.fragShdr || gl.createShader(gl.FRAGMENT_SHADER);
+    //         const program = gpuInstance.program || context.createProgram();
+    //         const vertShdr = gpuInstance.vertShdr || gl.createShader(gl.VERTEX_SHADER);
+    //         const fragShdr = gpuInstance.fragShdr || gl.createShader(gl.FRAGMENT_SHADER);
     //
-    //         if (gpu_instance.vertShdr) gl.detachShader(program, vertShdr);
-    //         if (gpu_instance.fragShdr) gl.detachShader(program, fragShdr);
+    //         if (gpuInstance.vertShdr) gl.detachShader(program, vertShdr);
+    //         if (gpuInstance.fragShdr) gl.detachShader(program, fragShdr);
     //
-    //         gl.shaderSource(vertShdr, this.vertex_glsl_code());
+    //         gl.shaderSource(vertShdr, this.vertexGlslCode());
     //         gl.compileShader(vertShdr);
     //         if (!gl.getShaderParameter(vertShdr, gl.COMPILE_STATUS))
     //             throw "Vertex shader compile error: " + gl.getShaderInfoLog(vertShdr);
     //
-    //         gl.shaderSource(fragShdr, this.fragment_glsl_code());
+    //         gl.shaderSource(fragShdr, this.fragmentGlslCode());
     //         gl.compileShader(fragShdr);
     //         if (!gl.getShaderParameter(fragShdr, gl.COMPILE_STATUS))
     //             throw "Fragment shader compile error: " + gl.getShaderInfoLog(fragShdr);
@@ -991,32 +991,32 @@
     //         if (!gl.getProgramParameter(program, gl.LINK_STATUS))
     //             throw "Shader linker error: " + gl.getProgramInfoLog(this.program);
     //
-    //         Object.assign(gpu_instance, {
+    //         Object.assign(gpuInstance, {
     //             program,
     //             vertShdr,
     //             fragShdr,
-    //             gpu_addresses: new GraphicsAddresses(program, gl)
+    //             gpuAddresses: new GraphicsAddresses(program, gl)
     //         });
-    //         return gpu_instance;
+    //         return gpuInstance;
     //     }
     //
-    //     activate(context, buffer_pointers, program_state, model_transform, material) {
+    //     activate(context, bufferPointers, programState, model_transform, material) {
     //         // activate(): Selects this Shader in GPU memory so the next shape draws using it.
-    //         const gpu_instance = super.activate(context);
+    //         const gpuInstance = super.activate(context);
     //
-    //         context.useProgram(gpu_instance.program);
+    //         context.useProgram(gpuInstance.program);
     //
     //         // --- Send over all the values needed by this particular shader to the GPU: ---
-    //         this.update_GPU(context, gpu_instance.gpu_addresses, program_state, model_transform, material);
+    //         this.updateGPU(context, gpuInstance.gpuAddresses, programState, model_transform, material);
     //
     //         // --- Turn on all the correct attributes and make sure they're pointing to the correct ranges in GPU memory. ---
-    //         for (let [attr_name, attribute] of Object.entries(gpu_instance.gpu_addresses.shader_attributes)) {
+    //         for (let [attrName, attribute] of Object.entries(gpuInstance.gpuAddresses.shader_attributes)) {
     //             if (!attribute.enabled) {
     //                 if (attribute.index >= 0) context.disableVertexAttribArray(attribute.index);
     //                 continue;
     //             }
     //             context.enableVertexAttribArray(attribute.index);
-    //             context.bindBuffer(context.ARRAY_BUFFER, buffer_pointers[attr_name]);
+    //             context.bindBuffer(context.ARRAY_BUFFER, bufferPointers[attrName]);
     //             // Activate the correct buffer.
     //             context.vertexAttribPointer(attribute.index, attribute.size, attribute.type,
     //                 attribute.normalized, attribute.stride, attribute.pointer);
@@ -1026,18 +1026,18 @@
     //     }
     //
     //     // Your custom Shader has to override the following functions:
-    //     vertex_glsl_code() {
+    //     vertexGlslCode() {
     //     }
     //
-    //     fragment_glsl_code() {
+    //     fragmentGlslCode() {
     //     }
     //
-    //     update_GPU() {
+    //     updateGPU() {
     //     }
     //
     //     // *** How those four functions work (and how GPU shader programs work in general):
     //
-    //     // vertex_glsl_code() and fragment_glsl_code() should each return strings that contain
+    //     // vertexGlslCode() and fragmentGlslCode() should each return strings that contain
     //     // code for a custom vertex shader and fragment shader, respectively.
     //
     //     // The "Vertex Shader" is code that is sent to the graphics card at runtime, where on each
@@ -1074,7 +1074,7 @@
     //     // new triangle is closer to the camera, and even if so, blending settings may interpolate some
     //     // of the old color into the result.  Finally, an image is displayed onscreen.
     //
-    //     // You must define an update_GPU() function that includes the extra custom JavaScript code
+    //     // You must define an updateGPU() function that includes the extra custom JavaScript code
     //     // needed to populate your particular shader program with all the data values it is expecting.
     // }
 
@@ -1100,17 +1100,17 @@
 //             // texture image onto one of your GPU contexts for its first time.
 //
 //             // Define what this object should store in each new WebGL Context:
-//             const initial_gpu_representation = {texture_buffer_pointer: undefined};
+//             const initialGpuRepresentation = {texture_buffer_pointer: undefined};
 //             // Our object might need to register to multiple GPU contexts in the case of
 //             // multiple drawing areas.  If this is a new GPU context for this object,
 //             // copy the object to the GPU.  Otherwise, this object already has been
 //             // copied over, so get a pointer to the existing instance.
-//             const gpu_instance = super.copyOntoGraphicsCard(context, initial_gpu_representation);
+//             const gpuInstance = super.copyOntoGraphicsCard(context, initialGpuRepresentation);
 //
-//             if (!gpu_instance.texture_buffer_pointer) gpu_instance.texture_buffer_pointer = context.createTexture();
+//             if (!gpuInstance.texture_buffer_pointer) gpuInstance.texture_buffer_pointer = context.createTexture();
 //
 //             const gl = context;
-//             gl.bindTexture(gl.TEXTURE_2D, gpu_instance.texture_buffer_pointer);
+//             gl.bindTexture(gl.TEXTURE_2D, gpuInstance.texture_buffer_pointer);
 //
 //             if (need_initial_settings) {
 //                 gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -1126,7 +1126,7 @@
 //                 gl.generateMipmap(gl.TEXTURE_2D);
 //             // If the user picked tri-linear sampling (the default) then generate
 //             // the necessary "mips" of the texture and store them on the GPU with it.
-//             return gpu_instance;
+//             return gpuInstance;
 //         }
 //
 //         activate(context, texture_unit = 0) {
@@ -1135,9 +1135,9 @@
 //             // Terminate draw requests until the image file is actually loaded over the network:
 //             if (!this.ready)
 //                 return;
-//             const gpu_instance = super.activate(context);
+//             const gpuInstance = super.activate(context);
 //             context.activeTexture(context["TEXTURE" + texture_unit]);
-//             context.bindTexture(context.TEXTURE_2D, gpu_instance.texture_buffer_pointer);
+//             context.bindTexture(context.TEXTURE_2D, gpuInstance.texture_buffer_pointer);
 //         }
 //     }
 
@@ -1147,22 +1147,22 @@
 //         // **ProgramState** stores any values that affect how your whole scene is drawn,
 //         // such as its current lights and the camera position.  Class Shader uses whatever
 //         // values are wrapped here as inputs to your custom shader program.  Your Shader
-//         // subclass must override its method "update_GPU()" to define how to send your
+//         // subclass must override its method "updateGPU()" to define how to send your
 //         // ProgramState's particular values over to your custom shader program.
-//         constructor(camera_transform = Mat4.identity(), projection_transform = Mat4.identity()) {
+//         constructor(cameraTransform = Mat4.identity(), projectionTransform = Mat4.identity()) {
 //             super();
-//             this.set_camera(camera_transform);
-//             const defaults = {projection_transform, animate: true, animation_time: 0, animation_delta_time: 0};
+//             this.setCamera(cameraTransform);
+//             const defaults = {projectionTransform, animate: true, animationTime: 0, animationDeltaTime: 0};
 //             Object.assign(this, defaults);
 //         }
 //
-//         set_camera(matrix) {
-//             // set_camera():  Applies a new (inverted) camera matrix to the ProgramState.
+//         setCamera(matrix) {
+//             // setCamera():  Applies a new (inverted) camera matrix to the ProgramState.
 //             // It's often useful to cache both the camera matrix and its inverse.  Both are needed
 //             // often and matrix inversion is too slow to recompute needlessly.
 //             // Note that setting a camera matrix traditionally means storing the inverted version,
 //             // so that's the one this function expects to receive; it automatically sets the other.
-//             Object.assign(this, {camera_transform: Mat4.inverse(matrix), camera_inverse: matrix})
+//             Object.assign(this, {cameraTransform: Mat4.inverse(matrix), camera_inverse: matrix})
 //         }
 //     }
 
@@ -1171,14 +1171,14 @@
     // class WebglManager {
     //     // **WebglManager** manages a whole graphics program for one on-page canvas, including its
     //     // textures, shapes, shaders, and scenes.  It requests a WebGL context and stores Scenes.
-    //     constructor(canvas, background_color, dimensions) {
+    //     constructor(canvas, backgroundColor, dimensions) {
     //         const members = {
     //             instances: new Map(),
     //             scenes: [],
     //             prev_time: 0,
     //             canvas,
     //             scratchpad: {},
-    //             program_state: new ProgramState()
+    //             programState: new ProgramState()
     //         };
     //         Object.assign(this, members);
     //         // Get the GPU ready, creating a new WebGL context for this canvas:
@@ -1191,7 +1191,7 @@
     //
     //         this.setSize(dimensions);
     //
-    //         gl.clearColor.apply(gl, background_color);           // Tell the GPU which color to clear the canvas with each frame.
+    //         gl.clearColor.apply(gl, backgroundColor);           // Tell the GPU which color to clear the canvas with each frame.
     //         gl.getExtension("OES_element_index_uint");           // Load an extension to allow shapes with more than 65535 vertices.
     //         gl.enable(gl.DEPTH_TEST);                            // Enable Z-Buffering test.
     //         // Specify an interpolation method for blending "transparent" triangles over the existing pixels:
@@ -1227,20 +1227,20 @@
     //     render(time = 0) {
     //         // render(): Draw a single frame of animation, using all loaded Scene objects.  Measure
     //         // how much real time has transpired in order to animate shapes' movements accordingly.
-    //         this.program_state.animation_delta_time = time - this.prev_time;
-    //         if (this.program_state.animate) this.program_state.animation_time += this.program_state.animation_delta_time;
+    //         this.programState.animationDeltaTime = time - this.prev_time;
+    //         if (this.programState.animate) this.programState.animationTime += this.programState.animationDeltaTime;
     //         this.prev_time = time;
     //
     //         const gl = this.context;
     //         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     //         // Clear the canvas's pixels and z-buffer.
     //
-    //         const open_list = [...this.scenes];
-    //         while (open_list.length) {
+    //         const openList = [...this.scenes];
+    //         while (openList.length) {
     //             // Traverse all Scenes and their children, recursively.
-    //             open_list.push(...open_list[0].children);
+    //             openList.push(...openList[0].children);
     //             // Call display() to draw each registered animation:
-    //             open_list.shift().display(this, this.program_state);
+    //             openList.shift().display(this, this.programState);
     //         }
     //         // Now that this frame is drawn, request that render() happen
     //         // again as soon as all other web page events are processed:
@@ -1253,43 +1253,43 @@
     // class Scene {
     //     // **Scene** is the base class for any scene part or code snippet that you can add to a
     //     // canvas.  Make your own subclass(es) of this and override their methods "display()"
-    //     // and "make_control_panel()" to make them draw to a canvas, or generate custom control
+    //     // and "makeControlPanel()" to make them draw to a canvas, or generate custom control
     //     // buttons and readouts, respectively.  Scenes exist in a hierarchy; their child Scenes
     //     // can either contribute more drawn shapes or provide some additional tool to the end
     //     // user via drawing additional control panel buttons or live text readouts.
     //     constructor() {
     //         this.children = [];
     //         // Set up how we'll handle key presses for the scene's control panel:
-    //         const callback_behavior = (callback, event) => {
+    //         const callbackBehavior = (callback, event) => {
     //             callback(event);
     //             event.preventDefault();    // Fire the callback and cancel any default browser shortcut that is an exact match.
     //             event.stopPropagation();   // Don't bubble the event to parent nodes; let child elements be targetted in isolation.
     //         }
-    //         this.key_controls = new Keyboard_Manager(document, callback_behavior);
+    //         this.keyControls = new KeyboardManager(document, callbackBehavior);
     //     }
     //
-    //     new_line(parent = this.control_panel) {
-    //         // new_line():  Formats a scene's control panel with a new line break.
+    //     newLine(parent = this.controlPanel) {
+    //         // newLine():  Formats a scene's control panel with a new line break.
     //         parent.appendChild(document.createElement("br"))
     //     }
     //
-    //     live_string(callback, parent = this.control_panel) {
-    //         // live_string(): Create an element somewhere in the control panel that
+    //     liveString(callback, parent = this.controlPanel) {
+    //         // liveString(): Create an element somewhere in the control panel that
     //         // does reporting of the scene's values in real time.  The event loop
     //         // will constantly update all HTML elements made this way.
     //         parent.appendChild(Object.assign(document.createElement("div"), {
-    //             className: "live_string",
+    //             className: "liveString",
     //             onload: callback
     //         }));
     //     }
     //
-    //     key_triggered_button(description, shortcut_combination, callback, color = '#6E6460',
-    //                          release_event, recipient = this, parent = this.control_panel) {
-    //         // key_triggered_button():  Trigger any scene behavior by assigning
+    //     keyTriggeredButton(description, shortcutCombination, callback, color = '#6E6460',
+    //                          releaseEvent, recipient = this, parent = this.controlPanel) {
+    //         // keyTriggeredButton():  Trigger any scene behavior by assigning
     //         // a key shortcut and a labelled HTML button to fire any callback
     //         // function/method of a Scene.  Optional release callback as well.
     //         const button = parent.appendChild(document.createElement("button"));
-    //         button.default_color = button.style.backgroundColor = color;
+    //         button.defaultColor = button.style.backgroundColor = color;
     //         const press = () => {
     //                 Object.assign(button.style, {
     //                     'background-color': color,
@@ -1299,28 +1299,28 @@
     //             },
     //             release = () => {
     //                 Object.assign(button.style, {
-    //                     'background-color': button.default_color,
+    //                     'background-color': button.defaultColor,
     //                     'z-index': "0", 'transform': "scale(1)"
     //                 });
-    //                 if (!release_event) return;
-    //                 release_event.call(recipient);
+    //                 if (!releaseEvent) return;
+    //                 releaseEvent.call(recipient);
     //             };
-    //         const key_name = shortcut_combination.join('+').split(" ").join("Space");
-    //         button.textContent = "(" + key_name + ") " + description;
+    //         const keyName = shortcutCombination.join('+').split(" ").join("Space");
+    //         button.textContent = "(" + keyName + ") " + description;
     //         button.addEventListener("mousedown", press);
     //         button.addEventListener("mouseup", release);
     //         button.addEventListener("touchstart", press, {passive: true});
     //         button.addEventListener("touchend", release, {passive: true});
-    //         if (!shortcut_combination) return;
-    //         this.key_controls.add(shortcut_combination, press, release);
+    //         if (!shortcutCombination) return;
+    //         this.keyControls.add(shortcutCombination, press, release);
     //     }
     //
     //     // To use class Scene, override at least one of the below functions,
     //     // which will be automatically called by other classes:
-    //     display(context, program_state) {
+    //     display(context, programState) {
     //     }                            // display(): Called by WebglManager for drawing.
-    //     make_control_panel() {
-    //     }                            // make_control_panel(): Called by Controls_Widget for generating interactive UI.
-    //     show_explanation(document_section) {
-    //     }                            // show_explanation(): Called by Text_Widget for generating documentation.
+    //     makeControlPanel() {
+    //     }                            // makeControlPanel(): Called by ControlsWidget for generating interactive UI.
+    //     showExplanation(documentSection) {
+    //     }                            // showExplanation(): Called by TextWidget for generating documentation.
     // }

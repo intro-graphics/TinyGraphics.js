@@ -11,23 +11,23 @@ class BasicShader extends Shader {
     /**
      * Defining how to synchronize our JavaScript's variables to the GPU's:
      * @param context
-     * @param gpu_addresses
-     * @param graphics_state
+     * @param gpuAddresses
+     * @param graphicsState
      * @param model_transform
      * @param material
      */
-    update_GPU(context, gpu_addresses, graphics_state, model_transform, material) {
-        const [P, C, M] = [graphics_state.projection_transform, graphics_state.camera_inverse, model_transform],
+    updateGPU(context, gpuAddresses, graphicsState, model_transform, material) {
+        const [P, C, M] = [graphicsState.projectionTransform, graphicsState.camera_inverse, model_transform],
             PCM = P.times(C).times(M);
-        context.uniformMatrix4fv(gpu_addresses.projection_camera_model_transform, false,
+        context.uniformMatrix4fv(gpuAddresses.projection_camera_modelTransform, false,
             Matrix.flatten_2D_to_1D(PCM.transposed()));
     }
 
-    vertex_glsl_code() {
+    vertexGlslCode() {
         return basicVert;
     }
 
-    fragment_glsl_code() {
+    fragmentGlslCode() {
         return basicFrag;
     }
 }

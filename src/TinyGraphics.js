@@ -15,7 +15,7 @@ export * from './geometries/ShapePack.js';
 export {Scene, MovementControls} from './scenes/Scene.js';
 export {MinimalScene} from './scenes/MinimalScene.js';
 
-export {Keyboard_Manager} from './activities/Keyboard_Manager.js';
+export {KeyboardManager} from './activities/KeyboardManager.js';
 
 export {Shader} from './shaders/Shader.js';
 export {BasicShader} from './shaders/BasicShader.js';

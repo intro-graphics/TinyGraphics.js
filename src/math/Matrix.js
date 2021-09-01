@@ -137,11 +137,11 @@ class Matrix extends Array {
     }
 
     /**
-     * "M.post_multiply(b)" overwrites the Matrix M with the product of M * b where b can be a Matrix or scalar.
+     * "M.postMultiply(b)" overwrites the Matrix M with the product of M * b where b can be a Matrix or scalar.
      * @param b
      * @returns {Matrix}
      */
-    post_multiply(b) {
+    postMultiply(b) {
         const new_value = this.times(b);
         this.length = 0;
         this.push(...new_value);

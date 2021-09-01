@@ -129,19 +129,19 @@ export class Surfaces_Demo extends Scene {
         };
     }
 
-    display_scene_0(context, program_state) {
+    display_scene_0(context, programState) {
         if (!context.scratchpad.controls) {
             this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
-            program_state.set_camera(Mat4.translation(0, 0, -3));
+            programState.setCamera(Mat4.translation(0, 0, -3));
         }
         // Draw the sheets, flipped 180 degrees so their normals point at us.
         const r = Mat4.rotation(Math.PI, 0, 1, 0).times(this.r);
-        this.shapes.sheet.draw(context, program_state, Mat4.translation(-1.5, 0, 0).times(r), this.material);
-        this.shapes.sheet2.draw(context, program_state, Mat4.translation(1.5, 0, 0).times(r), this.material);
+        this.shapes.sheet.draw(context, programState, Mat4.translation(-1.5, 0, 0).times(r), this.material);
+        this.shapes.sheet2.draw(context, programState, Mat4.translation(1.5, 0, 0).times(r), this.material);
     }
 
-    display_scene_1(context, program_state) {
-        const random = (x) => Math.sin(1000 * x + program_state.animation_time / 1000);
+    display_scene_1(context, programState) {
+        const random = (x) => Math.sin(1000 * x + programState.animationTime / 1000);
 
         // Update the JavaScript-side shape with new vertices:
         this.shapes.sheet.arrays.position.forEach((p, i, a) =>
@@ -150,34 +150,34 @@ export class Surfaces_Demo extends Scene {
         // This won't be perfect flat shading because vertices are shared.
         this.shapes.sheet.flat_shade();
         // Draw the current sheet shape.
-        this.shapes.sheet.draw(context, program_state, this.r, this.material);
+        this.shapes.sheet.draw(context, programState, this.r, this.material);
 
         // Update the gpu-side shape with new vertices.
         // Warning:  You can't call this until you've already drawn the shape once.
         this.shapes.sheet.copy_onto_graphics_card(context.context, ["position", "normal"], false);
     }
 
-    display_scene_2(context, program_state) {
+    display_scene_2(context, programState) {
         const model_transform = Mat4.translation(-5, 0, -2);
         // Draw all the shapes stored in this.shapes side by side.
         for (let s of Object.values(this.shapes)) {
-            s.draw(context, program_state, model_transform.times(this.r), this.material);
-            model_transform.post_multiply(Mat4.translation(2, 0, 0));
+            s.draw(context, programState, model_transform.times(this.r), this.material);
+            model_transform.postMultiply(Mat4.translation(2, 0, 0));
         }
     }
 
-    display_scene_3(context, program_state) {
-        const model_transform = Mat4.rotation(program_state.animation_time / 5000, 0, 1, 0);
-        this.shapes.bullet.draw(context, program_state, model_transform.times(this.r), this.solid);
+    display_scene_3(context, programState) {
+        const model_transform = Mat4.rotation(programState.animationTime / 5000, 0, 1, 0);
+        this.shapes.bullet.draw(context, programState, model_transform.times(this.r), this.solid);
     }
 
-    display_scene_4(context, program_state) {                                       // First, draw the compound axis shape all at once:
-        this.shapes.axis.draw(context, program_state, Mat4.translation(2, -1, -2), this.material);
+    display_scene_4(context, programState) {                                       // First, draw the compound axis shape all at once:
+        this.shapes.axis.draw(context, programState, Mat4.translation(2, -1, -2), this.material);
 
         // Manually recreate the above compound Shape out of individual components:
         const base = Mat4.translation(-1, -1, -2);
         const ball_matrix = base.times(Mat4.rotation(Math.PI / 2, 0, 1, 0).times(Mat4.scale(.25, .25, .25)));
-        this.shapes.ball.draw(context, program_state, ball_matrix, this.material);
+        this.shapes.ball.draw(context, programState, ball_matrix, this.material);
         const matrices = [Mat4.identity(),
             Mat4.rotation(-Math.PI / 2, 1, 0, 0).times(Mat4.scale(1, -1, 1)),
             Mat4.rotation(Math.PI / 2, 0, 1, 0).times(Mat4.scale(-1, 1, 1))];
@@ -188,113 +188,113 @@ export class Surfaces_Demo extends Scene {
                 box2_matrix = m.times(Mat4.translation(.95, 0, .5)).times(Mat4.scale(.05, .05, .4)),
                 box3_matrix = m.times(Mat4.translation(0, .95, .5)).times(Mat4.scale(.05, .05, .4)),
                 tube_matrix = m.times(Mat4.translation(0, 0, 1)).times(Mat4.scale(.1, .1, 2));
-            this.shapes["cone_" + i].draw(context, program_state, cone_matrix, this.material);
-            this.shapes.box.draw(context, program_state, box1_matrix, this.material);
-            this.shapes.box.draw(context, program_state, box2_matrix, this.material);
-            this.shapes.box.draw(context, program_state, box3_matrix, this.material);
-            this.shapes["tube_" + i].draw(context, program_state, tube_matrix, this.material);
+            this.shapes["cone_" + i].draw(context, programState, cone_matrix, this.material);
+            this.shapes.box.draw(context, programState, box1_matrix, this.material);
+            this.shapes.box.draw(context, programState, box2_matrix, this.material);
+            this.shapes.box.draw(context, programState, box3_matrix, this.material);
+            this.shapes["tube_" + i].draw(context, programState, tube_matrix, this.material);
         }
     }
 
-    display_scene_5(context, program_state) {
+    display_scene_5(context, programState) {
         const model_transform = Mat4.translation(-5, 0, -2);
-        const r = Mat4.rotation(program_state.animation_time / 3000, 1, 1, 1);
+        const r = Mat4.rotation(programState.animationTime / 3000, 1, 1, 1);
         // Draw all the shapes stored in this.shapes side by side.
         for (let s of Object.values(this.shapes)) {
-            s.draw(context, program_state, model_transform.times(r), this.material);
-            model_transform.post_multiply(Mat4.translation(2.5, 0, 0));
+            s.draw(context, programState, model_transform.times(r), this.material);
+            model_transform.postMultiply(Mat4.translation(2.5, 0, 0));
         }
     }
 
-    display_scene_6(context, program_state) {
-        const model_transform = Mat4.rotation(program_state.animation_time / 5000, 0, 1, 0);
-        this.shapes.shell.draw(context, program_state, model_transform.times(this.r), this.material);
+    display_scene_6(context, programState) {
+        const model_transform = Mat4.rotation(programState.animationTime / 5000, 0, 1, 0);
+        this.shapes.shell.draw(context, programState, model_transform.times(this.r), this.material);
     }
 
-    explain_scene_0(document_element) {
-        document_element.innerHTML += `<p>Parametric Surfaces can be generated by parametric functions that are driven by changes to two variables - s and t.  As either s or t increase, we can step along the shape's surface in some direction aligned with the shape, not the usual X,Y,Z axes.</p>
+    explain_scene_0(documentElement) {
+        documentElement.innerHTML += `<p>Parametric Surfaces can be generated by parametric functions that are driven by changes to two variables - s and t.  As either s or t increase, we can step along the shape's surface in some direction aligned with the shape, not the usual X,Y,Z axes.</p>
                                      <p>Grid_Patch is a generalized parametric surface.  It is always made of a sheet of squares arranged in rows and columns, corresponding to s and t.  The sheets are always guaranteed to have this row/column arrangement, but where it goes as you follow an edge to the next row or column over could vary.  When generating the shape below, we told it to do the most obvious thing whenever s or t increase; just increase X and Y.  A flat rectangle results.</p>
                                      <p>The shape on the right is the same except instead of building it incrementally by moving from the previous point, we assigned points manually.  The z values are a random height map.  The light is moving over its static peaks and valleys.  We have full control over where the sheet's points go.</p>
                                      <p>To create a new Grid_Patch shape, initialize it with the desired amounts of rows and columns you'd like.  The next two arguments are callback functions that return a new point given an old point (called p) and the current (s,t) coordinates.  The first callback is for rows, and will recieve arguments (s,p) back from Grid_Patch.  The second one is for columns, and will recieve arguments (t,p,s) back from Grid_Patch. </p>
                                      <p>Scroll down for more animations!</p>`;
     }
 
-    explain_scene_1(document_element) {
-        document_element.innerHTML += `<p>Shapes in tiny-graphics.js can also be modified and animated if need be.  The shape drawn below has vertex positions and normals that are recalculated for every frame.</p>
+    explain_scene_1(documentElement) {
+        documentElement.innerHTML += `<p>Shapes in tiny-graphics.js can also be modified and animated if need be.  The shape drawn below has vertex positions and normals that are recalculated for every frame.</p>
                                      <p>Call copy_onto_graphics_card() on the Shape to make this happen.  Pass in the context, then an array of the buffer names you'd like to overwrite, then false to indicate that indices should be left alone.  Overwriting buffers in place saves us from slow reallocations.  Warning:  Do not try calling copy_onto_graphics_card() to update a shape until after the shape's first draw() call has completed.</p>`;
     }
 
-    explain_scene_2(document_element) {
-        document_element.innerHTML += `<p>Parametric surfaces can be wrapped around themselves in circles, if increasing one of s or t causes a rotation around an axis.  These are called <a href="http://mathworld.wolfram.com/SurfaceofRevolution.html" target="blank">surfaces of revolution.</a></p>
+    explain_scene_2(documentElement) {
+        documentElement.innerHTML += `<p>Parametric surfaces can be wrapped around themselves in circles, if increasing one of s or t causes a rotation around an axis.  These are called <a href="http://mathworld.wolfram.com/SurfaceofRevolution.html" target="blank">surfaces of revolution.</a></p>
                                      <p>To draw these using Grid_Patch, we provide another class called Surface_Of_Revolution that extends Grid_Patch and takes a set of points as input.  Surface_Of_Revolution automatically sweeps the given points around the Z axis to make each column.  Your list of points, which become the rows, could be arranged to make any 1D curve.  The direction of your points matters; be careful not to end up with your normal vectors all pointing inside out after the sweep.</p>`;
     }
 
-    explain_scene_3(document_element) {
-        document_element.innerHTML += `<p>Here's a surface of revolution drawn using a manually specified point list.  The points spell out a 1D curve of the outline of a bullet's right side.  The Surface_Of_Revolution sweeps this around the Z axis.</p>`;
+    explain_scene_3(documentElement) {
+        documentElement.innerHTML += `<p>Here's a surface of revolution drawn using a manually specified point list.  The points spell out a 1D curve of the outline of a bullet's right side.  The Surface_Of_Revolution sweeps this around the Z axis.</p>`;
     }
 
-    explain_scene_4(document_element) {
-        document_element.innerHTML += `<p>Several Shapes can be compounded together into one, forming a single high-performance array.  Both of the axis arrows shapes below look identical and contain the same shapes, but the one on the right is must faster to draw because the shapes all exist together in one Vertex_Array object.</p>`;
+    explain_scene_4(documentElement) {
+        documentElement.innerHTML += `<p>Several Shapes can be compounded together into one, forming a single high-performance array.  Both of the axis arrows shapes below look identical and contain the same shapes, but the one on the right is must faster to draw because the shapes all exist together in one Vertex_Array object.</p>`;
     }
 
-    explain_scene_5(document_element) {
-        document_element.innerHTML += `<p>Here are some examples of other convenient shapes that are made by compounding other shapes together.  The rightmost two are not compound shapes but rather we tried to make them with just one Surface_Of_Revolution, preventing us from getting good crisp seams at the edges.</p>`;
+    explain_scene_5(documentElement) {
+        documentElement.innerHTML += `<p>Here are some examples of other convenient shapes that are made by compounding other shapes together.  The rightmost two are not compound shapes but rather we tried to make them with just one Surface_Of_Revolution, preventing us from getting good crisp seams at the edges.</p>`;
     }
 
-    explain_scene_6(document_element) {
-        document_element.innerHTML += `<p>Blending two 1D curves as a "ruled surface" using the "mix" function of vectors.  We are using hand-made lists of points for our curves, but you could have generated the points from spline functions.</p>`;
+    explain_scene_6(documentElement) {
+        documentElement.innerHTML += `<p>Blending two 1D curves as a "ruled surface" using the "mix" function of vectors.  We are using hand-made lists of points for our curves, but you could have generated the points from spline functions.</p>`;
     }
 
-    show_explanation(document_element, webgl_manager) {
+    showExplanation(documentElement, webglManager) {
         if (this.is_master) {
-            document_element.style.padding = 0;
-            document_element.style.width = "1080px";
-            document_element.style.overflowY = "hidden";
+            documentElement.style.padding = 0;
+            documentElement.style.width = "1080px";
+            documentElement.style.overflowY = "hidden";
 
             for (let i = 0; i < this.num_scenes; i++) {
-                const element_1 = document_element.appendChild(document.createElement("div"));
+                const element_1 = documentElement.appendChild(document.createElement("div"));
                 element_1.className = "canvas-widget";
 
-                const cw = new tiny.Canvas_Widget(element_1, undefined,
+                const cw = new tiny.CanvasWidget(element_1, undefined,
                     {make_controls: i == 0, make_editor: false, make_code_nav: false});
-                cw.webgl_manager.scenes.push(this.sections[i]);
-                cw.webgl_manager.program_state = webgl_manager.program_state;
-                cw.webgl_manager.set_size([1080, 300])
+                cw.webglManager.scenes.push(this.sections[i]);
+                cw.webglManager.programState = webglManager.programState;
+                cw.webglManager.set_size([1080, 300]);
 
-                const element_2 = document_element.appendChild(document.createElement("div"));
+                const element_2 = documentElement.appendChild(document.createElement("div"));
                 element_2.className = "code-widget";
 
-                const code = new tiny.Code_Widget(element_2,
+                const code = new tiny.CodeWidget(element_2,
                     Surfaces_Demo.prototype["construct_scene_" + i],
                     [], {hide_navigator: true});
 
-                const element_3 = document_element.appendChild(document.createElement("div"));
+                const element_3 = documentElement.appendChild(document.createElement("div"));
                 element_3.className = "code-widget";
 
-                const code_2 = new tiny.Code_Widget(element_3,
+                const code_2 = new tiny.CodeWidget(element_3,
                     Surfaces_Demo.prototype["display_scene_" + i],
                     [], {hide_navigator: true});
             }
 
-            const final_text = document_element.appendChild(document.createElement("div"));
+            const final_text = documentElement.appendChild(document.createElement("div"));
             final_text.innerHTML = `<p>That's all the examples.  Below is the code that generates this whole multi-part tutorial:</p>`;
         } else
-            this["explain_scene_" + this.scene_id](document_element);
+            this["explain_scene_" + this.scene_id](documentElement);
     }
 
-    display(context, program_state) {
-        program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 100);
-        this.r = Mat4.rotation(-.5 * Math.sin(program_state.animation_time / 5000), 1, 1, 1);
+    display(context, programState) {
+        programState.projectionTransform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 100);
+        this.r = Mat4.rotation(-.5 * Math.sin(programState.animationTime / 5000), 1, 1, 1);
 
         if (this.is_master) {
             context.canvas.style.display = "none";
             // *** Lights: *** Values of vector or point lights.  They'll be consulted by
             // the shader when coloring shapes.  See Light's class definition for inputs.
-            const t = this.t = program_state.animation_time / 1000;
+            const t = this.t = programState.animationTime / 1000;
             const angle = Math.sin(t);
-            const light_position = Mat4.rotation(angle, 1, 0, 0).times(vec4(0, 0, 1, 0));
-            program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000000)];
+            const lightPosition = Mat4.rotation(angle, 1, 0, 0).times(vec4(0, 0, 1, 0));
+            programState.lights = [new Light(lightPosition, color(1, 1, 1, 1), 1000000)];
         } else
-            this["display_scene_" + this.scene_id](context, program_state);
+            this["display_scene_" + this.scene_id](context, programState);
     }
 }
