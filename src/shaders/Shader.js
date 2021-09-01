@@ -1,20 +1,25 @@
-import {Graphics_Card_Object} from "../utils.js";
+import {GraphicsAddresses, GraphicsCardObject} from "../utils.js";
 
-class Shader extends Graphics_Card_Object {
-    // **Shader** loads a GLSL shader program onto your graphics card, starting from a JavaScript string.
-    // To use it, make subclasses of Shader that define these strings of GLSL code.  The base class will
-    // command the GPU to recieve, compile, and run these programs.  In WebGL 1, the shader runs once per
-    // every shape that is drawn onscreen.
-
-    // Extend the class and fill in the abstract functions, some of which define GLSL strings, and others
-    // (update_GPU) which define the extra custom JavaScript code needed to populate your particular shader
-    // program with all the data values it is expecting, such as matrices.  The shader pulls these values
-    // from two places in your JavaScript:  A Material object, for values pertaining to the current shape
-    // only, and a Program_State object, for values pertaining to your entire Scene or program.
-    copy_onto_graphics_card(context) {
-        // copy_onto_graphics_card():  Called automatically as needed to load the
-        // shader program onto one of your GPU contexts for its first time.
-
+/**
+ * **Shader** loads a GLSL shader program onto your graphics card, starting from a JavaScript string.
+ * To use it, make subclasses of Shader that define these strings of GLSL code.  The base class will
+ * command the GPU to receive, compile, and run these programs.  In WebGL 1, the shader runs once per
+ * every shape that is drawn onscreen.
+ *
+ * Extend the class and fill in the abstract functions, some of which define GLSL strings, and others
+ * (update_GPU) which define the extra custom JavaScript code needed to populate your particular shader
+ * program with all the data values it is expecting, such as matrices.  The shader pulls these values
+ * from two places in your JavaScript:  A Material object, for values pertaining to the current shape
+ * only, and a ProgramState object, for values pertaining to your entire Scene or program.
+ */
+class Shader extends GraphicsCardObject {
+    /**
+     * Called automatically as needed to load the
+     * shader program onto one of your GPU contexts for its first time.
+     * @param context
+     * @returns {*}
+     */
+    copyOntoGraphicsCard(context) {
         // Define what this object should store in each new WebGL Context:
         const initial_gpu_representation = {
             program: undefined, gpu_addresses: undefined,
@@ -24,7 +29,7 @@ class Shader extends Graphics_Card_Object {
         // multiple drawing areas.  If this is a new GPU context for this object,
         // copy the object to the GPU.  Otherwise, this object already has been
         // copied over, so get a pointer to the existing instance.
-        const gpu_instance = super.copy_onto_graphics_card(context, initial_gpu_representation);
+        const gpu_instance = super.copyOntoGraphicsCard(context, initial_gpu_representation);
 
         const gl = context;
         const program = gpu_instance.program || context.createProgram();
@@ -33,7 +38,6 @@ class Shader extends Graphics_Card_Object {
 
         if (gpu_instance.vertShdr) gl.detachShader(program, vertShdr);
         if (gpu_instance.fragShdr) gl.detachShader(program, fragShdr);
-
         gl.shaderSource(vertShdr, this.vertex_glsl_code());
         gl.compileShader(vertShdr);
         if (!gl.getShaderParameter(vertShdr, gl.COMPILE_STATUS))
@@ -54,13 +58,20 @@ class Shader extends Graphics_Card_Object {
             program,
             vertShdr,
             fragShdr,
-            gpu_addresses: new Graphics_Addresses(program, gl)
+            gpu_addresses: new GraphicsAddresses(program, gl)
         });
         return gpu_instance;
     }
 
+    /**
+     * Selects this Shader in GPU memory so the next shape draws using it.
+     * @param context
+     * @param buffer_pointers
+     * @param program_state
+     * @param model_transform
+     * @param material
+     */
     activate(context, buffer_pointers, program_state, model_transform, material) {
-        // activate(): Selects this Shader in GPU memory so the next shape draws using it.
         const gpu_instance = super.activate(context);
 
         context.useProgram(gpu_instance.program);
@@ -84,6 +95,16 @@ class Shader extends Graphics_Card_Object {
         }
     }
 
+    // /**
+    //  * Read the glsl shaders as string
+    //  * @param shaderFile
+    //  */
+    // read_from_file(shaderFile) {
+    //     const response =  fetch(shaderFile);
+    //     return await response.text();
+    // }
+
+
     // Your custom Shader has to override the following functions:
     vertex_glsl_code() {
     }
@@ -95,7 +116,6 @@ class Shader extends Graphics_Card_Object {
     }
 
     // *** How those four functions work (and how GPU shader programs work in general):
-
     // vertex_glsl_code() and fragment_glsl_code() should each return strings that contain
     // code for a custom vertex shader and fragment shader, respectively.
 

@@ -1,3 +1,5 @@
+import {Vector4} from "./Vector.js";
+
 class Matrix extends Array {
     /**
      * **Matrix** holds M by N matrices of floats.  Enables matrix and vector math.
@@ -113,7 +115,7 @@ class Matrix extends Array {
             // Matrix * Matrix case.
             if (!optional_preallocated_result)
                 result[r] = new Array(len2);
-            for (let c = 0, sum = 0; c < len2; c++) {
+            for (let c = 0; c < len2; c++) {
                 result[r][c] = 0;
                 for (let r2 = 0; r2 < len; r2++)
                     result[r][c] += this[r][r2] * b[r2][c];
@@ -237,7 +239,7 @@ class Mat4 extends Matrix {
 
         // Check for NaN, indicating a degenerate cross product, which
         // happens if eye == at, or if at minus eye is parallel to up.
-        if (!x.every(i => i == i))
+        if (!x.every(i => i === i))
             throw "Two parallel vectors were given";
         z.scale_by(-1);                               // Enforce right-handed coordinate system.
         return Mat4.translation(-x.dot(eye), -y.dot(eye), -z.dot(eye))

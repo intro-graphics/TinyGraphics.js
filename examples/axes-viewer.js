@@ -3,20 +3,22 @@ import {defs, tiny} from './common.js';
 const {vec3, vec4, color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
 
 export class Axes_Viewer extends Scene {
-    // **Axes_Viewer** is a helper scene (a secondary Scene Component) for helping you
-    // visualize the coordinate bases that are used in your real scene.  Your scene
-    // can feed this object a list of bases to draw as axis arrows.  Pressing the
-    // buttons of this helper scene cycles through a list of each basis you have added,
-    // drawing the selected one.  Call insert() and pass it a basis to add one to the
-    // list.
-    // Always reset the data structure by calling reset() before each frame in your scene.
+    /**
+     **Axes_Viewer** is a helper scene (a secondary Scene Component) for helping you
+    visualize the coordinate bases that are used in your real scene.  Your scene
+    can feed this object a list of bases to draw as axis arrows.  Pressing the
+    buttons of this helper scene cycles through a list of each basis you have added,
+    drawing the selected one.  Call insert() and pass it a basis to add one to the
+    list.
+    Always reset the data structure by calling reset() before each frame in your scene.
 
-    // Bases at the same level in your scene's hierarchy can be grouped together and
-    // displayed all at once; just store them at the same index in "this.groups" by
-    // passing the same ID number into insert().  Normally passing an ID is optional;
-    // omitting it inserts your basis in the next empty group.  To re-use IDs easily,
-    // obtain the next unused ID by calling next_group_id(), so you can re-use it for
-    // all bases that you want to appear at the same level.
+    Bases at the same level in your scene's hierarchy can be grouped together and
+    displayed all at once; just store them at the same index in "this.groups" by
+    passing the same ID number into insert().  Normally passing an ID is optional;
+    omitting it inserts your basis in the next empty group.  To re-use IDs easily,
+    obtain the next unused ID by calling next_group_id(), so you can re-use it for
+    all bases that you want to appear at the same level.
+    **/
     constructor() {
         super();
 

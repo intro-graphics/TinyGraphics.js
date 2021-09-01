@@ -20,7 +20,7 @@ export class Shape_From_File extends Shape {                                   /
             })
             .then(obj_file_contents => this.parse_into_mesh(obj_file_contents))
             .catch(error => {
-                this.copy_onto_graphics_card(this.gl);
+                this.copyOntoGraphicsCard(this.gl);
             })
     }
 
@@ -108,7 +108,7 @@ export class Obj_File_Demo extends Scene {                           // **Obj_Fi
                                                                      // shapes to add complexity to a scene.  Simpler primitives in your scene
                                                                      // can just be thought of as placeholders until you find a model file
                                                                      // that fits well.  This demo shows the teapot model twice, with one
-                                                                     // teapot showing off the Fake_Bump_Map effect while the other has a
+                                                                     // teapot showing off the FakeBumpMap effect while the other has a
                                                                      // regular texture and Phong lighting.
     constructor() {
         super();

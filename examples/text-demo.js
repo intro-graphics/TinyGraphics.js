@@ -37,10 +37,10 @@ export class Text_Line extends Shape {                           // **Text_Line*
                 [left, 1 - top], [right, 1 - top]));
         }
         if (!this.existing) {
-            this.copy_onto_graphics_card(context);
+            this.copyOntoGraphicsCard(context);
             this.existing = true;
         } else
-            this.copy_onto_graphics_card(context, ["texture_coord"], false);
+            this.copyOntoGraphicsCard(context, ["texture_coord"], false);
     }
 }
 

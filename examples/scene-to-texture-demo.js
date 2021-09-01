@@ -77,7 +77,7 @@ export class Scene_To_Texture_Demo extends Scene {                   // **Scene_
         // to act on our SRC setting once:
         if (this.skipped_first_frame)
             // Update the texture with the current scene:
-            this.texture.copy_onto_graphics_card(context.context, false);
+            this.texture.copyOntoGraphicsCard(context.context, false);
         this.skipped_first_frame = true;
 
         // Start over on a new drawing, never displaying the prior one:

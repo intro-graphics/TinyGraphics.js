@@ -2,12 +2,15 @@ import {defs, tiny} from './common.js';
 // Pull these names into this module's scope for convenience:
 const {vec3, vec4, color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
 
-export class Many_Lights_Demo extends Scene {                             // **Many_Lights_Demo** demonstrates how to make the illusion that
-                                                                          // there are many lights, despite only passing two to the shader.
-                                                                          // We re-locate the lights in between individual shape draws.
-                                                                          // Doing this trick performs much faster than looping through a
-                                                                          // long list of lights within the fragment shader, none of which
-                                                                          // need to affect every single shape in the scene.
+/**
+ * **Many_Lights_Demo** demonstrates how to make the illusion that
+ * there are many lights, despite only passing two to the shader.
+ * We re-locate the lights in between individual shape draws.
+ * Doing this trick performs much faster than looping through a
+ * long list of lights within the fragment shader, none of which
+ * need to affect every single shape in the scene.
+ */
+export class Many_Lights_Demo extends Scene {
     constructor() {
         super();
         // Define how many boxes (buildings) to draw:
@@ -40,7 +43,12 @@ export class Many_Lights_Demo extends Scene {                             // **M
             this.column_lights [~~(r)] = vec3(r, -Math.random(), -2 * Math.random() * this.columns);
     }
 
-    display(context, program_state) {                                         // display():  Draw each frame to animate the scene.
+    /**
+     * Draw each frame to animate the scene.
+     * @param context
+     * @param program_state
+     */
+    display(context, program_state) {
         program_state.set_camera(Mat4.look_at(vec3(this.rows / 2, 5, 5), vec3(this.rows / 2, 0, -4), vec3(0, 1, 0)));
         program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 500);
 

@@ -1,17 +1,24 @@
-import {defs, tiny} from './common.js';
+// import {defs} from './common.js';
 
 // Pull these names into this module's scope for convenience:
-const {vec3, vec4, color, hex_color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
-const {Triangle, Square, Tetrahedron, Windmill, Cube, Subdivision_Sphere} = defs;
+import {
+    vec3, vec4, color, hex_color, Mat4, Light, Shape, Material, Shader, Texture, Scene,
+    Triangle, Square, Tetrahedron, Windmill, Cube, SubdivisionSphere, PhongShader, MovementControls
+} from "../src/TinyGraphics.js";
 
-export class Transforms_Sandbox_Base extends Scene {
-    // **Transforms_Sandbox_Base** is a Scene that can be added to any display canvas.
+// const {} = defs;
+
+
+export class TransformsSandboxBase extends Scene {
+    // **TransformsSandboxBase** is a Scene that can be added to any display canvas.
     // This particular scene is broken up into two pieces for easier understanding.
     // The piece here is the base class, which sets up the machinery to draw a simple
     // scene demonstrating a few concepts.  A subclass of it, Transforms_Sandbox,
     // exposes only the display() method, which actually places and draws the shapes,
     // isolating that code so it can be experimented with on its own.
-    constructor() {                  // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
+
+    // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
+    constructor() {
         super();
         this.hover = this.swarm = false;
         // At the beginning of our program, load one of each of these shape
@@ -21,7 +28,7 @@ export class Transforms_Sandbox_Base extends Scene {
         // Don't define more than one blueprint for the same thing here.
         this.shapes = {
             'box': new Cube(),
-            'ball': new Subdivision_Sphere(4)
+            'ball': new SubdivisionSphere(4)
         };
 
         // *** Materials: *** Define a shader, and then define materials that use
@@ -29,7 +36,7 @@ export class Transforms_Sandbox_Base extends Scene {
         // Here we use a Phong shader and the Material stores the scalar
         // coefficients that appear in the Phong lighting formulas so that the
         // appearance of particular materials can be tweaked via these numbers.
-        const phong = new defs.Phong_Shader();
+        const phong = new PhongShader();
         this.materials = {
             plastic: new Material(phong,
                 {ambient: .2, diffusivity: .8, specularity: .5, color: color(.9, .5, .9, 1)}),
@@ -66,7 +73,7 @@ export class Transforms_Sandbox_Base extends Scene {
 
         // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
         if (!context.scratchpad.controls) {
-            this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
+            this.children.push(context.scratchpad.controls = new MovementControls());
 
             // Define the global camera and projection matrices, which are stored in program_state.  The camera
             // matrix follows the usual format for transforms, but with opposite values (cameras exist as
@@ -89,10 +96,10 @@ export class Transforms_Sandbox_Base extends Scene {
 }
 
 
-export class Transforms_Sandbox extends Transforms_Sandbox_Base {
+class TransformsSandbox extends TransformsSandboxBase {
     // **Transforms_Sandbox** is a Scene object that can be added to any display canvas.
     // This particular scene is broken up into two pieces for easier understanding.
-    // See the other piece, Transforms_Sandbox_Base, if you need to see the setup code.
+    // See the other piece, TransformsSandboxBase, if you need to see the setup code.
     // The piece here exposes only the display() method, which actually places and draws
     // the shapes.  We isolate that code so it can be experimented with on its own.
     // This gives you a very small code sandbox for editing a simple scene, and for
@@ -123,7 +130,7 @@ export class Transforms_Sandbox extends Transforms_Sandbox_Base {
             // translation(), scale(), and rotation() to generate matrices, and the
             // function times(), which generates products of matrices.
 
-        // const blue = color(0, 0, 1, 1), yellow = color(1, 1, 0, 1);
+            // const blue = color(0, 0, 1, 1), yellow = color(1, 1, 0, 1);
         const blue = hex_color("#1a9ffa"), yellow = hex_color("#fdc03a")
         // Variable model_transform will be a local matrix value that helps us position shapes.
         // It starts over as the identity every single frame - coordinate axes at the origin.
@@ -181,3 +188,5 @@ export class Transforms_Sandbox extends Transforms_Sandbox_Base {
         // expression that we pass into draw(), or store under a different name.
     }
 }
+
+export {TransformsSandbox}

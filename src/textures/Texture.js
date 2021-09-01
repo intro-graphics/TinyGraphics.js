@@ -1,6 +1,6 @@
-import {Graphics_Card_Object} from "../utils.js";
+import {GraphicsCardObject} from "../utils.js";
 
-class Texture extends Graphics_Card_Object {
+class Texture extends GraphicsCardObject {
     // **Texture** wraps a pointer to a new texture image where
     // it is stored in GPU memory, along with a new HTML image object.
     // This class initially copies the image to the GPU buffers,
@@ -15,8 +15,8 @@ class Texture extends Graphics_Card_Object {
         this.image.src = filename;
     }
 
-    copy_onto_graphics_card(context, need_initial_settings = true) {
-        // copy_onto_graphics_card():  Called automatically as needed to load the
+    copyOntoGraphicsCard(context, need_initial_settings = true) {
+        // copyOntoGraphicsCard():  Called automatically as needed to load the
         // texture image onto one of your GPU contexts for its first time.
 
         // Define what this object should store in each new WebGL Context:
@@ -25,7 +25,7 @@ class Texture extends Graphics_Card_Object {
         // multiple drawing areas.  If this is a new GPU context for this object,
         // copy the object to the GPU.  Otherwise, this object already has been
         // copied over, so get a pointer to the existing instance.
-        const gpu_instance = super.copy_onto_graphics_card(context, initial_gpu_representation);
+        const gpu_instance = super.copyOntoGraphicsCard(context, initial_gpu_representation);
 
         if (!gpu_instance.texture_buffer_pointer) gpu_instance.texture_buffer_pointer = context.createTexture();
 

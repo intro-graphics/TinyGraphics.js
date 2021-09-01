@@ -3,10 +3,13 @@
  * This file defines a lot of panels that can be placed on websites to create interactive graphics programs that use tiny-graphics.js.
  */
 
-import {tiny} from './tiny-graphics.js';
+// import {tiny} from './tiny-graphics.js';
 
 // Pull these names into this module's scope for convenience.
-const {color, Scene} = tiny;
+// const {color, Scene} = tiny;
+import {color, Scene} from "./TinyGraphics.js";
+import * as tiny from './TinyGraphics.js';
+import {WebglManager} from "./utils.js";
 
 export const widgets = {};
 
@@ -31,7 +34,7 @@ const Canvas_Widget = widgets.Canvas_Widget =
             const rules = [".canvas-widget { width: 1080px; background: White; margin:auto }",
                 ".canvas-widget canvas { width: 1080px; height: 600px; margin-bottom:-3px }"];
 
-            if (document.styleSheets.length == 0) document.head.appendChild(document.createElement("style"));
+            if (document.styleSheets.length === 0) document.head.appendChild(document.createElement("style"));
             for (const r of rules) document.styleSheets[document.styleSheets.length - 1].insertRule(r, 0)
 
             // Fill in the document elements:
@@ -60,7 +63,7 @@ const Canvas_Widget = widgets.Canvas_Widget =
             if (!this.show_canvas)
                 canvas.style.display = "none";
 
-            this.webgl_manager = new tiny.Webgl_Manager(canvas, color(0, 0, 0, 1));
+            this.webgl_manager = new WebglManager(canvas, color(0, 0, 0, 1));
             // Second parameter sets background color.
 
 
@@ -70,15 +73,15 @@ const Canvas_Widget = widgets.Canvas_Widget =
 
             const primary_scene = initial_scenes ? initial_scenes[0] : undefined;
             const additional_scenes = initial_scenes ? initial_scenes.slice(1) : [];
-            const primary_scene_definiton = primary_scene ? primary_scene.constructor : undefined;
+            const primary_scene_definition = primary_scene ? primary_scene.constructor : undefined;
             if (this.show_explanation)
                 this.embedded_explanation = new Text_Widget(this.embedded_explanation_area, this.webgl_manager.scenes, this.webgl_manager);
             if (this.make_controls)
                 this.embedded_controls = new Controls_Widget(this.embedded_controls_area, this.webgl_manager.scenes);
             if (this.make_editor)
-                this.embedded_editor = new Editor_Widget(this.embedded_editor_area, primary_scene_definiton, this);
+                this.embedded_editor = new Editor_Widget(this.embedded_editor_area, primary_scene_definition, this);
             if (this.make_code_nav)
-                this.embedded_code_nav = new Code_Widget(this.embedded_code_nav_area, primary_scene_definiton,
+                this.embedded_code_nav = new Code_Widget(this.embedded_code_nav_area, primary_scene_definition,
                     additional_scenes, {associated_editor: this.embedded_editor});
 
             // Start WebGL initialization.  Note that render() will re-queue itself for continuous calls.
@@ -215,7 +218,7 @@ const Code_Manager = widgets.Code_Manager =
                 else if (single_token[11]) token.type = "punctuator"
                 else if (single_token[12]) token.type = "whitespace"
                 this.tokens.push(token)
-                if (token.type != "whitespace" && token.type != "comment") this.no_comments.push(token.value);
+                if (token.type !== "whitespace" && token.type !== "comment") this.no_comments.push(token.value);
             }
         }
     }
@@ -236,7 +239,7 @@ const Code_Widget = widgets.Code_Widget =
                 "font-family:monospace; border: 1px solid black }"
             ];
 
-            if (document.styleSheets.length == 0)
+            if (document.styleSheets.length === 0)
                 document.head.appendChild(document.createElement("style"));
             for (const r of rules)
                 document.styleSheets[document.styleSheets.length - 1].insertRule(r, 0)
@@ -246,11 +249,11 @@ const Code_Widget = widgets.Code_Widget =
             if (!main_scene)
                 return;
 
-            import( './main-scene.js' )
+            import( '../main-scene.js' )
                 .then(module => {
-                    this.build_reader(element, main_scene, additional_scenes, module.defs);
+                    this.build_reader(element, main_scene, additional_scenes, module);
                     if (!options.hide_navigator)
-                        this.build_navigator(element, main_scene, additional_scenes, module.defs);
+                        this.build_navigator(element, main_scene, additional_scenes, module);
                 })
         }
 
@@ -292,7 +295,7 @@ const Code_Widget = widgets.Code_Widget =
 
             const third_row = class_list.insertRow(-1);
             third_row.style = "text-align:center";
-            third_row.innerHTML = "<td><b>tiny-graphics.js</b><br>(Always the same)</td> \
+            third_row.innerHTML = "<td><b>TinyGraphics.js</b><br>(Always the same)</td> \
                              <td><b>All other class definitions from dependencies:</td>";
 
             const fourth_row = class_list.insertRow(-1);
@@ -301,11 +304,11 @@ const Code_Widget = widgets.Code_Widget =
                 const cell = fourth_row.appendChild(document.createElement("td"));
                 // List all class names except the main one, which we'll display separately:
                 const class_names = Object.keys(list).filter(x => x != main_scene.name);
-                cell.style = "white-space:normal"
+                cell.style = "white-space:normal";
                 for (let name of class_names) {
                     const class_link = cell.appendChild(document.createElement("a"));
-                    class_link.style["margin-right"] = "80px"
-                    class_link.href = "javascript:void(0);"
+                    class_link.style["margin-right"] = "80px";
+                    class_link.href = "javascript:void(0);";
                     class_link.addEventListener('click', () => this.display_code(tiny[name] || definitions[name]));
                     class_link.textContent = name;
                     cell.appendChild(document.createTextNode(" "));
@@ -333,7 +336,7 @@ const Code_Widget = widgets.Code_Widget =
             };
 
             for (let t of new Code_Manager(code_string).tokens)
-                if (t.type == "name" && [...Object.keys(tiny), ...Object.keys(this.definitions)].includes(t.value)) {
+                if (t.type === "name" && [...Object.keys(tiny), ...Object.keys(this.definitions)].includes(t.value)) {
                     const link = this.code_display.appendChild(document.createElement('a'));
                     link.href = "javascript:void(0);"
                     link.addEventListener('click', () => this.display_code(tiny[t.value] || this.definitions[t.value]));
@@ -458,7 +461,7 @@ const Text_Widget = widgets.Text_Widget =
                              overflow-y:scroll; box-shadow: 10px 10px 90px 0 inset LightGray}",
                 ".text-widget div { transition:none } "
             ];
-            if (document.styleSheets.length == 0) document.head.appendChild(document.createElement("style"));
+            if (document.styleSheets.length === 0) document.head.appendChild(document.createElement("style"));
             for (const r of rules) document.styleSheets[document.styleSheets.length - 1].insertRule(r, 0)
 
             Object.assign(this, {element, scenes, webgl_manager});
