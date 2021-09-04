@@ -27,7 +27,7 @@ import {
     vec4,
     Vector3,
 } from "../src/TinyGraphics.js";
-import {CanvasWidget, CodeWidget} from "../main-scene.js";
+import {CanvasWidget, CodeWidget} from "../mainScenes.js";
 
 export class SurfacesDemo extends Scene {
     constructor(scene_id, material) {

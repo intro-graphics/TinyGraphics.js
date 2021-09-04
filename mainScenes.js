@@ -36,9 +36,9 @@ const {
 
 // ******************** End extra step
 
-// (Can define Main_Scene's class here)
+// (Can define MainScene's class here)
 
-const Main_Scene = TextDemo;
+const MainScene = TextDemo;
 const Additional_Scenes = [];
 
-export {Main_Scene, Additional_Scenes, CanvasWidget, CodeWidget, TextWidget};
+export {MainScene, Additional_Scenes, CanvasWidget, CodeWidget, TextWidget};

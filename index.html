@@ -15,12 +15,12 @@
 <script type=module>
     // ********************* THE ENTRY POINT OF YOUR WHOLE PROGRAM STARTS HERE *********************
     // Indicate which element on the page you want the CanvasWidget to replace with a 3D WebGL area:
-    const element_to_replace = document.querySelector("#main-canvas");
-    import {Main_Scene, Additional_Scenes, CanvasWidget} from './main-scene.js';
+    const elementToReplace = document.querySelector("#main-canvas");
+    import {MainScene, Additional_Scenes, CanvasWidget} from './mainScenes.js';
     // Import the file that defines a scene.
-    const scenes = [Main_Scene, ...Additional_Scenes].map(scene => new scene());
+    const scenes = [MainScene, ...Additional_Scenes].map(scene => new scene());
     // This line creates your scene.
-    new CanvasWidget(element_to_replace, scenes);
+    new CanvasWidget(elementToReplace, scenes);
 </script>
 
 </body>

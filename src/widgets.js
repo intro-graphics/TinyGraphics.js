@@ -249,7 +249,7 @@ const CodeWidget = widgets.CodeWidget =
             if (!mainScene)
                 return;
 
-            import( '../main-scene.js' )
+            import( '../mainScenes.js' )
                 .then(module => {
                     this.buildReader(element, mainScene, additionalScenes, module);
                     if (!options.hide_navigator)
@@ -279,7 +279,7 @@ const CodeWidget = widgets.CodeWidget =
             topCell.appendChild(document.createTextNode("Click below to navigate through all classes that are defined."));
             const content = topCell.appendChild(document.createElement("p"));
             content.style = "text-align:center; margin:0; font-weight:bold";
-            content.innerHTML = "main-scene.js<br>Main Scene: ";
+            content.innerHTML = "mainScenes.js<br>Main Scene: ";
             const mainSceneLink = content.appendChild(document.createElement("a"));
             mainSceneLink.href = "javascript:void(0);";
             mainSceneLink.addEventListener('click', () => this.displayCode(mainScene));

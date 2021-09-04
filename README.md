@@ -26,7 +26,7 @@ To see all the demos and edit them:  Open the included "host.bat" or "host.comma
 browser. Open Developer Tools and create a workspace for your new folder. Now you can edit the files, which is necessary
 to view the different demos.
 
-To select a demo, open and edit main-scene.js. Assign your choice to the Main_Scene variable. Your choices for scenes
+To select a demo, open and edit mainScenes.js. Assign your choice to the MainScene variable. Your choices for scenes
 are:
 
 * Minimal_Webgl_Demo

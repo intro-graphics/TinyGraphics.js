@@ -15,22 +15,25 @@ import {
     Vector,
 } from "../src/TinyGraphics.js";
 
-export class TextLine extends Shape {                           // **TextLine** embeds text in the 3D world, using a crude texture
-    // method.  This Shape is made of a horizontal arrangement of quads.
-    // Each is textured over with images of ASCII characters, spelling
-    // out a string.  Usage:  Instantiate the Shape with the desired
-    // character line width.  Then assign it a single-line string by calling
-    // setString("your string") on it. Draw the shape on a material
-    // with full ambient weight, and text.png assigned as its texture
-    // file.  For multi-line strings, repeat this process and draw with
-    // a different matrix.
+/**
+ * **TextLine** embeds text in the 3D world, using a crude texture
+ * method.  This Shape is made of a horizontal arrangement of quads.
+ * Each is textured over with images of ASCII characters, spelling
+ * out a string.  Usage:  Instantiate the Shape with the desired
+ * character line width.  Then assign it a single-line string by calling
+ * setString("your string") on it. Draw the shape on a material
+ * with full ambient weight, and text.png assigned as its texture
+ * file.  For multi-line strings, repeat this process and draw with
+ * a different matrix.
+ */
+export class TextLine extends Shape {
     constructor(maxSize) {
         super("position", "normal", "texture_coord");
         this.max_size = maxSize;
-        let object_transform = Mat4.identity();
+        let objectTransform = Mat4.identity();
         for (let i = 0; i < maxSize; i++) {                                       // Each quad is a separate Square instance:
-            Square.insert_transformed_copy_into(this, [], object_transform);
-            object_transform.postMultiply(Mat4.translation(1.5, 0, 0));
+            Square.insert_transformed_copy_into(this, [], objectTransform);
+            objectTransform.postMultiply(Mat4.translation(1.5, 0, 0));
         }
     }
 
@@ -38,8 +41,8 @@ export class TextLine extends Shape {                           // **TextLine** 
         // values per quad, which enclose each of the string's characters.
         this.arrays.texture_coord = [];
         for (let i = 0; i < this.max_size; i++) {
-            let row = Math.floor((i < line.length ? line.charCodeAt(i) : ' '.charCodeAt()) / 16),
-                col = Math.floor((i < line.length ? line.charCodeAt(i) : ' '.charCodeAt()) % 16);
+            let row = Math.floor((i < line.length ? line.charCodeAt(i) : ' '.charCodeAt(0)) / 16),
+                col = Math.floor((i < line.length ? line.charCodeAt(i) : ' '.charCodeAt(0)) % 16);
 
             let skip = 3, size = 32, sizeFloor = size - skip;
             let dim = size * 16,
