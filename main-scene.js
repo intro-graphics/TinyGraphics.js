@@ -3,7 +3,7 @@
 import {AxesViewerTestScene} from "./examples/axesViewer.js";
 // import {CollisionDemo, InertiaDemo} from "./examples/collisionsDemo.js"
 import {ManyLightsDemo} from "./examples/manyLightsDemo.js"
-// import {Obj_File_Demo} from "./examples/obj-file-demo.js"
+import {ObjFileDemo} from "./examples/objFileDemo.js"
 // import {Scene_To_Texture_Demo} from "./examples/scene-to-texture-demo.js"
 // import {Surfaces_Demo} from "./examples/surfaces-demo.js"
 // import {Text_Demo} from "./examples/textDemo.js"
@@ -29,7 +29,7 @@ const {
 //     // {AxesViewer, AxesViewerTestScene},
 //     //         {InertiaDemo, CollisionDemo},
 //     //         {ManyLightsDemo},
-//     //         {Obj_File_Demo},
+//     //         {ObjFileDemo},
 //     //         {Scene_To_Texture_Demo},
 //     //         {Surfaces_Demo},
 //     //         {Text_Demo},
@@ -39,7 +39,7 @@ const {
 
 // (Can define Main_Scene's class here)
 
-const Main_Scene = ManyLightsDemo;
+const Main_Scene = ObjFileDemo;
 const Additional_Scenes = [];
 
 export {Main_Scene, Additional_Scenes, CanvasWidget, CodeWidget, TextWidget}
