@@ -1,4 +1,50 @@
 /**
+ * Vector and Matrix algebra are not built into JavaScript at first.  We will add it now.
+ *
+ * You will be able to declare a 3D vector [x,y,z] supporting various common vector operations
+ * with syntax:  vec(x,y), vec3( x,y,z ) or vec4( x,y,z, zero or one ).  For general sized vectors, use
+ * class Vector and declare them with standard Array-supported operations like .of().
+ *
+ * For matrices, you will use class Mat4 to generate the 4 by 4 matrices that are common
+ * in graphics, or for general sized matrices you can use class Matrix.
+ *
+ * To get vector algebra that performs well in JavaScript, we based class Vector on consecutive
+ * buffers (using type Float32Array).  Implementations should specialize for common vector
+ * sizes 3 and 4 since JavaScript engines can better optimize functions when they can predict
+ * argument count.  Implementations should also avoid allocating new array objects since these
+ * will all have to be garbage collected.
+ *
+ * Examples:
+ *  ** For size 3 **
+ *     equals: "vec3( 1,0,0 ).equals( vec3( 1,0,0 ) )" returns true.
+ *       plus: "vec3( 1,0,0 ).plus  ( vec3( 1,0,0 ) )" returns the Vector [ 2,0,0 ].
+ *      minus: "vec3( 1,0,0 ).minus ( vec3( 1,0,0 ) )" returns the Vector [ 0,0,0 ].
+ * mult-pairs: "vec3( 1,2,3 ).mult_pairs( vec3( 3,2,0 ) )" returns the Vector [ 3,4,0 ].
+ *      scale: "vec3( 1,2,3 ).scale( 2 )" overwrites the Vector with [ 2,4,6 ].
+ *      times: "vec3( 1,2,3 ).times( 2 )" returns the Vector [ 2,4,6 ].
+ * randomized: Returns this Vector plus a random vector of a given maximum length.
+ *        mix: "vec3( 0,2,4 ).mix( vec3( 10,10,10 ), .5 )" returns the Vector [ 5,6,7 ].
+ *       norm: "vec3( 1,2,3 ).norm()" returns the square root of 15.
+ * normalized: "vec3( 4,4,4 ).normalized()" returns the Vector [ sqrt(3), sqrt(3), sqrt(3) ]
+ *  normalize: "vec3( 4,4,4 ).normalize()" overwrites the Vector with [ sqrt(3), sqrt(3), sqrt(3) ].
+ *        dot: "vec3( 1,2,3 ).dot( vec3( 1,2,3 ) )" returns 15.
+ *       cast: "vec3.cast( [-1,-1,0], [1,-1,0], [-1,1,0] )" converts a list of Array literals into a list of vec3's.
+ *        to4: "vec3( 1,2,3 ).to4( true or false )" returns the homogeneous vec4 [ 1,2,3, 1 or 0 ].
+ *      cross: "vec3( 1,0,0 ).cross( vec3( 0,1,0 ) )" returns the Vector [ 0,0,1 ].  Use only on 3x1 Vecs.
+ *  to_string: "vec3( 1,2,3 ).to_string()" returns "[vec3 1, 2, 3]"
+ *  ** For size 4, same except: **
+ *        to3: "vec4( 4,3,2,1 ).to3()" returns the vec3 [ 4,3,2 ].  Use to truncate vec4 to vec3.
+ *  ** To assign by value **
+ *       copy: "let new_vector = old_vector.copy()" assigns by value so you get a different vector object.
+ *  ** For any size **
+ * to declare: Vector.of( 1,2,3,4,5,6,7,8,9,10 ) returns a Vector filled with those ten entries.
+ *  ** For multiplication by matrices **
+ *             "any_mat4.times( vec4( 1,2,3,0 ) )" premultiplies the homogeneous Vector [1,2,3]
+ *              by the 4x4 matrix and returns the new vec4.  Requires a vec4 as input.
+ */
+
+
+/**
  * **Vector** stores vectors of floating point numbers.  Puts vector math into JavaScript.
  * @Note  Vectors should be created with of() due to wierdness with the TypedArray spec.
  * @Tip Assign Vectors with .copy() to avoid referring two variables to the same Vector object.
