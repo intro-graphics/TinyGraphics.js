@@ -16,7 +16,7 @@ export class Text_Line extends Shape {                           // **Text_Line*
         this.max_size = max_size;
         var object_transform = Mat4.identity();
         for (var i = 0; i < max_size; i++) {                                       // Each quad is a separate Square instance:
-            defs.Square.insert_transformed_copy_into(this, [], object_transform);
+            Square.insert_transformed_copy_into(this, [], object_transform);
             object_transform.postMultiply(Mat4.translation(1.5, 0, 0));
         }
     }
@@ -48,12 +48,12 @@ export class Text_Line extends Shape {                           // **Text_Line*
 export class Text_Demo extends Scene {             // **Text_Demo** is a scene with a cube, for demonstrating the Text_Line utility Shape.
     constructor() {
         super()
-        this.shapes = {cube: new defs.Cube(), text: new Text_Line(35)};
+        this.shapes = {cube: new Cube(), text: new Text_Line(35)};
         // Don't create any DOM elements to control this scene:
         this.widget_options = {make_controls: false};
 
-        const phong = new defs.Phong_Shader();
-        const texture = new defs.Textured_Phong(1);
+        const phong = new Phong_Shader();
+        const texture = new Textured_Phong(1);
         this.grey = new Material(phong, {
             color: color(.5, .5, .5, 1), ambient: 0,
             diffusivity: .3, specularity: .5, smoothness: 10,

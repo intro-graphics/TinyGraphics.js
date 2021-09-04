@@ -11,7 +11,7 @@ class FunnyShader extends Shader {
         // updateGPU():  Define how to synchronize our JavaScript's variables to the GPU's:
         const [P, C, M] = [programState.projectionTransform, programState.camera_inverse, model_transform],
             PCM = P.times(C).times(M);
-        context.uniformMatrix4fv(gpuAddresses.projection_camera_modelTransform, false, Mat.flatten_2D_to_1D(PCM.transposed()));
+        context.uniformMatrix4fv(gpuAddresses.projection_camera_modelTransform, false, Mat.flatten2dTo1D(PCM.transposed()));
         context.uniform1f(gpuAddresses.animationTime, programState.animationTime / 1000);
     }
 

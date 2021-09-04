@@ -104,7 +104,7 @@ export class ShapeFromFile extends Shape {                                   // 
             }
             this.indices = unpacked.indices;
         }
-        this.normalize_positions(false);
+        this.normalizePositions(false);
         this.ready = true;
     }
 

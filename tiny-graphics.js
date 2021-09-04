@@ -448,8 +448,8 @@
 //         // **Matrix** holds M by N matrices of floats.  Enables matrix and vector math.
 //         // Example usage:
 //         //  "Matrix( rows )" returns a Matrix with those rows, where rows is an array of float arrays.
-//         //  "M.set_identity( m, n )" assigns the m by n identity to Matrix M.
-//         //  "M.sub_block( start, end )" where start and end are each a [ row, column ] pair returns a sub-rectangle cut out from M.
+//         //  "M.setIdentity( m, n )" assigns the m by n identity to Matrix M.
+//         //  "M.subBlock( start, end )" where start and end are each a [ row, column ] pair returns a sub-rectangle cut out from M.
 //         //  "M.copy()" creates a deep copy of M and returns it so you can modify it without affecting the original.
 //         //  "M.equals(b)", "M.plus(b)", and "M.minus(b)" are operations betwen two matrices.
 //         //  "M.transposed()" returns a new matrix where all rows of M became columns and vice versa.
@@ -457,7 +457,7 @@
 //         //               new Matrix or Vector4 holding the product.
 //         //  "M.pre_multiply(b)"  overwrites the Matrix M with the product of b * M where b must be another Matrix.
 //         //  "M.postMultiply(b)" overwrites the Matrix M with the product of M * b where b can be a Matrix or scalar.
-//         //  "Matrix.flatten_2D_to_1D( M )" flattens input (a Matrix or any array of Vectors or float arrays)
+//         //  "Matrix.flatten2dTo1D( M )" flattens input (a Matrix or any array of Vectors or float arrays)
 //         //                                 into a row-major 1D array of raw floats.
 //         //  "M.to_string()" where M contains the 4x4 identity returns "[[1, 0, 0, 0] [0, 1, 0, 0] [0, 0, 1, 0] [0, 0, 0, 1]]".
 //
@@ -466,7 +466,7 @@
 //             this.push(...args)
 //         }
 //
-//         static flatten_2D_to_1D(M) {
+//         static flatten2dTo1D(M) {
 //             let index = 0, floats = new Float32Array(M.length && M.length * M[0].length);
 //             for (let i = 0; i < M.length; i++) for (let j = 0; j < M[i].length; j++) floats[index++] = M[i][j];
 //             return floats;
@@ -477,7 +477,7 @@
 //             this.push(...M);
 //         }
 //
-//         set_identity(m, n) {
+//         setIdentity(m, n) {
 //             this.length = 0;
 //             for (let i = 0; i < m; i++) {
 //                 this.push(Array(n).fill(0));
@@ -485,7 +485,7 @@
 //             }
 //         }
 //
-//         sub_block(start, end) {
+//         subBlock(start, end) {
 //             return Matrix.from(this.slice(start[0], end[0]).map(r => r.slice(start[1], end[1])));
 //         }
 //
@@ -813,7 +813,7 @@
 //                 if (!didExist)
 //                     gpuInstance.webGL_buffer_pointers[name] = gl.createBuffer();
 //                 gl.bindBuffer(gl.ARRAY_BUFFER, gpuInstance.webGL_buffer_pointers[name]);
-//                 write(gl.ARRAY_BUFFER, Matrix.flatten_2D_to_1D(this.arrays[name]));
+//                 write(gl.ARRAY_BUFFER, Matrix.flatten2dTo1D(this.arrays[name]));
 //             }
 //             if (this.indices.length && writeToIndices) {
 //                 if (!didExist)

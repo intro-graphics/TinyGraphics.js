@@ -40,7 +40,7 @@ class GraphicsCardObject {
                     frame. Instead, call these in your scene's constructor and keep the result as a class member, 
                     or otherwise make sure it only happens once.  In the off chance that you have a somehow deformable 
                     shape that MUST change every frame, then at least use the special arguments of 
-                    copy_onto_graphics_card to limit which buffers get overwritten every frame to only 
+                    copyOntoGraphicsCard to limit which buffers get overwritten every frame to only 
                     the necessary ones.`;
         }
         // Check if this object already exists on that GPU context.
@@ -112,7 +112,7 @@ class VertexBuffer extends GraphicsCardObject {
             if (!didExist)
                 gpuInstance.webGL_buffer_pointers[name] = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, gpuInstance.webGL_buffer_pointers[name]);
-            write(gl.ARRAY_BUFFER, Matrix.flatten_2D_to_1D(this.arrays[name]));
+            write(gl.ARRAY_BUFFER, Matrix.flatten2dTo1D(this.arrays[name]));
         }
         if (this.indices.length && writeToIndices) {
             if (!didExist)

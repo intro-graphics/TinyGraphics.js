@@ -215,8 +215,8 @@ class MovementControls extends Scene {
         this.keyTriggeredButton("(Un)freeze mouse look around", ["f"], () => this.lookAroundLocked ^= 1, "#8B8885");
         this.newLine();
         this.keyTriggeredButton("Go to world origin", ["r"], () => {
-            this.matrix().set_identity(4, 4);
-            this.inverse().set_identity(4, 4);
+            this.matrix().setIdentity(4, 4);
+            this.inverse().setIdentity(4, 4);
         }, "#8B8885");
         this.newLine();
 

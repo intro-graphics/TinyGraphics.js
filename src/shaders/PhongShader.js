@@ -58,8 +58,8 @@ class PhongShader extends Shader {
         // call, and thus across each instance of the vertex shader.
         // Transpose them since the GPU expects matrices as column-major arrays.
         const PCM = gpuState.projectionTransform.times(gpuState.camera_inverse).times(model_transform);
-        gl.uniformMatrix4fv(gpu.model_transform, false, Matrix.flatten_2D_to_1D(model_transform.transposed()));
-        gl.uniformMatrix4fv(gpu.projection_camera_modelTransform, false, Matrix.flatten_2D_to_1D(PCM.transposed()));
+        gl.uniformMatrix4fv(gpu.model_transform, false, Matrix.flatten2dTo1D(model_transform.transposed()));
+        gl.uniformMatrix4fv(gpu.projection_camera_modelTransform, false, Matrix.flatten2dTo1D(PCM.transposed()));
 
         // Omitting lights will show only the material color, scaled by the ambient term:
         if (!gpuState.lights.length)

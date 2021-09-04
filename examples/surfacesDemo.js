@@ -1,9 +1,21 @@
-import {defs, tiny} from './common.js';
 // Pull these names into this module's scope for convenience:
-const {Vector3, vec3, vec4, color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
-const {Triangle, Square, Tetrahedron, Windmill, Cube, Subdivision_Sphere} = defs;
+import {
+    AxisArrows, CappedCylinder, ClosedCone,
+    color, ConeTip,
+    Cube, CylindricalTube, GridPatch, GridSphere,
+    Light,
+    Mat4,
+    Material, MovementControls, PhongShader, Regular2dPolygon, RoundedCappedCylinder, RoundedClosedCone,
+    Scene, SubdivisionSphere, SurfaceOfRevolution,
+    Texture,
+    TexturedPhong, Torus,
+    vec3,
+    vec4,
+    Vector3,
+} from "../src/TinyGraphics.js";
+import {CanvasWidget, CodeWidget} from "../main-scene.js";
 
-export class Surfaces_Demo extends Scene {
+export class SurfacesDemo extends Scene {
     constructor(scene_id, material) {
         super();
 
@@ -21,11 +33,11 @@ export class Surfaces_Demo extends Scene {
         this.widget_options = {make_controls: false};
 
         if (this.is_master) {
-            const textured = new defs.Textured_Phong(1);
+            const textured = new TexturedPhong(1);
             this.material = new Material(textured, {ambient: .5, texture: new Texture("assets/rgb.jpg")});
 
             for (let i = 0; i < this.num_scenes; i++)
-                this.sections.push(new Surfaces_Demo(i, this.material));
+                this.sections.push(new SurfacesDemo(i, this.material));
         } else
             this["construct_scene_" + scene_id]();
     }
@@ -41,8 +53,8 @@ export class Surfaces_Demo extends Scene {
         const column_operation_2 = (t, p, s) => vec3(2 * t - 1, 2 * s - 1, Math.random() / 2);
 
         this.shapes = {
-            sheet: new defs.Grid_Patch(10, 10, row_operation, column_operation),
-            sheet2: new defs.Grid_Patch(10, 10, row_operation_2, column_operation_2)
+            sheet: new GridPatch(10, 10, row_operation, column_operation),
+            sheet2: new GridPatch(10, 10, row_operation_2, column_operation_2),
         };
     }
 
@@ -51,50 +63,50 @@ export class Surfaces_Demo extends Scene {
         const row_operation = (s, p) => p ? Mat4.translation(0, .2, 0).times(p.to4(1)).to3()
             : initial_corner_point;
         const column_operation = (t, p) => Mat4.translation(.2, 0, 0).times(p.to4(1)).to3();
-        this.shapes = {sheet: new defs.Grid_Patch(10, 10, row_operation, column_operation)};
+        this.shapes = {sheet: new GridPatch(10, 10, row_operation, column_operation)};
     }
 
     construct_scene_2() {
         this.shapes = {
-            donut: new defs.Torus(15, 15, [[0, 2], [0, 1]]),
-            hexagon: new defs.Regular_2D_Polygon(1, 5),
-            cone: new defs.Cone_Tip(4, 10, [[0, 2], [0, 1]]),
-            tube: new defs.Cylindrical_Tube(1, 10, [[0, 2], [0, 1]]),
-            ball: new defs.Grid_Sphere(6, 6, [[0, 2], [0, 1]]),
-            donut2: new (defs.Torus.prototype.make_flat_shaded_version())(20, 20, [[0, 2], [0, 1]]),
+            donut: new Torus(15, 15, [[0, 2], [0, 1]]),
+            hexagon: new Regular2dPolygon(1, 5),
+            cone: new ConeTip(4, 10, [[0, 2], [0, 1]]),
+            tube: new CylindricalTube(1, 10, [[0, 2], [0, 1]]),
+            ball: new GridSphere(6, 6, [[0, 2], [0, 1]]),
+            donut2: new (Torus.prototype.makeFlatShadedVersion())(20, 20, [[0, 2], [0, 1]]),
         };
     }
 
     construct_scene_3() {
         const points = Vector3.cast([0, 0, .8], [.5, 0, 1], [.5, 0, .8], [.4, 0, .7], [.4, 0, .5], [.5, 0, .4], [.5, 0, -1], [.4, 0, -1.5], [.25, 0, -1.8], [0, 0, -1.7]);
 
-        this.shapes = {bullet: new defs.Surface_Of_Revolution(9, 9, points)};
+        this.shapes = {bullet: new SurfaceOfRevolution(9, 9, points)};
 
-        const phong = new defs.Phong_Shader(1);
+        const phong = new PhongShader(1);
         this.solid = new Material(phong, {diffusivity: .5, smoothness: 800, color: color(.7, .8, .6, 1)});
     }
 
     construct_scene_4() {
         this.shapes = {
-            axis: new defs.Axis_Arrows(),
-            ball: new defs.Subdivision_Sphere(3),
-            box: new defs.Cube(),
-            cone_0: new defs.Closed_Cone(4, 10, [[.67, 1], [0, 1]]),
-            tube_0: new defs.Cylindrical_Tube(7, 7, [[.67, 1], [0, 1]]),
-            cone_1: new defs.Closed_Cone(4, 10, [[.34, .66], [0, 1]]),
-            tube_1: new defs.Cylindrical_Tube(7, 7, [[.34, .66], [0, 1]]),
-            cone_2: new defs.Closed_Cone(4, 10, [[0, .33], [0, 1]]),
-            tube_2: new defs.Cylindrical_Tube(7, 7, [[0, .33], [0, 1]]),
+            axis: new AxisArrows(),
+            ball: new SubdivisionSphere(3),
+            box: new Cube(),
+            cone_0: new ClosedCone(4, 10, [[.67, 1], [0, 1]]),
+            tube_0: new CylindricalTube(7, 7, [[.67, 1], [0, 1]]),
+            cone_1: new ClosedCone(4, 10, [[.34, .66], [0, 1]]),
+            tube_1: new CylindricalTube(7, 7, [[.34, .66], [0, 1]]),
+            cone_2: new ClosedCone(4, 10, [[0, .33], [0, 1]]),
+            tube_2: new CylindricalTube(7, 7, [[0, .33], [0, 1]]),
         };
     }
 
     construct_scene_5() {
         this.shapes = {
             box: new Cube(),
-            cone: new defs.Closed_Cone(4, 10, [[0, 2], [0, 1]]),
-            capped: new defs.Capped_Cylinder(1, 10, [[0, 2], [0, 1]]),
-            cone2: new defs.Rounded_Closed_Cone(5, 10, [[0, 2], [0, 1]]),
-            capped2: new defs.Rounded_Capped_Cylinder(5, 10, [[0, 2], [0, 1]])
+            cone: new ClosedCone(4, 10, [[0, 2], [0, 1]]),
+            capped: new CappedCylinder(1, 10, [[0, 2], [0, 1]]),
+            cone2: new RoundedClosedCone(5, 10, [[0, 2], [0, 1]]),
+            capped2: new RoundedCappedCylinder(5, 10, [[0, 2], [0, 1]]),
         };
     }
 
@@ -118,20 +130,20 @@ export class Surfaces_Demo extends Scene {
 
         // Now that we have two 1D curves, let's make a surface between them:
 
-        let sampler1 = i => defs.Grid_Patch.sample_array(square_array, i);
-        let sampler2 = i => defs.Grid_Patch.sample_array(star_array, i);
+        let sampler1 = i => GridPatch.sample_array(square_array, i);
+        let sampler2 = i => GridPatch.sample_array(star_array, i);
 
         let sample_two_arrays = (j, p, i) => sampler2(i).mix(sampler1(i), j);
 
 
         this.shapes = {
-            shell: new defs.Grid_Patch(30, 30, sampler2, sample_two_arrays, [[0, 1], [0, 1]])
+            shell: new GridPatch(30, 30, sampler2, sample_two_arrays, [[0, 1], [0, 1]]),
         };
     }
 
     display_scene_0(context, programState) {
         if (!context.scratchpad.controls) {
-            this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
+            this.children.push(context.scratchpad.controls = new MovementControls());
             programState.setCamera(Mat4.translation(0, 0, -3));
         }
         // Draw the sheets, flipped 180 degrees so their normals point at us.
@@ -148,13 +160,13 @@ export class Surfaces_Demo extends Scene {
             a[i] = vec3(p[0], p[1], .15 * random(i / a.length)));
         // Update the normals to reflect the surface's new arrangement.
         // This won't be perfect flat shading because vertices are shared.
-        this.shapes.sheet.flat_shade();
+        this.shapes.sheet.makeFlatShadedVersion();
         // Draw the current sheet shape.
         this.shapes.sheet.draw(context, programState, this.r, this.material);
 
         // Update the gpu-side shape with new vertices.
         // Warning:  You can't call this until you've already drawn the shape once.
-        this.shapes.sheet.copy_onto_graphics_card(context.context, ["position", "normal"], false);
+        this.shapes.sheet.copyOntoGraphicsCard(context.context, ["position", "normal"], false);
     }
 
     display_scene_2(context, programState) {
@@ -221,7 +233,7 @@ export class Surfaces_Demo extends Scene {
 
     explain_scene_1(documentElement) {
         documentElement.innerHTML += `<p>Shapes in tiny-graphics.js can also be modified and animated if need be.  The shape drawn below has vertex positions and normals that are recalculated for every frame.</p>
-                                     <p>Call copy_onto_graphics_card() on the Shape to make this happen.  Pass in the context, then an array of the buffer names you'd like to overwrite, then false to indicate that indices should be left alone.  Overwriting buffers in place saves us from slow reallocations.  Warning:  Do not try calling copy_onto_graphics_card() to update a shape until after the shape's first draw() call has completed.</p>`;
+                                     <p>Call copyOntoGraphicsCard() on the Shape to make this happen.  Pass in the context, then an array of the buffer names you'd like to overwrite, then false to indicate that indices should be left alone.  Overwriting buffers in place saves us from slow reallocations.  Warning:  Do not try calling copyOntoGraphicsCard() to update a shape until after the shape's first draw() call has completed.</p>`;
     }
 
     explain_scene_2(documentElement) {
@@ -255,24 +267,24 @@ export class Surfaces_Demo extends Scene {
                 const element_1 = documentElement.appendChild(document.createElement("div"));
                 element_1.className = "canvas-widget";
 
-                const cw = new tiny.CanvasWidget(element_1, undefined,
+                const cw = new CanvasWidget(element_1, undefined,
                     {make_controls: i == 0, make_editor: false, make_code_nav: false});
                 cw.webglManager.scenes.push(this.sections[i]);
                 cw.webglManager.programState = webglManager.programState;
-                cw.webglManager.set_size([1080, 300]);
+                cw.webglManager.setSize([1080, 300]);
 
                 const element_2 = documentElement.appendChild(document.createElement("div"));
                 element_2.className = "code-widget";
 
-                const code = new tiny.CodeWidget(element_2,
-                    Surfaces_Demo.prototype["construct_scene_" + i],
+                const code = new CodeWidget(element_2,
+                    SurfacesDemo.prototype["construct_scene_" + i],
                     [], {hide_navigator: true});
 
                 const element_3 = documentElement.appendChild(document.createElement("div"));
                 element_3.className = "code-widget";
 
-                const code_2 = new tiny.CodeWidget(element_3,
-                    Surfaces_Demo.prototype["display_scene_" + i],
+                const code_2 = new CodeWidget(element_3,
+                    SurfacesDemo.prototype["display_scene_" + i],
                     [], {hide_navigator: true});
             }
 

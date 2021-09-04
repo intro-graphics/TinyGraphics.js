@@ -66,69 +66,66 @@ class Shape extends VertexBuffer {
      * Shape's points, but with new normals generated from flat shading.
      * @returns {{new(...[*]): {}, prototype: {}}}
      */
-    make_flat_shaded_version() {
-        let duplicate_the_shared_vertices = this.duplicate_the_shared_vertices;
-        let flat_shade = this.flat_shade;
+    makeFlatShadedVersion() {
         return class extends this.constructor {
             constructor(...args) {
                 super(...args);
-                duplicate_the_shared_vertices();
-                flat_shade();
+                this.duplicateTheSharedVertices();
+                this.flatShade();
+            }
+
+            /**
+             * Prepare an indexed shape for flat shading if it is not ready -- that is, if there are any
+             * edges where the same vertices are indexed by both the adjacent triangles, and those two
+             * triangles are not co-planar.  The two would therefore fight over assigning different normal
+             * vectors to the shared vertices.
+             */
+            duplicateTheSharedVertices() {
+                const arrays = {};
+                for (let arr in this.arrays) arrays[arr] = [];
+                for (let index of this.indices)
+                    for (let arr in this.arrays)
+                        arrays[arr].push(this.arrays[arr][index]);
+                // Make re-arranged versions of each data field, with
+                Object.assign(this.arrays, arrays);
+                // copied values every time an index was formerly re-used.
+                this.indices = this.indices.map((x, i) => i);
+                // Without shared vertices, we can use sequential numbering.
+            }
+
+            /**
+             * Automatically assign the correct normals to each triangular element to achieve flat shading.
+             * Affect all recently added triangles (those past "offset" in the list).  Assumes that no
+             * vertices are shared across seams.   First, iterate through the index or position triples:
+             */
+            flatShade() {
+                for (let counter = 0; counter < (this.indices ? this.indices.length : this.arrays.position.length); counter += 3) {
+                    const indices = this.indices.length ? [this.indices[counter], this.indices[counter + 1], this.indices[counter + 2]]
+                        : [counter, counter + 1, counter + 2];
+                    const [p1, p2, p3] = indices.map(i => this.arrays.position[i]);
+                    // Cross the two edge vectors of this triangle together to get its normal:
+                    const n1 = p1.minus(p2).cross(p3.minus(p1)).normalized();
+                    // Flip the normal if adding it to the triangle brings it closer to the origin:
+                    if (n1.times(.1).plus(p1).norm() < p1.norm()) n1.scale_by(-1);
+                    // Propagate this normal to the 3 vertices:
+                    for (let i of indices) this.arrays.normal[i] = Vector3.from(n1);
+                }
             }
         }
     }
 
-    /**
-     * Prepare an indexed shape for flat shading if it is not ready -- that is, if there are any
-     * edges where the same vertices are indexed by both the adjacent triangles, and those two
-     * triangles are not co-planar.  The two would therefore fight over assigning different normal
-     * vectors to the shared vertices.
-     */
-    duplicate_the_shared_vertices() {
-        const arrays = {};
-        console.log(this.arrays)
-        for (let arr in this.arrays) arrays[arr] = [];
-        for (let index of this.indices)
-            for (let arr in this.arrays)
-                arrays[arr].push(this.arrays[arr][index]);
-        // Make re-arranged versions of each data field, with
-        Object.assign(this.arrays, arrays);
-        // copied values every time an index was formerly re-used.
-        this.indices = this.indices.map((x, i) => i);
-        // Without shared vertices, we can use sequential numbering.
-    }
-
-    /**
-     * Automatically assign the correct normals to each triangular element to achieve flat shading.
-     * Affect all recently added triangles (those past "offset" in the list).  Assumes that no
-     * vertices are shared across seams.   First, iterate through the index or position triples:
-     */
-    flat_shade() {
-        for (let counter = 0; counter < (this.indices ? this.indices.length : this.arrays.position.length); counter += 3) {
-            const indices = this.indices.length ? [this.indices[counter], this.indices[counter + 1], this.indices[counter + 2]]
-                : [counter, counter + 1, counter + 2];
-            const [p1, p2, p3] = indices.map(i => this.arrays.position[i]);
-            // Cross the two edge vectors of this triangle together to get its normal:
-            const n1 = p1.minus(p2).cross(p3.minus(p1)).normalized();
-            // Flip the normal if adding it to the triangle brings it closer to the origin:
-            if (n1.times(.1).plus(p1).norm() < p1.norm()) n1.scale_by(-1);
-            // Propagate this normal to the 3 vertices:
-            for (let i of indices) this.arrays.normal[i] = Vector3.from(n1);
-        }
-    }
-
-    normalize_positions(keep_aspect_ratios = true) {
-        let p_arr = this.arrays.position;
-        const average_position = p_arr.reduce((acc, p) => acc.plus(p.times(1 / p_arr.length)),
+    normalizePositions(keepAspectRatios = true) {
+        let positionArray = this.arrays.position;
+        const averagePosition = positionArray.reduce((acc, p) => acc.plus(p.times(1 / positionArray.length)),
             vec3(0, 0, 0));
-        p_arr = p_arr.map(p => p.minus(average_position));           // Center the point cloud on the origin.
-        const average_lengths = p_arr.reduce((acc, p) =>
-            acc.plus(p.map(x => Math.abs(x)).times(1 / p_arr.length)), vec3(0, 0, 0));
-        if (keep_aspect_ratios) {
+        positionArray = positionArray.map(p => p.minus(averagePosition));           // Center the point cloud on the origin.
+        const averageLengths = positionArray.reduce((acc, p) =>
+            acc.plus(p.map(x => Math.abs(x)).times(1 / positionArray.length)), vec3(0, 0, 0));
+        if (keepAspectRatios) {
             // Divide each axis by its average distance from the origin.
-            this.arrays.position = p_arr.map(p => p.map((x, i) => x / average_lengths[i]));
+            this.arrays.position = positionArray.map(p => p.map((x, i) => x / averageLengths[i]));
         } else
-            this.arrays.position = p_arr.map(p => p.times(1 / average_lengths.norm()));
+            this.arrays.position = positionArray.map(p => p.times(1 / averageLengths.norm()));
     }
 }
 

@@ -20,7 +20,7 @@ class BasicShader extends Shader {
         const [P, C, M] = [graphicsState.projectionTransform, graphicsState.camera_inverse, model_transform],
             PCM = P.times(C).times(M);
         context.uniformMatrix4fv(gpuAddresses.projection_camera_modelTransform, false,
-            Matrix.flatten_2D_to_1D(PCM.transposed()));
+            Matrix.flatten2dTo1D(PCM.transposed()));
     }
 
     vertexGlslCode() {

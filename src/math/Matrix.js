@@ -11,7 +11,7 @@ class Matrix extends Array {
         this.push(...args)
     }
 
-    static flatten_2D_to_1D(M) {
+    static flatten2dTo1D(M) {
         let index = 0, floats = new Float32Array(M.length && M.length * M[0].length);
         for (let i = 0; i < M.length; i++) for (let j = 0; j < M[i].length; j++) floats[index++] = M[i][j];
         return floats;
@@ -31,7 +31,7 @@ class Matrix extends Array {
      * @param m row number
      * @param n column number
      */
-    set_identity(m, n) {
+    setIdentity(m, n) {
         this.length = 0;
         for (let i = 0; i < m; i++) {
             this.push(Array(n).fill(0));
@@ -40,12 +40,12 @@ class Matrix extends Array {
     }
 
     /**
-     * "M.sub_block( start, end )" where start and end are each a [ row, column ] pair returns a sub-rectangle cut out from M.
+     * "M.subBlock( start, end )" where start and end are each a [ row, column ] pair returns a sub-rectangle cut out from M.
      * @param start
      * @param end
      * @returns {*}
      */
-    sub_block(start, end) {
+    subBlock(start, end) {
         return Matrix.from(this.slice(start[0], end[0]).map(r => r.slice(start[1], end[1])));
     }
 

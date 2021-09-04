@@ -1,24 +1,25 @@
-import {defs, tiny} from './common.js';
-// Pull these names into this module's scope for convenience:
-const {vec3, vec4, color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
+import {AxisArrows, Cube} from "../src/geometries/ShapePack.js";
+import {color, FakeBumpMap, Light, Mat4, Material, Scene, Texture, vec3, vec4} from "../src/TinyGraphics.js";
 
-export class Scene_To_Texture_Demo extends Scene {                   // **Scene_To_Texture_Demo** is a crude way of doing multi-pass rendering.
-                                                                     // We will draw a scene (containing just the left box with the striped
-                                                                     // texture) to a hidden canvas.  The hidden canvas's colors are copied
-                                                                     // to an HTML Image object, and then to one of our Textures.  Finally,
-                                                                     // we clear the buffer in the middle of display() and start over.
-                                                                     // The scene is drawn again (with a different texture) and a new box
-                                                                     // on the right side, textured with the first scene.
-                                                                     // NOTE: To use this for two-pass rendering, you simply need to write
-                                                                     // any shader that acts upon the input texture as if it were a
-                                                                     // previous rendering result.
+/**
+ * **SceneToTextureDemo** is a crude way of doing multi-pass rendering.
+ * We will draw a scene (containing just the left box with the striped
+ * texture) to a hidden canvas.  The hidden canvas's colors are copied
+ * to an HTML Image object, and then to one of our Textures.  Finally,
+ * we clear the buffer in the middle of display() and start over.
+ * The scene is drawn again (with a different texture) and a new box
+ * on the right side, textured with the first scene.
+ * NOTE: To use this for two-pass rendering, you simply need to write
+ * any shader that acts upon the input texture as if it were a
+ */
+export class SceneToTextureDemo extends Scene {
     constructor() {               // Request the camera, shapes, and materials our Scene will need:
         super();
         this.shapes = {
-            box: new defs.Cube(),
-            box_2: new defs.Cube(),
-            axis: new defs.Axis_Arrows()
-        }
+            box: new Cube(),
+            box_2: new Cube(),
+            axis: new AxisArrows(),
+        };
         // Scale the texture coordinates:
         this.shapes.box_2.arrays.texture_coord.forEach(p => p.scale_by(2));
 
@@ -29,13 +30,13 @@ export class Scene_To_Texture_Demo extends Scene {                   // **Scene_
         this.scratchpad.height = 256;                // Initial image source: Blank gif file:
         this.texture = new Texture("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
 
-        const bump = new defs.Fake_Bump_Map(1);
+        const bump = new FakeBumpMap(1);
         this.materials =
             {
                 a: new Material(bump, {ambient: .5, texture: new Texture("assets/rgb.jpg")}),
                 b: new Material(bump, {ambient: .5, texture: new Texture("assets/earth.gif")}),
                 c: new Material(bump, {ambient: 1, texture: this.texture}),
-            }
+            };
 
         this.spin = 0;
         this.cube_1 = Mat4.translation(-2, 0, 0);
