@@ -6,7 +6,7 @@ import {CollisionDemo} from "./examples/collisionsDemo.js";
 // import {ObjFileDemo} from "./examples/objFileDemo.js"
 // import {SceneToTextureDemo} from "./examples/sceneToTextureDemo.js"
 // import {SurfacesDemo} from "./examples/surfacesDemo.js"
-// import {Text_Demo} from "./examples/textDemo.js"
+import {TextDemo} from "./examples/textDemo.js"
 // Pull these names into this module's scope for convenience:
 import {widgets} from "./src/widgets.js";
 
@@ -31,14 +31,14 @@ const {
 //     //         {ObjFileDemo},
 //     //         {SceneToTextureDemo},
 //     //         {SurfacesDemo},
-//     //         {Text_Demo},
+//     //         {TextDemo},
 //             {TransformsSandbox});
 
 // ******************** End extra step
 
 // (Can define Main_Scene's class here)
 
-const Main_Scene = CollisionDemo;
+const Main_Scene = TextDemo;
 const Additional_Scenes = [];
 
 export {Main_Scene, Additional_Scenes, CanvasWidget, CodeWidget, TextWidget};

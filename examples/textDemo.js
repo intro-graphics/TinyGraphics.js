@@ -1,37 +1,50 @@
-import {tiny} from './common.js';
 // Pull these names into this module's scope for convenience:
-const {Vector, vec3, vec4, color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
+import {
+    color,
+    Cube,
+    Light,
+    Mat4,
+    Material,
+    PhongShader,
+    Scene,
+    Shape,
+    Square,
+    Texture,
+    TexturedPhong,
+    vec4,
+    Vector,
+} from "../src/TinyGraphics.js";
 
-export class Text_Line extends Shape {                           // **Text_Line** embeds text in the 3D world, using a crude texture
-                                                                 // method.  This Shape is made of a horizontal arrangement of quads.
-                                                                 // Each is textured over with images of ASCII characters, spelling
-                                                                 // out a string.  Usage:  Instantiate the Shape with the desired
-                                                                 // character line width.  Then assign it a single-line string by calling
-                                                                 // set_string("your string") on it. Draw the shape on a material
-                                                                 // with full ambient weight, and text.png assigned as its texture
-                                                                 // file.  For multi-line strings, repeat this process and draw with
-                                                                 // a different matrix.
-    constructor(max_size) {
+export class TextLine extends Shape {                           // **TextLine** embeds text in the 3D world, using a crude texture
+    // method.  This Shape is made of a horizontal arrangement of quads.
+    // Each is textured over with images of ASCII characters, spelling
+    // out a string.  Usage:  Instantiate the Shape with the desired
+    // character line width.  Then assign it a single-line string by calling
+    // setString("your string") on it. Draw the shape on a material
+    // with full ambient weight, and text.png assigned as its texture
+    // file.  For multi-line strings, repeat this process and draw with
+    // a different matrix.
+    constructor(maxSize) {
         super("position", "normal", "texture_coord");
-        this.max_size = max_size;
-        var object_transform = Mat4.identity();
-        for (var i = 0; i < max_size; i++) {                                       // Each quad is a separate Square instance:
+        this.max_size = maxSize;
+        let object_transform = Mat4.identity();
+        for (let i = 0; i < maxSize; i++) {                                       // Each quad is a separate Square instance:
             Square.insert_transformed_copy_into(this, [], object_transform);
             object_transform.postMultiply(Mat4.translation(1.5, 0, 0));
         }
     }
 
-    set_string(line, context) {           // set_string():  Call this to overwrite the texture coordinates buffer with new
+    setString(line, context) {           // setString():  Call this to overwrite the texture coordinates buffer with new
         // values per quad, which enclose each of the string's characters.
         this.arrays.texture_coord = [];
-        for (var i = 0; i < this.max_size; i++) {
-            var row = Math.floor((i < line.length ? line.charCodeAt(i) : ' '.charCodeAt()) / 16),
+        for (let i = 0; i < this.max_size; i++) {
+            let row = Math.floor((i < line.length ? line.charCodeAt(i) : ' '.charCodeAt()) / 16),
                 col = Math.floor((i < line.length ? line.charCodeAt(i) : ' '.charCodeAt()) % 16);
 
-            var skip = 3, size = 32, sizefloor = size - skip;
-            var dim = size * 16,
+            let skip = 3, size = 32, sizeFloor = size - skip;
+            let dim = size * 16,
                 left = (col * size + skip) / dim, top = (row * size + skip) / dim,
-                right = (col * size + sizefloor) / dim, bottom = (row * size + sizefloor + 5) / dim;
+                right = (col * size + sizeFloor) / dim, bottom = (row * size + sizeFloor + 5) / dim;
 
             this.arrays.texture_coord.push(...Vector.cast([left, 1 - bottom], [right, 1 - bottom],
                 [left, 1 - top], [right, 1 - top]));
@@ -45,15 +58,15 @@ export class Text_Line extends Shape {                           // **Text_Line*
 }
 
 
-export class Text_Demo extends Scene {             // **Text_Demo** is a scene with a cube, for demonstrating the Text_Line utility Shape.
+export class TextDemo extends Scene {             // **TextDemo** is a scene with a cube, for demonstrating the TextLine utility Shape.
     constructor() {
         super();
-        this.shapes = {cube: new Cube(), text: new Text_Line(35)};
+        this.shapes = {cube: new Cube(), text: new TextLine(35)};
         // Don't create any DOM elements to control this scene:
         this.widget_options = {make_controls: false};
 
-        const phong = new Phong_Shader();
-        const texture = new Textured_Phong(1);
+        const phong = new PhongShader();
+        const texture = new TexturedPhong();
         this.grey = new Material(phong, {
             color: color(.5, .5, .5, 1), ambient: 0,
             diffusivity: .3, specularity: .5, smoothness: 10,
@@ -73,28 +86,28 @@ export class Text_Demo extends Scene {             // **Text_Demo** is a scene w
         programState.projectionTransform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 500);
 
         const t = programState.animationTime / 1000;
-        const funny_orbit = Mat4.rotation(Math.PI / 4 * t, Math.cos(t), Math.sin(t), .7 * Math.cos(t));
-        this.shapes.cube.draw(context, programState, funny_orbit, this.grey);
+        const funnyOrbit = Mat4.rotation(Math.PI / 4 * t, Math.cos(t), Math.sin(t), .7 * Math.cos(t));
+        this.shapes.cube.draw(context, programState, funnyOrbit, this.grey);
 
 
         let strings = ["This is some text", "More text", "1234567890", "This is a line.\n\n\n" + "This is another line.",
-            Text_Line.toString(), Text_Line.toString()];
+            TextLine.toString(), TextLine.toString()];
 
         // Sample the "strings" array and draw them onto a cube.
         for (let i = 0; i < 3; i++)
             for (let j = 0; j < 2; j++) {             // Find the matrix for a basis located along one of the cube's sides:
-                let cube_side = Mat4.rotation(i == 0 ? Math.PI / 2 : 0, 1, 0, 0)
-                    .times(Mat4.rotation(Math.PI * j - (i == 1 ? Math.PI / 2 : 0), 0, 1, 0))
+                let cubeSide = Mat4.rotation(i === 0 ? Math.PI / 2 : 0, 1, 0, 0)
+                    .times(Mat4.rotation(Math.PI * j - (i === 1 ? Math.PI / 2 : 0), 0, 1, 0))
                     .times(Mat4.translation(-.9, .9, 1.01));
 
-                const multi_line_string = strings[2 * i + j].split('\n');
+                const multiLineString = strings[2 * i + j].split('\n');
                 // Draw a Text_String for every line in our string, up to 30 lines:
-                for (let line of multi_line_string.slice(0, 30)) {             // Assign the string to Text_String, and then draw it.
-                    this.shapes.text.set_string(line, context.context);
-                    this.shapes.text.draw(context, programState, funny_orbit.times(cube_side)
+                for (let line of multiLineString.slice(0, 30)) {             // Assign the string to Text_String, and then draw it.
+                    this.shapes.text.setString(line, context.context);
+                    this.shapes.text.draw(context, programState, funnyOrbit.times(cubeSide)
                         .times(Mat4.scale(.03, .03, .03)), this.text_image);
                     // Move our basis down a line.
-                    cube_side.postMultiply(Mat4.translation(0, -.06, 0));
+                    cubeSide.postMultiply(Mat4.translation(0, -.06, 0));
                 }
             }
     }
