@@ -179,7 +179,7 @@ export class TestData {
     // **TestData** pre-loads some Shapes and Textures that other Scenes can borrow.
     constructor() {
         this.textures = {
-            rgb: new Texture("assets/rgb.jpg"),
+            rgb: new Texture("assets/uv.png"),
             earth: new Texture("assets/earth.gif"),
             stars: new Texture("assets/stars.png"),
             text: new Texture("assets/text.png"),

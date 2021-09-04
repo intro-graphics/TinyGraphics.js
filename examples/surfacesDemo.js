@@ -48,7 +48,7 @@ export class SurfacesDemo extends Scene {
 
         if (this.is_master) {
             const textured = new TexturedPhong(1);
-            this.material = new Material(textured, {ambient: .5, texture: new Texture("assets/rgb.jpg")});
+            this.material = new Material(textured, {ambient: .5, texture: new Texture("assets/uv.png")});
 
             for (let i = 0; i < this.num_scenes; i++)
                 this.sections.push(new SurfacesDemo(i, this.material));

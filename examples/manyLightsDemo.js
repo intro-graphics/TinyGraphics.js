@@ -20,7 +20,7 @@ export class ManyLightsDemo extends Scene {
         this.brick = new Material(shader, {
             color: color(1, 1, 1, 1),
             ambient: .05, diffusivity: .5, specularity: .5, smoothness: 10,
-            texture: new Texture("assets/rgb.jpg"),
+            texture: new Texture("assets/uv.png"),
         });
 
         // Don't create any DOM elements to control this scene:

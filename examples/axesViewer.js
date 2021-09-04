@@ -41,7 +41,7 @@ export class AxesViewer extends Scene {
         const bump = new TexturedPhong();
         this.material = new Material(bump, {
             color: color(0, 0, 0, 1), ambient: 1,
-            texture: new Texture("assets/rgb.jpg"),
+            texture: new Texture("assets/uv.png"),
         });
     }
 
