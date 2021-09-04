@@ -19,4 +19,4 @@ class MinimalScene extends Scene {
     }
 }
 
-export {MinimalScene}
+export {MinimalScene};

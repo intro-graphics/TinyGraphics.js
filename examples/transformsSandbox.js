@@ -32,7 +32,7 @@ export class TransformsSandboxBase extends Scene {
         // Don't define more than one blueprint for the same thing here.
         this.shapes = {
             'box': new Cube(),
-            'ball': new SubdivisionSphere(4)
+            'ball': new SubdivisionSphere(4),
         };
 
         // *** Materials: *** Define a shader, and then define materials that use
@@ -132,7 +132,7 @@ class TransformsSandbox extends TransformsSandboxBase {
             // function times(), which generates products of matrices.
 
             // const blue = color(0, 0, 1, 1), yellow = color(1, 1, 0, 1);
-        const blue = hex_color("#1a9ffa"), yellow = hex_color("#fdc03a")
+        const blue = hex_color("#1a9ffa"), yellow = hex_color("#fdc03a");
         // Variable modelTransform will be a local matrix value that helps us position shapes.
         // It starts over as the identity every single frame - coordinate axes at the origin.
         let modelTransform = Mat4.identity();
@@ -190,4 +190,4 @@ class TransformsSandbox extends TransformsSandboxBase {
     }
 }
 
-export {TransformsSandbox}
+export {TransformsSandbox};

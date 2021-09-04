@@ -23,7 +23,7 @@ class Shader extends GraphicsCardObject {
         // Define what this object should store in each new WebGL Context:
         const initialGpuRepresentation = {
             program: undefined, gpuAddresses: undefined,
-            vertShdr: undefined, fragShdr: undefined
+            vertShdr: undefined, fragShdr: undefined,
         };
         // Our object might need to register to multiple GPU contexts in the case of
         // multiple drawing areas.  If this is a new GPU context for this object,
@@ -58,7 +58,7 @@ class Shader extends GraphicsCardObject {
             program,
             vertShdr,
             fragShdr,
-            gpuAddresses: new GraphicsAddresses(program, gl)
+            gpuAddresses: new GraphicsAddresses(program, gl),
         });
         return gpuInstance;
     }
@@ -157,4 +157,4 @@ class Shader extends GraphicsCardObject {
     // needed to populate your particular shader program with all the data values it is expecting.
 }
 
-export {Shader}
+export {Shader};

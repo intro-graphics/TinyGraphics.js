@@ -14,4 +14,4 @@ class MinimalShape extends VertexBuffer {
     }
 }
 
-export {MinimalShape}
+export {MinimalShape};

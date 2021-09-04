@@ -45,4 +45,4 @@ class FakeBumpMap extends TexturedPhong {
     }
 }
 
-export {TexturedPhong, FakeBumpMap}
+export {TexturedPhong, FakeBumpMap};

@@ -1,18 +1,17 @@
 // import {defs, tiny} from './examples/common.js';
 // import {defs} from './examples/common.js';
 // import {AxesViewerTestScene} from "./examples/axesViewer.js";
-// import {CollisionDemo, InertiaDemo} from "./examples/collisionsDemo.js"
+import {CollisionDemo} from "./examples/collisionsDemo.js";
 // import {ManyLightsDemo} from "./examples/manyLightsDemo.js"
 // import {ObjFileDemo} from "./examples/objFileDemo.js"
 // import {SceneToTextureDemo} from "./examples/sceneToTextureDemo.js"
-import {SurfacesDemo} from "./examples/surfacesDemo.js"
+// import {SurfacesDemo} from "./examples/surfacesDemo.js"
 // import {Text_Demo} from "./examples/textDemo.js"
 // Pull these names into this module's scope for convenience:
 import {widgets} from "./src/widgets.js";
-import {TransformsSandbox} from "./examples/transformsSandbox.js";
 
 const {
-    CanvasWidget, CodeWidget, TextWidget
+    CanvasWidget, CodeWidget, TextWidget,
 } = widgets;
 
 // Now we have loaded everything in the files tiny-graphics.js, tiny-graphics-widgets.js, and common.js.
@@ -39,7 +38,7 @@ const {
 
 // (Can define Main_Scene's class here)
 
-const Main_Scene = SurfacesDemo;
+const Main_Scene = CollisionDemo;
 const Additional_Scenes = [];
 
-export {Main_Scene, Additional_Scenes, CanvasWidget, CodeWidget, TextWidget}
+export {Main_Scene, Additional_Scenes, CanvasWidget, CodeWidget, TextWidget};

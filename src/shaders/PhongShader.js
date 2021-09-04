@@ -97,4 +97,4 @@ class PhongShader extends Shader {
     }
 }
 
-export {PhongShader}
+export {PhongShader};

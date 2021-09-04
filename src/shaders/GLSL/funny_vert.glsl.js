@@ -13,4 +13,4 @@ void main(){
     f_tex_coord = texture_coord;
     // Directly use original texture coords and interpolate between.
 }
-`
+`;

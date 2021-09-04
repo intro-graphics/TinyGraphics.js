@@ -62,7 +62,7 @@ class Tetrahedron extends Shape {
             // but can't produce flat shading or discontinuous seams in textures.
             this.arrays.position = Vec.cast([0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]);
             this.arrays.normal = Vec.cast([-a, -a, -a], [1, 0, 0], [0, 1, 0], [0, 0, 1]);
-            this.arrays.texture_coord = Vec.cast([0, 0], [1, 0], [0, 1,], [1, 1]);
+            this.arrays.texture_coord = Vec.cast([0, 0], [1, 0], [0, 1], [1, 1]);
             // Notice the repeats in the index list.  Vertices are shared
             // and appear in multiple triangles with this method.
             this.indices.push(0, 1, 2, 0, 1, 3, 0, 2, 3, 1, 2, 3);
@@ -407,7 +407,7 @@ class CappedCylinder extends Shape {
  */
 class RoundedCappedCylinder extends SurfaceOfRevolution {
     constructor(rows, columns, texture_range) {
-        super(rows, columns, [vec3(0, 0, .5), vec3(1, 0, .5), vec3(1, 0, -.5), vec3(0, 0, -.5)], texture_range)
+        super(rows, columns, [vec3(0, 0, .5), vec3(1, 0, .5), vec3(1, 0, -.5), vec3(0, 0, -.5)], texture_range);
     }
 }
 
@@ -455,5 +455,5 @@ export {
     SurfaceOfRevolution,
     Torus,
     Tetrahedron,
-    Windmill
-}
+    Windmill,
+};

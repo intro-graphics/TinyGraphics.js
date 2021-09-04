@@ -228,7 +228,7 @@ class Container {
         if (replacement.constructor === Object)
             return Object.assign(target, replacement);
         // Otherwise we'll try to guess the key to override by type:
-        const matchingKeysByType = Object.entries(this).filter(([key, value
+        const matchingKeysByType = Object.entries(this).filter(([key, value,
                                                                 ]) => replacement instanceof value.constructor);
         if (!matchingKeysByType[0]) throw "Container: Can't figure out which value you're trying to replace; nothing matched by type.";
         return Object.assign(target, {[matchingKeysByType[0][0]]: replacement});

@@ -111,7 +111,7 @@ class Shape extends VertexBuffer {
                     for (let i of indices) this.arrays.normal[i] = Vector3.from(n1);
                 }
             }
-        }
+        };
     }
 
     normalizePositions(keepAspectRatios = true) {
@@ -129,4 +129,4 @@ class Shape extends VertexBuffer {
     }
 }
 
-export {Shape}
+export {Shape};

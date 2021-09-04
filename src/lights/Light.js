@@ -10,4 +10,4 @@ class Light {
     }
 }
 
-export {Light}
+export {Light};

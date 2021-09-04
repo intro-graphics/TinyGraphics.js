@@ -61,4 +61,4 @@ class Texture extends GraphicsCardObject {
     }
 }
 
-export {Texture}
+export {Texture};

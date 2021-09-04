@@ -8,7 +8,7 @@ export {Material} from './materials/Material.js';
 export {Texture} from './textures/Texture.js';
 
 export {Shape} from './geometries/Shape.js';
-export {MinimalShape} from './geometries/MinimalShape.js'
+export {MinimalShape} from './geometries/MinimalShape.js';
 
 export * from './geometries/ShapePack.js';
 
@@ -20,4 +20,4 @@ export {KeyboardManager} from './activities/KeyboardManager.js';
 export {Shader} from './shaders/Shader.js';
 export {BasicShader} from './shaders/BasicShader.js';
 export {PhongShader} from './shaders/PhongShader.js';
-export {TexturedPhong, FakeBumpMap} from "./shaders/TexturedPhong.js"
+export {TexturedPhong, FakeBumpMap} from "./shaders/TexturedPhong.js";

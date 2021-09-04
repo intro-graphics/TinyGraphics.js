@@ -1,4 +1,4 @@
-import {defs, tiny} from './common.js';
+import {tiny} from './common.js';
 // Pull these names into this module's scope for convenience:
 const {Vector, vec3, vec4, color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
 
@@ -47,7 +47,7 @@ export class Text_Line extends Shape {                           // **Text_Line*
 
 export class Text_Demo extends Scene {             // **Text_Demo** is a scene with a cube, for demonstrating the Text_Line utility Shape.
     constructor() {
-        super()
+        super();
         this.shapes = {cube: new Cube(), text: new Text_Line(35)};
         // Don't create any DOM elements to control this scene:
         this.widget_options = {make_controls: false};
@@ -57,7 +57,7 @@ export class Text_Demo extends Scene {             // **Text_Demo** is a scene w
         this.grey = new Material(phong, {
             color: color(.5, .5, .5, 1), ambient: 0,
             diffusivity: .3, specularity: .5, smoothness: 10,
-        })
+        });
 
         // To show text you need a Material like this one:
         this.text_image = new Material(texture, {

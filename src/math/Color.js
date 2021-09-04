@@ -44,4 +44,4 @@ class Color extends Vector4 {
 const color = Color.create_from_float;
 const hex_color = Color.create_from_hex;
 
-export {Color, color, hex_color}
+export {Color, color, hex_color};

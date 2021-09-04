@@ -15,4 +15,4 @@ class Material extends Container {
     }
 }
 
-export {Material}
+export {Material};

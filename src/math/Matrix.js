@@ -8,7 +8,7 @@ class Matrix extends Array {
      */
     constructor(...args) {
         super(0);
-        this.push(...args)
+        this.push(...args);
     }
 
     static flatten2dTo1D(M) {
@@ -54,7 +54,7 @@ class Matrix extends Array {
      * @returns {*[][]}
      */
     copy() {
-        return this.map(r => [...r])
+        return this.map(r => [...r]);
     }
 
     /**
@@ -63,7 +63,7 @@ class Matrix extends Array {
      * @returns {this is T[]} Boolean number
      */
     equals(b) {
-        return this.every((r, i) => r.every((x, j) => x === b[i][j]))
+        return this.every((r, i) => r.every((x, j) => x === b[i][j]));
     }
 
     /**
@@ -72,7 +72,7 @@ class Matrix extends Array {
      * @returns {*[]}
      */
     plus(b) {
-        return this.map((r, i) => r.map((x, j) => x + b[i][j]))
+        return this.map((r, i) => r.map((x, j) => x + b[i][j]));
     }
 
     /**
@@ -81,7 +81,7 @@ class Matrix extends Array {
      * @returns {*[]}
      */
     minus(b) {
-        return this.map((r, i) => r.map((x, j) => x - b[i][j]))
+        return this.map((r, i) => r.map((x, j) => x - b[i][j]));
     }
 
     /**
@@ -89,7 +89,7 @@ class Matrix extends Array {
      * @returns {*[]}
      */
     transposed() {
-        return this.map((r, i) => r.map((x, j) => this[j][i]))
+        return this.map((r, i) => r.map((x, j) => this[j][i]));
     }
 
     /**
@@ -153,7 +153,7 @@ class Matrix extends Array {
      * @returns {string}
      */
     to_string() {
-        return "[" + this.map((r, i) => "[" + r.join(", ") + "]").join(" ") + "]"
+        return "[" + this.map((r, i) => "[" + r.join(", ") + "]").join(" ") + "]";
     }
 }
 
@@ -178,8 +178,8 @@ class Mat4 extends Matrix {
         // rotation(): Requires a scalar (angle) and a three-component axis vector.
         const normalize = (x, y, z) => {
             const n = Math.sqrt(x * x + y * y + z * z);
-            return [x / n, y / n, z / n]
-        }
+            return [x / n, y / n, z / n];
+        };
         let [i, j, k] = normalize(x, y, z),
             [c, s] = [Math.cos(angle), Math.sin(angle)],
             omc = 1.0 - c;
@@ -310,4 +310,4 @@ class Mat4 extends Matrix {
     }
 }
 
-export {Matrix, Mat4}
+export {Matrix, Mat4};

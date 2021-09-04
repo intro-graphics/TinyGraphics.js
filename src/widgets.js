@@ -29,13 +29,13 @@ widgets.CanvasWidget =
             };
             if (initialScenes && initialScenes[0])
                 Object.assign(options, initialScenes[0].widget_options);
-            Object.assign(this, defaults, options)
+            Object.assign(this, defaults, options);
 
             const rules = [".canvas-widget { width: 1080px; background: White; margin:auto }",
                 ".canvas-widget canvas { width: 1080px; height: 600px; margin-bottom:-3px }"];
 
             if (document.styleSheets.length === 0) document.head.appendChild(document.createElement("style"));
-            for (const r of rules) document.styleSheets[document.styleSheets.length - 1].insertRule(r, 0)
+            for (const r of rules) document.styleSheets[document.styleSheets.length - 1].insertRule(r, 0);
 
             // Fill in the document elements:
             if (this.showExplanation) {
@@ -87,7 +87,7 @@ widgets.CanvasWidget =
             // Start WebGL initialization.  Note that render() will re-queue itself for continuous calls.
             this.webglManager.render();
         }
-    }
+    };
 
 
 const ControlsWidget = widgets.ControlsWidget =
@@ -122,7 +122,7 @@ const ControlsWidget = widgets.ControlsWidget =
                 ".hide { transform: scaleY(0); height:0px; overflow:hidden  }"];
 
             const style = document.head.appendChild(document.createElement("style"));
-            for (const r of rules) document.styleSheets[document.styleSheets.length - 1].insertRule(r, 0)
+            for (const r of rules) document.styleSheets[document.styleSheets.length - 1].insertRule(r, 0);
 
             const table = element.appendChild(document.createElement("table"));
             table.className = "control-box";
@@ -180,7 +180,7 @@ const ControlsWidget = widgets.ControlsWidget =
             // TODO: Cap this so that it can't be called faster than a human can read?
             this.event = window.requestAnimFrame(this.render.bind(this));
         }
-    }
+    };
 
 
 const CodeManager = widgets.CodeManager =
@@ -197,31 +197,31 @@ const CodeManager = widgets.CodeManager =
                 /(0[xX][\da-fA-F]+|0[oO][0-7]+|0[bB][01]+|(?:\d*\.\d+|\d+\.?)(?:[eE][+-]?\d+)?)/,                                     // Any number.
                 /((?!\d)(?:(?!\s)[$\w\u0080-\uFFFF]|\\u[\da-fA-F]{4}|\\u{[\da-fA-F]+})+)/,                                          // Any name.
                 /(--|\+\+|&&|\|\||=>|\.{3}|(?:[+\-\/%&|^]|\*{1,2}|<{1,2}|>{1,3}|!=?|={1,2})=?|[?~.,:;[\](){}])/,                      // Any punctuator.
-                /(\s+)|(^$|[\s\S])/                                                                                                   // Any whitespace. Lastly, blank/invalid.
+                /(\s+)|(^$|[\s\S])/,                                                                                                   // Any whitespace. Lastly, blank/invalid.
             ].map(r => r.source).join('|'), 'g');
 
             this.tokens = [];
             this.no_comments = [];
             let singleToken = null;
             while ((singleToken = esSixTokensParser.exec(code)) !== null) {
-                let token = {type: "invalid", value: singleToken[0]}
+                let token = {type: "invalid", value: singleToken[0]};
                 if (singleToken[1]) {
                     token.type = "string";
                     token.closed = !!(singleToken[3] || singleToken[4]);
-                } else if (singleToken[5]) token.type = "comment"
+                } else if (singleToken[5]) token.type = "comment";
                 else if (singleToken[6]) {
                     token.type = "comment";
                     token.closed = !!singleToken[7];
-                } else if (singleToken[8]) token.type = "regex"
-                else if (singleToken[9]) token.type = "number"
-                else if (singleToken[10]) token.type = "name"
-                else if (singleToken[11]) token.type = "punctuator"
-                else if (singleToken[12]) token.type = "whitespace"
-                this.tokens.push(token)
+                } else if (singleToken[8]) token.type = "regex";
+                else if (singleToken[9]) token.type = "number";
+                else if (singleToken[10]) token.type = "name";
+                else if (singleToken[11]) token.type = "punctuator";
+                else if (singleToken[12]) token.type = "whitespace";
+                this.tokens.push(token);
                 if (token.type !== "whitespace" && token.type !== "comment") this.no_comments.push(token.value);
             }
         }
-    }
+    };
 
 
 const CodeWidget = widgets.CodeWidget =
@@ -236,13 +236,13 @@ const CodeWidget = widgets.CodeWidget =
                 ".code-widget table { display:block; margin:auto; overflow-x:auto; width:1080px; border-radius:10px; " +
                 "border-collapse:collapse; border: 1px solid black }",
                 ".code-widget table.class-list td { border-width:thin; background: White; padding:10px; " +
-                "font-family:monospace; border: 1px solid black }"
+                "font-family:monospace; border: 1px solid black }",
             ];
 
             if (document.styleSheets.length === 0)
                 document.head.appendChild(document.createElement("style"));
             for (const r of rules)
-                document.styleSheets[document.styleSheets.length - 1].insertRule(r, 0)
+                document.styleSheets[document.styleSheets.length - 1].insertRule(r, 0);
 
             this.associated_editor_widget = options.associated_editor;
 
@@ -254,7 +254,7 @@ const CodeWidget = widgets.CodeWidget =
                     this.buildReader(element, mainScene, additionalScenes, module);
                     if (!options.hide_navigator)
                         this.buildNavigator(element, mainScene, additionalScenes, module);
-                })
+                });
         }
 
         buildReader(element, mainScene, additionalScenes, definitions) {
@@ -281,7 +281,7 @@ const CodeWidget = widgets.CodeWidget =
             content.style = "text-align:center; margin:0; font-weight:bold";
             content.innerHTML = "main-scene.js<br>Main Scene: ";
             const mainSceneLink = content.appendChild(document.createElement("a"));
-            mainSceneLink.href = "javascript:void(0);"
+            mainSceneLink.href = "javascript:void(0);";
             mainSceneLink.addEventListener('click', () => this.displayCode(mainScene));
             mainSceneLink.textContent = mainScene.name;
 
@@ -289,7 +289,7 @@ const CodeWidget = widgets.CodeWidget =
             secondCell.colSpan = 2;
             secondCell.style = "text-align:center; font-weight:bold";
             const indexSrcLink = secondCell.appendChild(document.createElement("a"));
-            indexSrcLink.href = "javascript:void(0);"
+            indexSrcLink.href = "javascript:void(0);";
             indexSrcLink.addEventListener('click', () => this.displayCode());
             indexSrcLink.textContent = "This page's complete HTML source";
 
@@ -332,13 +332,13 @@ const CodeWidget = widgets.CodeWidget =
             this.code_display.innerHTML = "";
             const colorMap = {
                 string: "chocolate", comment: "green", regex: "blue", number: "magenta",
-                name: "black", punctuator: "red", whitespace: "black"
+                name: "black", punctuator: "red", whitespace: "black",
             };
 
             for (let t of new CodeManager(codeString).tokens)
                 if (t.type === "name" && [...Object.keys(tiny), ...Object.keys(this.definitions)].includes(t.value)) {
                     const link = this.code_display.appendChild(document.createElement('a'));
-                    link.href = "javascript:void(0);"
+                    link.href = "javascript:void(0);";
                     link.addEventListener('click', () => this.displayCode(tiny[t.value] || this.definitions[t.value]));
                     link.textContent = t.value;
                 } else {
@@ -347,7 +347,7 @@ const CodeWidget = widgets.CodeWidget =
                     span.textContent = t.value;
                 }
         }
-    }
+    };
 
 
 const EditorWidget = widgets.EditorWidget =
@@ -359,7 +359,7 @@ const EditorWidget = widgets.EditorWidget =
                                          box-shadow: 4px 6px 16px 0px rgba(0,0,0,0.3); transition: background .3s, transform .3s }",
                 ".editor-widget input { margin-right:5px }",
                 ".editor-widget textarea { white-space:pre; width:1040px; margin-bottom:30px }",
-                ".editor-widget button:hover, button:focus { transform: scale(1.3); color:#252424 }"
+                ".editor-widget button:hover, button:focus { transform: scale(1.3); color:#252424 }",
             ];
 
             for (const r of rules) document.styleSheets[0].insertRule(r, 1);
@@ -371,7 +371,7 @@ const EditorWidget = widgets.EditorWidget =
             // Don't refresh the page on submit:
             form.addEventListener('submit', event => {
                 event.preventDefault();
-                this.submitDemo()
+                this.submitDemo();
             }, false);
 
             const explanation = form.appendChild(document.createElement("p"));
@@ -423,11 +423,11 @@ const EditorWidget = widgets.EditorWidget =
             return fetch(url,
                 {
                     body: body, method: body === undefined ? 'GET' : 'POST',
-                    headers: {'content-type': 'application/json'}
+                    headers: {'content-type': 'application/json'},
                 }).then(response => {
-                if (response.ok) return Promise.resolve(response.json())
-                else return Promise.reject(response.status)
-            })
+                if (response.ok) return Promise.resolve(response.json());
+                else return Promise.reject(response.status);
+            });
         }
 
         submitDemo() {
@@ -445,10 +445,10 @@ const EditorWidget = widgets.EditorWidget =
                     this.submitResult.innerHTML += response.message + "<br>";
                 })
                 .catch(error => {
-                    this.submitResult.innerHTML += "Error " + error + " when trying to upload.<br>"
-                })
+                    this.submitResult.innerHTML += "Error " + error + " when trying to upload.<br>";
+                });
         }
-    }
+    };
 
 
 const TextWidget = widgets.TextWidget =
@@ -459,10 +459,10 @@ const TextWidget = widgets.TextWidget =
             const rules = [".text-widget { background: white; width:1060px;\
                              padding:0 10px; overflow:auto; transition:1s; \
                              overflow-y:scroll; box-shadow: 10px 10px 90px 0 inset LightGray}",
-                ".text-widget div { transition:none } "
+                ".text-widget div { transition:none } ",
             ];
             if (document.styleSheets.length === 0) document.head.appendChild(document.createElement("style"));
-            for (const r of rules) document.styleSheets[document.styleSheets.length - 1].insertRule(r, 0)
+            for (const r of rules) document.styleSheets[document.styleSheets.length - 1].insertRule(r, 0);
 
             Object.assign(this, {element, scenes, webglManager});
             this.render();
@@ -472,6 +472,6 @@ const TextWidget = widgets.TextWidget =
             if (this.scenes[0])
                 this.scenes[0].showExplanation(this.element, this.webglManager);
             else
-                this.event = window.requestAnimFrame(this.render.bind(this))
+                this.event = window.requestAnimFrame(this.render.bind(this));
         }
-    }
+    };

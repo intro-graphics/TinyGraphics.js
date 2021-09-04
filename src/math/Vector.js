@@ -17,47 +17,47 @@ class Vector extends Float32Array {
      *  For compact syntax when declaring lists.
      */
     static cast(...args) {
-        return args.map(x => Vector.from(x))
+        return args.map(x => Vector.from(x));
     }
 
     copy() {
-        return new Vector(this)
+        return new Vector(this);
     }
 
     equals(b) {
-        return this.every((x, i) => x === b[i])
+        return this.every((x, i) => x === b[i]);
     }
 
     plus(b) {
-        return this.map((x, i) => x + b[i])
+        return this.map((x, i) => x + b[i]);
     }
 
     minus(b) {
-        return this.map((x, i) => x - b[i])
+        return this.map((x, i) => x - b[i]);
     }
 
     times_pairwise(b) {
-        return this.map((x, i) => x * b[i])
+        return this.map((x, i) => x * b[i]);
     }
 
     scale_by(s) {
-        this.forEach((x, i, a) => a[i] *= s)
+        this.forEach((x, i, a) => a[i] *= s);
     }
 
     times(s) {
-        return this.map(x => s * x)
+        return this.map(x => s * x);
     }
 
     randomized(s) {
-        return this.map(x => x + s * (Math.random() - .5))
+        return this.map(x => x + s * (Math.random() - .5));
     }
 
     mix(b, s) {
-        return this.map((x, i) => (1 - s) * x + s * b[i])
+        return this.map((x, i) => (1 - s) * x + s * b[i]);
     }
 
     norm() {
-        return Math.sqrt(this.dot(this))
+        return Math.sqrt(this.dot(this));
     }
 
     /**
@@ -65,14 +65,14 @@ class Vector extends Float32Array {
      * @returns {Float32Array}
      */
     normalized() {
-        return this.times(1 / this.norm())
+        return this.times(1 / this.norm());
     }
 
     /**
      * Normalize the vector to a unit vector
      */
     normalize() {
-        this.scale_by(1 / this.norm())
+        this.scale_by(1 / this.norm());
     }
 
     dot(b) {
@@ -107,7 +107,7 @@ class Vector extends Float32Array {
     }
 
     to_string() {
-        return "[vector " + this.join(", ") + "]"
+        return "[vector " + this.join(", ") + "]";
     }
 }
 
@@ -141,12 +141,12 @@ class Vector3 extends Float32Array {
             shared_memory[1] = y;
             shared_memory[2] = z;
             return shared_memory;
-        }
+        };
         return Vector3.unsafe(x, y, z);
     }
 
     copy() {
-        return Vector3.from(this)
+        return Vector3.from(this);
     }
 
     /**
@@ -155,48 +155,48 @@ class Vector3 extends Float32Array {
      * @returns {boolean}
      */
     equals(b) {
-        return this[0] === b[0] && this[1] === b[1] && this[2] === b[2]
+        return this[0] === b[0] && this[1] === b[1] && this[2] === b[2];
     }
 
     plus(b) {
-        return vec3(this[0] + b[0], this[1] + b[1], this[2] + b[2])
+        return vec3(this[0] + b[0], this[1] + b[1], this[2] + b[2]);
     }
 
     minus(b) {
-        return vec3(this[0] - b[0], this[1] - b[1], this[2] - b[2])
+        return vec3(this[0] - b[0], this[1] - b[1], this[2] - b[2]);
     }
 
     times(s) {
-        return vec3(this[0] * s, this[1] * s, this[2] * s)
+        return vec3(this[0] * s, this[1] * s, this[2] * s);
     }
 
     times_pairwise(b) {
-        return vec3(this[0] * b[0], this[1] * b[1], this[2] * b[2])
+        return vec3(this[0] * b[0], this[1] * b[1], this[2] * b[2]);
     }
 
     // Pre-fix operations: Use these for better performance (to avoid new allocation).
     add_by(b) {
         this[0] += b[0];
         this[1] += b[1];
-        this[2] += b[2]
+        this[2] += b[2];
     }
 
     subtract_by(b) {
         this[0] -= b[0];
         this[1] -= b[1];
-        this[2] -= b[2]
+        this[2] -= b[2];
     }
 
     scale_by(s) {
         this[0] *= s;
         this[1] *= s;
-        this[2] *= s
+        this[2] *= s;
     }
 
     scale_pairwise_by(b) {
         this[0] *= b[0];
         this[1] *= b[1];
-        this[2] *= b[2]
+        this[2] *= b[2];
     }
 
     // Other operations:
@@ -213,7 +213,7 @@ class Vector3 extends Float32Array {
     }
 
     norm() {
-        return Math.sqrt(this[0] * this[0] + this[1] * this[1] + this[2] * this[2])
+        return Math.sqrt(this[0] * this[0] + this[1] * this[1] + this[2] * this[2]);
     }
 
     normalized() {
@@ -229,23 +229,23 @@ class Vector3 extends Float32Array {
     }
 
     dot(b) {
-        return this[0] * b[0] + this[1] * b[1] + this[2] * b[2]
+        return this[0] * b[0] + this[1] * b[1] + this[2] * b[2];
     }
 
     cross(b) {
         return vec3(this[1] * b[2] - this[2] * b[1],
             this[2] * b[0] - this[0] * b[2],
-            this[0] * b[1] - this[1] * b[0])
+            this[0] * b[1] - this[1] * b[0]);
     }
 
     to4(is_a_point)
     // to4():  Convert to a homogeneous vector of 4 values.
     {
-        return vec4(this[0], this[1], this[2], +is_a_point)
+        return vec4(this[0], this[1], this[2], +is_a_point);
     }
 
     to_string() {
-        return "[vec3 " + this.join(", ") + "]"
+        return "[vec3 " + this.join(", ") + "]";
     }
 }
 
@@ -276,11 +276,11 @@ class Vector4 extends Float32Array {
             shared_memory[1] = y;
             shared_memory[2] = z;
             shared_memory[3] = w;
-        }
+        };
     }
 
     copy() {
-        return Vector4.from(this)
+        return Vector4.from(this);
     }
 
     /**
@@ -289,23 +289,23 @@ class Vector4 extends Float32Array {
      * @returns {boolean}
      */
     equals(b) {
-        return this[0] === b[0] && this[1] === b[1] && this[2] === b[2] && this[3] === b[3]
+        return this[0] === b[0] && this[1] === b[1] && this[2] === b[2] && this[3] === b[3];
     }
 
     plus(b) {
-        return vec4(this[0] + b[0], this[1] + b[1], this[2] + b[2], this[3] + b[3])
+        return vec4(this[0] + b[0], this[1] + b[1], this[2] + b[2], this[3] + b[3]);
     }
 
     minus(b) {
-        return vec4(this[0] - b[0], this[1] - b[1], this[2] - b[2], this[3] - b[3])
+        return vec4(this[0] - b[0], this[1] - b[1], this[2] - b[2], this[3] - b[3]);
     }
 
     times(s) {
-        return vec4(this[0] * s, this[1] * s, this[2] * s, this[3] * s)
+        return vec4(this[0] * s, this[1] * s, this[2] * s, this[3] * s);
     }
 
     times_pairwise(b) {
-        return vec4(this[0] * b[0], this[1] * b[1], this[2] * b[2], this[3] * b[3])
+        return vec4(this[0] * b[0], this[1] * b[1], this[2] * b[2], this[3] * b[3]);
     }
 
     /**
@@ -316,28 +316,28 @@ class Vector4 extends Float32Array {
         this[0] += b[0];
         this[1] += b[1];
         this[2] += b[2];
-        this[3] += b[3]
+        this[3] += b[3];
     }
 
     subtract_by(b) {
         this[0] -= b[0];
         this[1] -= b[1];
         this[2] -= b[2];
-        this[3] -= b[3]
+        this[3] -= b[3];
     }
 
     scale_by(s) {
         this[0] *= s;
         this[1] *= s;
         this[2] *= s;
-        this[3] *= s
+        this[3] *= s;
     }
 
     scale_pairwise_by(b) {
         this[0] *= b[0];
         this[1] *= b[1];
         this[2] *= b[2];
-        this[3] *= b[3]
+        this[3] *= b[3];
     }
 
     // Other operations:
@@ -357,7 +357,7 @@ class Vector4 extends Float32Array {
 
     norm() {
         // The norms should behave like for Vector3 because of the homogenous format.
-        return Math.sqrt(this[0] * this[0] + this[1] * this[1] + this[2] * this[2])
+        return Math.sqrt(this[0] * this[0] + this[1] * this[1] + this[2] * this[2]);
     }
 
     normalized() {
@@ -375,15 +375,15 @@ class Vector4 extends Float32Array {
     }
 
     dot(b) {
-        return this[0] * b[0] + this[1] * b[1] + this[2] * b[2] + this[3] * b[3]
+        return this[0] * b[0] + this[1] * b[1] + this[2] * b[2] + this[3] * b[3];
     }
 
     to3() {
-        return vec3(this[0], this[1], this[2])
+        return vec3(this[0], this[1], this[2]);
     }
 
     to_string() {
-        return "[vec4 " + this.join(", ") + "]"
+        return "[vec4 " + this.join(", ") + "]";
     }
 }
 

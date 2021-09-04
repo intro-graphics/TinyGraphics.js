@@ -50,4 +50,4 @@ void main(){
     // Compute the final color with contributions from lights:
     gl_FragColor.xyz += phong_model_lights(normalize(N), vertex_worldspace);
 }
-`
+`;
