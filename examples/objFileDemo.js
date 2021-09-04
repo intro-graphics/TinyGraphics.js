@@ -129,19 +129,19 @@ export class ObjFileDemo extends Scene {
     constructor() {
         super();
         // Load the model file:
-        this.shapes = {"teapot": new ShapeFromFile("assets/teapot.obj")};
+        this.shapes = {"teapot": new ShapeFromFile("assets/monkey.obj")};
 
         // Don't create any DOM elements to control this scene:
         this.widget_options = {make_controls: false};
         // Non bump mapped:
         this.stars = new Material(new TexturedPhong(), {
             color: color(.5, .5, .5, 1),
-            ambient: .3, diffusivity: .5, specularity: .5, texture: new Texture("assets/stars.png"),
+            ambient: .3, diffusivity: .5, specularity: .5, texture: new Texture("assets/brick.png"),
         });
         // Bump mapped:
         this.bumps = new Material(new FakeBumpMap(), {
             color: color(.5, .5, .5, 1),
-            ambient: .3, diffusivity: .5, specularity: .5, texture: new Texture("assets/stars.png"),
+            ambient: .3, diffusivity: .5, specularity: .5, texture: new Texture("assets/brick.png"),
         });
     }
 
