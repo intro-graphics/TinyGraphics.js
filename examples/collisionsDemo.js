@@ -184,7 +184,6 @@ export class TestData {
             stars: new Texture("assets/stars.png"),
             text: new Texture("assets/text.png"),
         };
-        // TODO: Fix the flat shading version
         this.shapes = {
             donut: new (Torus.prototype.makeFlatShadedVersion())(20, 20, [[0, 2], [0, 1]]),
             cone: new ClosedCone(4, 10, [[0, 2], [0, 1]]),
