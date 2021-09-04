@@ -1,8 +1,8 @@
 // import {defs, tiny} from './examples/common.js';
 // import {defs} from './examples/common.js';
 import {AxesViewerTestScene} from "./examples/axesViewer.js";
-import {CollisionDemo, InertiaDemo} from "./examples/collisionsDemo.js"
-// import {Many_Lights_Demo} from "./examples/many-lights-demo.js"
+// import {CollisionDemo, InertiaDemo} from "./examples/collisionsDemo.js"
+import {ManyLightsDemo} from "./examples/manyLightsDemo.js"
 // import {Obj_File_Demo} from "./examples/obj-file-demo.js"
 // import {Scene_To_Texture_Demo} from "./examples/scene-to-texture-demo.js"
 // import {Surfaces_Demo} from "./examples/surfaces-demo.js"
@@ -28,7 +28,7 @@ const {
 // Object.assign(widgets,
 //     // {AxesViewer, AxesViewerTestScene},
 //     //         {InertiaDemo, CollisionDemo},
-//     //         {Many_Lights_Demo},
+//     //         {ManyLightsDemo},
 //     //         {Obj_File_Demo},
 //     //         {Scene_To_Texture_Demo},
 //     //         {Surfaces_Demo},
@@ -39,7 +39,7 @@ const {
 
 // (Can define Main_Scene's class here)
 
-const Main_Scene = CollisionDemo;
+const Main_Scene = ManyLightsDemo;
 const Additional_Scenes = [];
 
 export {Main_Scene, Additional_Scenes, CanvasWidget, CodeWidget, TextWidget}

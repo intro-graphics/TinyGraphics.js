@@ -1,27 +1,26 @@
-import {defs, tiny} from './common.js';
-// Pull these names into this module's scope for convenience:
-const {vec3, vec4, color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
+import {color, Cube, FakeBumpMap, Light, Mat4, Material, Scene, Texture, vec3} from "../src/TinyGraphics.js";
+
 
 /**
- * **Many_Lights_Demo** demonstrates how to make the illusion that
+ * **ManyLightsDemo** demonstrates how to make the illusion that
  * there are many lights, despite only passing two to the shader.
  * We re-locate the lights in between individual shape draws.
  * Doing this trick performs much faster than looping through a
  * long list of lights within the fragment shader, none of which
  * need to affect every single shape in the scene.
  */
-export class Many_Lights_Demo extends Scene {
+export class ManyLightsDemo extends Scene {
     constructor() {
         super();
         // Define how many boxes (buildings) to draw:
         Object.assign(this, {rows: 20, columns: 35});
 
-        this.shapes = {cube: new defs.Cube()};
-        const shader = new defs.Fake_Bump_Map();
+        this.shapes = {cube: new Cube()};
+        const shader = new FakeBumpMap();
         this.brick = new Material(shader, {
             color: color(1, 1, 1, 1),
             ambient: .05, diffusivity: .5, specularity: .5, smoothness: 10,
-            texture: new Texture("assets/rgb.jpg")
+            texture: new Texture("assets/rgb.jpg"),
         });
 
         // Don't create any DOM elements to control this scene:

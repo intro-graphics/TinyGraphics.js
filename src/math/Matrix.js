@@ -1,4 +1,4 @@
-import {Vector4} from "./Vector.js";
+import {vec3, vec4, Vector4} from "./Vector.js";
 
 class Matrix extends Array {
     /**
