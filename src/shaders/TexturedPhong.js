@@ -22,9 +22,9 @@ class TexturedPhong extends PhongShader {
         return texturePhongFrag;
     }
 
-    updateGPU(context, gpuAddresses, gpuState, model_transform, material) {
-        // updateGPU(): Add a little more to the base class's version of this method.
-        super.updateGPU(context, gpuAddresses, gpuState, model_transform, material);
+    updateGpu(context, gpuAddresses, gpuState, model_transform, material) {
+        // updateGpu(): Add a little more to the base class's version of this method.
+        super.updateGpu(context, gpuAddresses, gpuState, model_transform, material);
 
         if (material.texture && material.texture.ready) {
             // Select texture unit 0 for the fragment shader Sampler2D uniform called "texture":

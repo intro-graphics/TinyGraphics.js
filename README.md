@@ -29,16 +29,16 @@ to view the different demos.
 To select a demo, open and edit mainScenes.js. Assign your choice to the MainScene variable. Your choices for scenes
 are:
 
-* Minimal_Webgl_Demo
-* Transforms_Sandbox
+* MinimalWebglDemo
+* TransformsSandbox
 * AxesViewerTestScene
 * InertiaDemo
-* Collision_Demo
-* Many_Lights_Demo
-* Obj_File_Demo
-* Text_Demo
-* Scene_To_Texture_Demo
-* Surfaces_Demo
+* CollisionDemo
+* ManyLightsDemo
+* ObjFileDemo
+* TextDemo
+* SceneToTextureDemo
+* SurfacesDemo
 
 The code comments in each file should help, especially if you look at the definition of Transforms_Sandbox. So should
 the explanations that the demos print on the page. Enjoy!

@@ -16,7 +16,7 @@ class BasicShader extends Shader {
      * @param model_transform
      * @param material
      */
-    updateGPU(context, gpuAddresses, graphicsState, model_transform, material) {
+    updateGpu(context, gpuAddresses, graphicsState, model_transform, material) {
         const [P, C, M] = [graphicsState.projectionTransform, graphicsState.camera_inverse, model_transform],
             PCM = P.times(C).times(M);
         context.uniformMatrix4fv(gpuAddresses.projection_camera_modelTransform, false,

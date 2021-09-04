@@ -222,16 +222,16 @@ class Mat4 extends Matrix {
     /**
      * Produce a traditional graphics camera "lookat" matrix.
      * Each input must be a 3x1 Vector.
-     * Note:  look_at() assumes the result will be used for a camera and stores its
+     * Note:  lookAt() assumes the result will be used for a camera and stores its
      * result in inverse space.
-     * If you want to use look_at to point a non-camera towards something, you can
+     * If you want to use lookAt to point a non-camera towards something, you can
      * do so, but to generate the correct basis you must re-invert its result.
      * @param eye
      * @param at
      * @param up
      * @returns {*}
      */
-    static look_at(eye, at, up) {
+    static lookAt(eye, at, up) {
         // Compute vectors along the requested coordinate axes. "y" is the "updated" and orthogonalized local y axis.
         let z = at.minus(eye).normalized(),
             x = z.cross(up).normalized(),

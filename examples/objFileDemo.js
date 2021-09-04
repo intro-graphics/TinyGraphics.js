@@ -121,15 +121,15 @@ export class ShapeFromFile extends Shape {                                   // 
  * Detailed model files can be used in place of simpler primitive-based
  * shapes to add complexity to a scene.  Simpler primitives in your scene
  * can just be thought of as placeholders until you find a model file
- * that fits well.  This demo shows the teapot model twice, with one
- * teapot showing off the FakeBumpMap effect while the other has a
+ * that fits well.  This demo shows the monkey model twice, with one
+ * monkey showing off the FakeBumpMap effect while the other has a
  * regular texture and Phong lighting.
  */
 export class ObjFileDemo extends Scene {
     constructor() {
         super();
         // Load the model file:
-        this.shapes = {"teapot": new ShapeFromFile("assets/monkey.obj")};
+        this.shapes = {"monkey": new ShapeFromFile("assets/monkey.obj")};
 
         // Don't create any DOM elements to control this scene:
         this.widget_options = {make_controls: false};
@@ -160,13 +160,13 @@ export class ObjFileDemo extends Scene {
                 .times(Mat4.translation(2 * i, 0, 0))
                 .times(Mat4.rotation(t / 1500, -1, 2, 0))
                 .times(Mat4.rotation(-Math.PI / 2, 1, 0, 0));
-            this.shapes.teapot.draw(context, programState, model_transform, i === 1 ? this.stars : this.bumps);
+            this.shapes.monkey.draw(context, programState, model_transform, i === 1 ? this.stars : this.bumps);
         }
     }
 
     showExplanation(documentElement) {
-        documentElement.innerHTML += "<p>This demo loads an external 3D model file of a teapot.  It uses a condensed version of the \"webgl-obj-loader.js\" "
+        documentElement.innerHTML += "<p>This demo loads an external 3D model file of a monkey.  It uses a condensed version of the \"webgl-obj-loader.js\" "
             + "open source library, though this version is not guaranteed to be complete and may not handle some .OBJ files.  It is contained in the class \"ShapeFromFile\". "
-            + "</p><p>One of these teapots is lit with bump mapping.  Can you tell which one?</p>";
+            + "</p><p>One of these monkeys is lit with bump mapping.  Can you tell which one?</p>";
     }
 }

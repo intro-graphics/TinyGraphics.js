@@ -7,8 +7,8 @@ import funny_frag from "./GLSL/funny_frag.glsl.js";
  * texture coordinates but without an input image.
  */
 class FunnyShader extends Shader {
-    updateGPU(context, gpuAddresses, programState, model_transform, material) {
-        // updateGPU():  Define how to synchronize our JavaScript's variables to the GPU's:
+    updateGpu(context, gpuAddresses, programState, model_transform, material) {
+        // updateGpu():  Define how to synchronize our JavaScript's variables to the GPU's:
         const [P, C, M] = [programState.projectionTransform, programState.camera_inverse, model_transform],
             PCM = P.times(C).times(M);
         context.uniformMatrix4fv(gpuAddresses.projection_camera_modelTransform, false, Mat.flatten2dTo1D(PCM.transposed()));

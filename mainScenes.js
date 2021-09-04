@@ -8,6 +8,7 @@ import {SceneToTextureDemo} from "./examples/sceneToTextureDemo.js";
 import {SurfacesDemo} from "./examples/surfacesDemo.js";
 import {TransformsSandbox} from "./examples/transformsSandbox.js";
 import {MinimalScene} from "./src/TinyGraphics.js";
+import {ShadowDemo} from "./examples/shadowDemo.js";
 
 const {
     CanvasWidget, CodeWidget, TextWidget,
@@ -25,7 +26,7 @@ Object.assign(widgets,
     {TransformsSandbox});
 
 // Define the MainScene's class here
-const MainScene = MinimalScene;
+const MainScene = ShadowDemo;
 const AdditionalScenes = [];
 
 export {MainScene, AdditionalScenes, CanvasWidget, CodeWidget, TextWidget};

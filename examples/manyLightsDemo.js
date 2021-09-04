@@ -48,7 +48,7 @@ export class ManyLightsDemo extends Scene {
      * @param programState
      */
     display(context, programState) {
-        programState.setCamera(Mat4.look_at(vec3(this.rows / 2, 5, 5), vec3(this.rows / 2, 0, -4), vec3(0, 1, 0)));
+        programState.setCamera(Mat4.lookAt(vec3(this.rows / 2, 5, 5), vec3(this.rows / 2, 0, -4), vec3(0, 1, 0)));
         programState.projectionTransform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 500);
 
         // To draw each individual box, select the two lights sharing

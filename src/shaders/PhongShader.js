@@ -76,7 +76,7 @@ class PhongShader extends Shader {
     }
 
     /**
-     * updateGPU(): Define how to synchronize our JavaScript's variables to GPU.  This is where the shader
+     * updateGpu(): Define how to synchronize our JavaScript's variables to GPU.  This is where the shader
      * receives ALL of its inputs.  Every value the GPU wants is divided into two categories:  Values that belong
      * to individual objects being drawn (which we call "Material") and values belonging to the whole scene or
      * program (which we call the "ProgramState").  Send both a material and a program state to the shaders
@@ -87,7 +87,7 @@ class PhongShader extends Shader {
      * @param model_transform
      * @param material
      */
-    updateGPU(context, gpuAddresses, gpuState, model_transform, material) {
+    updateGpu(context, gpuAddresses, gpuState, model_transform, material) {
         // Fill in any missing fields in the Material object with custom defaults for this shader:
         const defaults = {color: color(0, 0, 0, 1), ambient: 0, diffusivity: 1, specularity: 1, smoothness: 40};
         material = Object.assign({}, defaults, material);

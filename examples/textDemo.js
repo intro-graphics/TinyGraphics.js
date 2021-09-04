@@ -85,7 +85,7 @@ export class TextDemo extends Scene {             // **TextDemo** is a scene wit
     display(context, programState) {
         programState.lights = [new Light(vec4(3, 2, 1, 0), color(1, 1, 1, 1), 1000000),
             new Light(vec4(3, 10, 10, 1), color(1, .7, .7, 1), 100000)];
-        programState.setCamera(Mat4.look_at(...Vector.cast([0, 0, 4], [0, 0, 0], [0, 1, 0])));
+        programState.setCamera(Mat4.lookAt(...Vector.cast([0, 0, 4], [0, 0, 0], [0, 1, 0])));
         programState.projectionTransform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 500);
 
         const t = programState.animationTime / 1000;

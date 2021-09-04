@@ -59,7 +59,7 @@ export class SceneToTextureDemo extends Scene {
         programState.lights = [new Light(vec4(-5, 5, 5, 1), color(0, 1, 1, 1), 100000)];
         const t = programState.animationTime / 1000, dt = programState.animationDeltaTime / 1000;
 
-        programState.setCamera(Mat4.look_at(vec3(0, 0, 5), vec3(0, 0, 0), vec3(0, 1, 0)));
+        programState.setCamera(Mat4.lookAt(vec3(0, 0, 5), vec3(0, 0, 0), vec3(0, 1, 0)));
         programState.projectionTransform = Mat4.perspective(Math.PI / 4, context.width / context.height, .5, 500);
 
         // Update persistent matrix state:

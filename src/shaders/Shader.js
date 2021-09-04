@@ -7,7 +7,7 @@ import {GraphicsAddresses, GraphicsCardObject} from "../utils.js";
  * every shape that is drawn onscreen.
  *
  * Extend the class and fill in the abstract functions, some of which define GLSL strings, and others
- * (updateGPU) which define the extra custom JavaScript code needed to populate your particular shader
+ * (updateGpu) which define the extra custom JavaScript code needed to populate your particular shader
  * program with all the data values it is expecting, such as matrices.  The shader pulls these values
  * from two places in your JavaScript:  A Material object, for values pertaining to the current shape
  * only, and a ProgramState object, for values pertaining to your entire Scene or program.
@@ -77,7 +77,7 @@ class Shader extends GraphicsCardObject {
         context.useProgram(gpuInstance.program);
 
         // --- Send over all the values needed by this particular shader to the GPU: ---
-        this.updateGPU(context, gpuInstance.gpuAddresses, programState, model_transform, material);
+        this.updateGpu(context, gpuInstance.gpuAddresses, programState, model_transform, material);
 
         // --- Turn on all the correct attributes and make sure they're pointing to the correct ranges in GPU memory. ---
         for (let [attrName, attribute] of Object.entries(gpuInstance.gpuAddresses.shader_attributes)) {
@@ -112,7 +112,7 @@ class Shader extends GraphicsCardObject {
     fragmentGlslCode() {
     }
 
-    updateGPU() {
+    updateGpu() {
     }
 
     // *** How those four functions work (and how GPU shader programs work in general):
@@ -153,7 +153,7 @@ class Shader extends GraphicsCardObject {
     // new triangle is closer to the camera, and even if so, blending settings may interpolate some
     // of the old color into the result.  Finally, an image is displayed onscreen.
 
-    // You must define an updateGPU() function that includes the extra custom JavaScript code
+    // You must define an updateGpu() function that includes the extra custom JavaScript code
     // needed to populate your particular shader program with all the data values it is expecting.
 }
 

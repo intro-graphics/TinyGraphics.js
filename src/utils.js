@@ -239,7 +239,7 @@ class Container {
  * **ProgramState** stores any values that affect how your whole scene is drawn,
  * such as its current lights and the camera position.  Class Shader uses whatever
  * values are wrapped here as inputs to your custom shader program.  Your Shader
- * subclass must override its method "updateGPU()" to define how to send your
+ * subclass must override its method "updateGpu()" to define how to send your
  * ProgramState's particular values over to your custom shader program.
  */
 class ProgramState extends Container {
