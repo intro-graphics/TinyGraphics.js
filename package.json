@@ -1,0 +1,15 @@
+{
+  "name": "tiny-graphics",
+  "version": "2.0.0-dev",
+  "description": "A small, readable WebGL 2 library for learning computer graphics.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "serve": "node tools/serve.mjs",
+    "test": "node tools/test-math.mjs",
+    "check": "node tools/test-math.mjs && node tools/check-examples.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "1.60.0"
+  }
+}

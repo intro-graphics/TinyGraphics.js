@@ -1,4 +1,4 @@
-import {defs, tiny} from './common.js';
+import {defs, tiny} from '../common.js';
 // Pull these names into this module's scope for convenience:
 const {Vector3, vec3, vec4, color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
 const {Triangle, Square, Tetrahedron, Windmill, Cube, Subdivision_Sphere} = defs;
@@ -154,7 +154,7 @@ export class Surfaces_Demo extends Scene {
 
         // Update the gpu-side shape with new vertices.
         // Warning:  You can't call this until you've already drawn the shape once.
-        this.shapes.sheet.copy_onto_graphics_card(context.context, ["position", "normal"], false);
+        this.shapes.sheet.copy_onto_graphics_card(context.gl, ["position", "normal"], false);
     }
 
     display_scene_2(context, program_state) {
@@ -247,33 +247,19 @@ export class Surfaces_Demo extends Scene {
 
     show_explanation(document_element, webgl_manager) {
         if (this.is_master) {
-            document_element.style.padding = 0;
-            document_element.style.width = "1080px";
-            document_element.style.overflowY = "hidden";
-
             for (let i = 0; i < this.num_scenes; i++) {
                 const element_1 = document_element.appendChild(document.createElement("div"));
-                element_1.className = "canvas-widget";
-
-                const cw = new tiny.Canvas_Widget(element_1, undefined,
-                    {make_controls: i == 0, make_editor: false, make_code_nav: false});
+                // Controls_Widget watches the scene list, so scenes pushed after construction still get panels.
+                const cw = new tiny.Canvas_Widget(element_1, [],
+                    {make_controls: i == 0, show_explanation: false, aspect: 1080 / 300});
                 cw.webgl_manager.scenes.push(this.sections[i]);
                 cw.webgl_manager.program_state = webgl_manager.program_state;
-                cw.webgl_manager.set_size([1080, 300])
+                this.sections[i].show_explanation(element_1.insertBefore(document.createElement("div"), element_1.firstChild), cw.webgl_manager);
 
-                const element_2 = document_element.appendChild(document.createElement("div"));
-                element_2.className = "code-widget";
-
-                const code = new tiny.Code_Widget(element_2,
-                    Surfaces_Demo.prototype["construct_scene_" + i],
-                    [], {hide_navigator: true});
-
-                const element_3 = document_element.appendChild(document.createElement("div"));
-                element_3.className = "code-widget";
-
-                const code_2 = new tiny.Code_Widget(element_3,
-                    Surfaces_Demo.prototype["display_scene_" + i],
-                    [], {hide_navigator: true});
+                new tiny.Code_Widget(document_element.appendChild(document.createElement("div")),
+                    Surfaces_Demo.prototype["construct_scene_" + i], {hide_navigator: true});
+                new tiny.Code_Widget(document_element.appendChild(document.createElement("div")),
+                    Surfaces_Demo.prototype["display_scene_" + i], {hide_navigator: true});
             }
 
             const final_text = document_element.appendChild(document.createElement("div"));
@@ -287,7 +273,7 @@ export class Surfaces_Demo extends Scene {
         this.r = Mat4.rotation(-.5 * Math.sin(program_state.animation_time / 5000), 1, 1, 1);
 
         if (this.is_master) {
-            context.canvas.style.display = "none";
+            context.canvas.parentElement.style.display = "none";
             // *** Lights: *** Values of vector or point lights.  They'll be consulted by
             // the shader when coloring shapes.  See Light's class definition for inputs.
             const t = this.t = program_state.animation_time / 1000;

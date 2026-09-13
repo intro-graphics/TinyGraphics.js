@@ -1,3 +1,6 @@
 *.command
 .idea/
 .DS_Store
+node_modules/
+tools/shots/
+tools/.doc-snippets/
