@@ -2,6 +2,8 @@
 
 A small, readable WebGL 2 library for **learning** computer graphics.
 
+**[Open the live examples →](https://intro-graphics.github.io/TinyGraphics.js/v2/)** · [Docs](docs/) · [API](docs/api.md)
+
 TinyGraphics.js handles the tedious parts of GPU programming for you: buffer uploads, shader compilation, uniform lookup and the render loop. It also adds the vector and matrix math that JavaScript lacks. It does **not** hide the ideas you are there to learn. You still build every matrix, write every shader, and place every shape. The whole library is about 2,400 lines of heavily commented JavaScript, with no build step and no dependencies, and reading it is part of the point.
 
 It has been used in UCLA's CS 174A (Introduction to Computer Graphics) since 2016.
