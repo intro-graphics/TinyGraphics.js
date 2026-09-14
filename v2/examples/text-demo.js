@@ -94,8 +94,8 @@ export class Text_Demo extends Scene {             // **Text_Demo** is a scene w
                     .times(Mat4.translation(-.9, .9, 1.01));
 
                 const multi_line_string = strings[2 * i + j].split('\n');
-                // Draw a Text_String for every line in our string, up to 30 lines:
-                for (let line of multi_line_string.slice(0, 30)) {             // Assign the string to Text_String, and then draw it.
+                // Draw a Text_String for every line in our string, as many as fit on one face:
+                for (let line of multi_line_string.slice(0, 15)) {             // Assign the string to Text_String, and then draw it.
                     this.shapes.text.set_string(line, context.context);
                     this.shapes.text.draw(context, program_state, funny_orbit.times(cube_side)
                         .times(Mat4.scale(.06, .06, .06)), this.text_image);
