@@ -1,4 +1,4 @@
-import {defs, tiny} from './common.js';
+import {defs, tiny} from '../common.js';
 // Pull these names into this module's scope for convenience:
 const {vec3, vec4, vec, color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
 
@@ -19,9 +19,7 @@ export class Shape_From_File extends Shape {                                   /
                 else return Promise.reject(response.status)
             })
             .then(obj_file_contents => this.parse_into_mesh(obj_file_contents))
-            .catch(error => {
-                this.copy_onto_graphics_card(this.gl);
-            })
+            .catch(error => console.error(`Shape_From_File: could not load "${filename}" (${error}).`))
     }
 
     parse_into_mesh(data) {                           // Adapted from the "webgl-obj-loader.js" library found online:

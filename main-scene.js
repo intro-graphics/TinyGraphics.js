@@ -1,43 +1,45 @@
-import {defs, tiny} from './examples/common.js';
-import {Axes_Viewer, Axes_Viewer_Test_Scene} from "./examples/axes-viewer.js"
-import {Collision_Demo, Inertia_Demo} from "./examples/collisions-demo.js"
-import {Many_Lights_Demo} from "./examples/many-lights-demo.js"
-import {Obj_File_Demo} from "./examples/obj-file-demo.js"
-import {Scene_To_Texture_Demo} from "./examples/scene-to-texture-demo.js"
-import {Surfaces_Demo} from "./examples/surfaces-demo.js"
-import {Text_Demo} from "./examples/text-demo.js"
-import {Transforms_Sandbox} from "./examples/transforms-sandbox.js"
-// Pull these names into this module's scope for convenience:
-const {
-    Vector, Vector3, vec, vec3, vec4, color, Matrix, Mat4, Light, Shape, Material, Shader, Texture, Scene,
-    Canvas_Widget, Code_Widget, Text_Widget
-} = tiny;
+// main-scene.js — YOUR scene.  index.html shows it when no ?scene= is given.
+// Start here: change display(), reload the page, look.  See docs/01-first-scene.md.
+import {defs, tiny} from './common.js';
 
-// Now we have loaded everything in the files tiny-graphics.js, tiny-graphics-widgets.js, and common.js.
-// This yielded "tiny", an object wrapping the stuff in the first two files, and "defs" for wrapping all the rest.
+const {vec3, vec4, color, hex_color, Mat4, Light, Material, Scene} = tiny;
 
-// ******************** Extra step only for when executing on a local machine:
-//                      Load any more files in your directory and copy them into "defs."
-//                      (On the web, a server should instead just pack all these as well
-//                      as common.js into one file for you, such as "dependencies.js")
+export class Main_Scene extends Scene {
+    constructor() {
+        super();
+        // Create shapes and materials ONCE, here — never inside display().
+        this.shapes = {box: new defs.Cube(), ball: new defs.Subdivision_Sphere(4)};
+        const phong = new defs.Phong_Shader();
+        this.materials = {
+            plastic: new Material(phong, {ambient: .2, diffusivity: .8, specularity: .4, color: hex_color("#e0a040")}),
+            metal: new Material(phong, {ambient: .1, diffusivity: .5, specularity: 1, color: hex_color("#5a8fd6")}),
+        };
+        this.spin = true;
+    }
 
-const Minimal_Webgl_Demo = defs.Minimal_Webgl_Demo;
+    make_control_panel() {
+        this.key_triggered_button("Toggle spinning", ["t"], () => this.spin = !this.spin);
+        this.new_line();
+        this.slider("ball height", {min: 0, max: 4, step: .1, value: 2}, v => this.ball_height = v);
+    }
 
-Object.assign(defs,
-    {Axes_Viewer, Axes_Viewer_Test_Scene},
-            {Inertia_Demo, Collision_Demo},
-            {Many_Lights_Demo},
-            {Obj_File_Demo},
-            {Scene_To_Texture_Demo},
-            {Surfaces_Demo},
-            {Text_Demo},
-            {Transforms_Sandbox});
+    display(context, program_state) {
+        // Camera and lights: one place for the whole scene.
+        if (!context.scratchpad.controls) {
+            this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
+            program_state.set_camera(Mat4.look_at(vec3(0, 3, 10), vec3(0, 1, 0), vec3(0, 1, 0)));
+        }
+        program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.aspect_ratio, .1, 100);
+        program_state.lights = [new Light(vec4(3, 6, 5, 1), color(1, 1, 1, 1), 1000)];
 
-// ******************** End extra step
+        const t = program_state.animation_time / 1000;
+        const angle = this.spin ? t : 0;
 
-// (Can define Main_Scene's class here)
-
-const Main_Scene = Transforms_Sandbox;
-const Additional_Scenes = [];
-
-export {Main_Scene, Additional_Scenes, Canvas_Widget, Code_Widget, Text_Widget, defs}
+        // A box, and a ball orbiting it.  Read each model matrix right to left.
+        this.shapes.box.draw(context, program_state, Mat4.rotation(angle, 0, 1, 0), this.materials.plastic);
+        const ball = Mat4.rotation(angle, 0, 1, 0)
+            .times(Mat4.translation(3, this.ball_height ?? 2, 0))
+            .times(Mat4.scale(.5, .5, .5));
+        this.shapes.ball.draw(context, program_state, ball, this.materials.metal);
+    }
+}

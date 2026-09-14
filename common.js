@@ -1,16 +1,29 @@
-import {tiny} from '../tiny-graphics.js';
-import {widgets} from '../tiny-graphics-widgets.js';
-// Pull these names into this module's scope for convenience:
+/**
+ * @file common.js — the entry point for most programs.  Import this file to get everything:
+ *
+ *     import {tiny, defs} from './common.js';
+ *     const {vec3, vec4, color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
+ *
+ * `tiny` holds the core library (tiny-graphics.js) and the page widgets (tiny-graphics-widgets.js).
+ * `defs` holds the ready-made building blocks defined below: shapes, shaders, and camera controls.
+ * Read them — each one is a worked example of the technique it implements.
+ */
+import {tiny as core} from './tiny-graphics.js';
+import {widgets} from './tiny-graphics-widgets.js';
+
+const tiny = {...core, ...widgets};
 const {
     Vector, Vector3, vec, vec3, vec4, color, Matrix, Mat4,
     Light, Shape, Material, Shader, Texture, Scene
 } = tiny;
 
-Object.assign(tiny, widgets);
-
 const defs = {};
 
 export {tiny, defs};
+
+// ═════════════════════════════════════════════════════════════════════════════════════════
+// Shapes
+// ═════════════════════════════════════════════════════════════════════════════════════════
 
 const Triangle = defs.Triangle =
     class Triangle extends Shape {
@@ -69,22 +82,22 @@ const Tetrahedron = defs.Tetrahedron =
             if (!using_flat_shading) {
                 // Method 1:  A tetrahedron with shared vertices.  Compact, performs better,
                 // but can't produce flat shading or discontinuous seams in textures.
-                this.arrays.position = Vec.cast([0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]);
-                this.arrays.normal = Vec.cast([-a, -a, -a], [1, 0, 0], [0, 1, 0], [0, 0, 1]);
-                this.arrays.texture_coord = Vec.cast([0, 0], [1, 0], [0, 1,], [1, 1]);
+                this.arrays.position = Vector.cast([0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]);
+                this.arrays.normal = Vector.cast([-a, -a, -a], [1, 0, 0], [0, 1, 0], [0, 0, 1]);
+                this.arrays.texture_coord = Vector.cast([0, 0], [1, 0], [0, 1,], [1, 1]);
                 // Notice the repeats in the index list.  Vertices are shared
                 // and appear in multiple triangles with this method.
                 this.indices.push(0, 1, 2, 0, 1, 3, 0, 2, 3, 1, 2, 3);
             } else {
                 // Method 2:  A tetrahedron with four independent triangles.
-                this.arrays.position = Vec.cast([0, 0, 0], [1, 0, 0], [0, 1, 0],
+                this.arrays.position = Vector.cast([0, 0, 0], [1, 0, 0], [0, 1, 0],
                     [0, 0, 0], [1, 0, 0], [0, 0, 1],
                     [0, 0, 0], [0, 1, 0], [0, 0, 1],
                     [0, 0, 1], [1, 0, 0], [0, 1, 0]);
 
                 // The essence of flat shading:  This time, values of normal vectors can
                 // be constant per whole triangle.  Repeat them for all three vertices.
-                this.arrays.normal = Vec.cast([0, 0, -1], [0, 0, -1], [0, 0, -1],
+                this.arrays.normal = Vector.cast([0, 0, -1], [0, 0, -1], [0, 0, -1],
                     [0, -1, 0], [0, -1, 0], [0, -1, 0],
                     [-1, 0, 0], [-1, 0, 0], [-1, 0, 0],
                     [a, a, a], [a, a, a], [a, a, a]);
@@ -93,7 +106,7 @@ const Tetrahedron = defs.Tetrahedron =
                 // image is mapped onto each face).  We couldn't do this with shared
                 // vertices since this features abrupt transitions when approaching the
                 // same point from different directions.
-                this.arrays.texture_coord = Vec.cast([0, 0], [1, 0], [1, 1],
+                this.arrays.texture_coord = Vector.cast([0, 0], [1, 0], [1, 1],
                     [0, 0], [1, 0], [1, 1],
                     [0, 0], [1, 0], [1, 1],
                     [0, 0], [1, 0], [1, 1]);
@@ -450,218 +463,165 @@ const Minimal_Shape = defs.Minimal_Shape =
     }
 
 
-const Minimal_Webgl_Demo = defs.Minimal_Webgl_Demo =
-    class Minimal_Webgl_Demo extends Scene {
-        // **Minimal_Webgl_Demo** is an extremely simple example of a Scene class.
-        constructor(webgl_manager, control_panel) {
-            super(webgl_manager, control_panel);
-            // Don't create any DOM elements to control this scene:
-            this.widget_options = {make_controls: false, show_explanation: false};
-            // Send a Triangle's vertices to the GPU's buffers:
-            this.shapes = {triangle: new Minimal_Shape()};
-            this.shader = new Basic_Shader();
-        }
-
-        display(context, graphics_state) {
-            // Every frame, simply draw the Triangle at its default location.
-            this.shapes.triangle.draw(context, graphics_state, Mat4.identity(), new Material(this.shader));
-        }
-    }
-
+// ═════════════════════════════════════════════════════════════════════════════════════════
+// Shaders
+// ═════════════════════════════════════════════════════════════════════════════════════════
 
 const Basic_Shader = defs.Basic_Shader =
     class Basic_Shader extends Shader {
-        // **Basic_Shader** is nearly the simplest example of a subclass of Shader, which stores and
-        // maanges a GPU program.  Basic_Shader is a trivial pass-through shader that applies a
-        // shape's matrices and then simply samples literal colors stored at each vertex.
-        update_GPU(context, gpu_addresses, graphics_state, model_transform, material) {
-            // update_GPU():  Defining how to synchronize our JavaScript's variables to the GPU's:
-            const [P, C, M] = [graphics_state.projection_transform, graphics_state.camera_inverse, model_transform],
-                PCM = P.times(C).times(M);
-            context.uniformMatrix4fv(gpu_addresses.projection_camera_model_transform, false,
-                Matrix.flatten_2D_to_1D(PCM.transposed()));
-        }
-
-        shared_glsl_code() {
-            // ********* SHARED CODE, INCLUDED IN BOTH SHADERS *********
-            return `precision mediump float;
-                varying vec4 VERTEX_COLOR;
-            `;
+        // **Basic_Shader** — nearly the simplest possible Shader: transform each vertex by
+        // projection · view · model, and color it with the color stored at that vertex.
+        update_GPU(gl, gpu_addresses, program_state, model_transform, material) {
+            const PVM = program_state.projection_transform.times(program_state.view_transform).times(model_transform);
+            gl.uniformMatrix4fv(gpu_addresses.projection_camera_model_transform, false, Matrix.column_major(PVM));
         }
 
         vertex_glsl_code() {
-            // ********* VERTEX SHADER *********
-            return this.shared_glsl_code() + `
-                attribute vec4 color;
-                attribute vec3 position;                            
-                // Position is expressed in object coordinates.
+            return `#version 300 es
+                precision mediump float;
+                in vec3 position;                           // object space
+                in vec4 color;
                 uniform mat4 projection_camera_model_transform;
-        
-                void main(){
-                    // Compute the vertex's final resting place (in NDCS), and use the hard-coded color of the vertex:
-                    gl_Position = projection_camera_model_transform * vec4( position, 1.0 );
+                out vec4 VERTEX_COLOR;
+
+                void main() {
+                    gl_Position = projection_camera_model_transform * vec4(position, 1.0);
                     VERTEX_COLOR = color;
                 }`;
         }
 
         fragment_glsl_code() {
-            // ********* FRAGMENT SHADER *********
-            return this.shared_glsl_code() + `
-                void main(){
-                    // The interpolation gets done directly on the per-vertex colors:
-                    gl_FragColor = VERTEX_COLOR;
+            return `#version 300 es
+                precision mediump float;
+                in vec4 VERTEX_COLOR;                       // interpolated between the three vertices
+                out vec4 frag_color;
+
+                void main() {
+                    frag_color = VERTEX_COLOR;
                 }`;
         }
-    }
+    };
 
 
 const Funny_Shader = defs.Funny_Shader =
     class Funny_Shader extends Shader {
-        // **Funny_Shader**: A simple "procedural" texture shader, with
-        // texture coordinates but without an input image.
-        update_GPU(context, gpu_addresses, program_state, model_transform, material) {
-            // update_GPU():  Define how to synchronize our JavaScript's variables to the GPU's:
-            const [P, C, M] = [program_state.projection_transform, program_state.camera_inverse, model_transform],
-                PCM = P.times(C).times(M);
-            context.uniformMatrix4fv(gpu_addresses.projection_camera_model_transform, false, Mat.flatten_2D_to_1D(PCM.transposed()));
-            context.uniform1f(gpu_addresses.animation_time, program_state.animation_time / 1000);
-        }
-
-        shared_glsl_code() {
-            // ********* SHARED CODE, INCLUDED IN BOTH SHADERS *********
-            return `precision mediump float;
-                varying vec2 f_tex_coord;
-            `;
+        // **Funny_Shader** — a "procedural texture": the color is a formula of the texture
+        // coordinates and time, with no image involved.
+        update_GPU(gl, gpu_addresses, program_state, model_transform, material) {
+            const PVM = program_state.projection_transform.times(program_state.view_transform).times(model_transform);
+            gl.uniformMatrix4fv(gpu_addresses.projection_camera_model_transform, false, Matrix.column_major(PVM));
+            gl.uniform1f(gpu_addresses.animation_time, program_state.animation_time / 1000);
         }
 
         vertex_glsl_code() {
-            // ********* VERTEX SHADER *********
-            return this.shared_glsl_code() + `
-                attribute vec3 position;                            
-                // Position is expressed in object coordinates.
-                attribute vec2 texture_coord;
+            return `#version 300 es
+                precision mediump float;
+                in vec3 position;
+                in vec2 texture_coord;
                 uniform mat4 projection_camera_model_transform;
-        
-                void main(){ 
-                    gl_Position = projection_camera_model_transform * vec4( position, 1.0 );   
-                    // The vertex's final resting place (in NDCS).
-                    f_tex_coord = texture_coord;                                       
-                    // Directly use original texture coords and interpolate between.
+                out vec2 f_tex_coord;
+
+                void main() {
+                    gl_Position = projection_camera_model_transform * vec4(position, 1.0);
+                    f_tex_coord = texture_coord;
                 }`;
         }
 
         fragment_glsl_code() {
-            // ********* FRAGMENT SHADER *********
-            return this.shared_glsl_code() + `
+            return `#version 300 es
+                precision mediump float;
+                in vec2 f_tex_coord;
                 uniform float animation_time;
-                void main(){ 
-                    float a = animation_time, u = f_tex_coord.x, v = f_tex_coord.y;   
-                    // Use an arbitrary math function to color in all pixels as a complex                                                                  
-                    gl_FragColor = vec4(                                    
-                        // function of the UV texture coordintaes of the pixel and of time.  
-                        2.0 * u * sin(17.0 * u ) + 3.0 * v * sin(11.0 * v ) + 1.0 * sin(13.0 * a),
-                        3.0 * u * sin(18.0 * u ) + 4.0 * v * sin(12.0 * v ) + 2.0 * sin(14.0 * a),
-                        4.0 * u * sin(19.0 * u ) + 5.0 * v * sin(13.0 * v ) + 3.0 * sin(15.0 * a),
-                        5.0 * u * sin(20.0 * u ) + 6.0 * v * sin(14.0 * v ) + 4.0 * sin(16.0 * a));
+                out vec4 frag_color;
+
+                void main() {
+                    float a = animation_time, u = f_tex_coord.x, v = f_tex_coord.y;
+                    frag_color = vec4(
+                        2.0 * u * sin(17.0 * u) + 3.0 * v * sin(11.0 * v) + 1.0 * sin(13.0 * a),
+                        3.0 * u * sin(18.0 * u) + 4.0 * v * sin(12.0 * v) + 2.0 * sin(14.0 * a),
+                        4.0 * u * sin(19.0 * u) + 5.0 * v * sin(13.0 * v) + 3.0 * sin(15.0 * a),
+                        5.0 * u * sin(20.0 * u) + 6.0 * v * sin(14.0 * v) + 4.0 * sin(16.0 * a));
                 }`;
         }
-    }
+    };
 
 
 const Phong_Shader = defs.Phong_Shader =
     class Phong_Shader extends Shader {
-        // **Phong_Shader** is a subclass of Shader, which stores and maanges a GPU program.
-        // Graphic cards prior to year 2000 had shaders like this one hard-coded into them
-        // instead of customizable shaders.  "Phong-Blinn" Shading here is a process of
-        // determining brightness of pixels via vector math.  It compares the normal vector
-        // at that pixel with the vectors toward the camera and light sources.
-
-
+        // **Phong_Shader** — the Phong reflection model (with Blinn's half vector), evaluated per
+        // fragment ("Phong shading").  Before programmable GPUs, lighting like this was built into
+        // the hardware.  Material options: color, ambient, diffusivity, specularity, smoothness.
+        //
+        //   I = color·ambient + Σ_lights attenuation · ( color·light·diffusivity·max(N·L, 0)
+        //                                               + light·specularity·max(N·H, 0)^smoothness )
         constructor(num_lights = 2) {
             super();
             this.num_lights = num_lights;
         }
 
         shared_glsl_code() {
-            // ********* SHARED CODE, INCLUDED IN BOTH SHADERS *********
-            return ` precision mediump float;
-                const int N_LIGHTS = ` + this.num_lights + `;
+            return `#version 300 es
+                precision mediump float;
+                precision mediump int;      // vertex and fragment shaders default to different int precisions,
+                                            // and a uniform shared by both must match
+                const int N_LIGHTS = ${this.num_lights};
                 uniform float ambient, diffusivity, specularity, smoothness;
                 uniform vec4 light_positions_or_vectors[N_LIGHTS], light_colors[N_LIGHTS];
                 uniform float light_attenuation_factors[N_LIGHTS];
+                uniform int num_lights_in_use;
                 uniform vec4 shape_color;
-                uniform vec3 squared_scale, camera_center;
-        
-                // Specifier "varying" means a variable's final value will be passed from the vertex shader
-                // on to the next phase (fragment shader), then interpolated per-fragment, weighted by the
-                // pixel fragment's proximity to each of the 3 vertices (barycentric interpolation).
-                varying vec3 N, vertex_worldspace;
-                // ***** PHONG SHADING HAPPENS HERE: *****                                       
-                vec3 phong_model_lights( vec3 N, vec3 vertex_worldspace ){                                        
-                    // phong_model_lights():  Add up the lights' contributions.
-                    vec3 E = normalize( camera_center - vertex_worldspace );
-                    vec3 result = vec3( 0.0 );
-                    for(int i = 0; i < N_LIGHTS; i++){
-                        // Lights store homogeneous coords - either a position or vector.  If w is 0, the 
-                        // light will appear directional (uniform direction from all points), and we 
-                        // simply obtain a vector towards the light by directly using the stored value.
-                        // Otherwise if w is 1 it will appear as a point light -- compute the vector to 
-                        // the point light's location from the current surface point.  In either case, 
-                        // fade (attenuate) the light as the vector needed to reach it gets longer.  
-                        vec3 surface_to_light_vector = light_positions_or_vectors[i].xyz - 
-                                                       light_positions_or_vectors[i].w * vertex_worldspace;                                             
-                        float distance_to_light = length( surface_to_light_vector );
-        
-                        vec3 L = normalize( surface_to_light_vector );
-                        vec3 H = normalize( L + E );
-                        // Compute the diffuse and specular components from the Phong
-                        // Reflection Model, using Blinn's "halfway vector" method:
-                        float diffuse  =      max( dot( N, L ), 0.0 );
-                        float specular = pow( max( dot( N, H ), 0.0 ), smoothness );
-                        float attenuation = 1.0 / (1.0 + light_attenuation_factors[i] * distance_to_light * distance_to_light );
-                        
+                uniform vec3 camera_center;
+
+                vec3 phong_model_lights(vec3 N, vec3 vertex_worldspace) {
+                    vec3 E = normalize(camera_center - vertex_worldspace);     // toward the eye
+                    vec3 result = vec3(0.0);
+                    for (int i = 0; i < N_LIGHTS; i++) {
+                        if (i >= num_lights_in_use) break;
+                        // w = 0: a directional light, the stored xyz already is the direction toward it.
+                        // w = 1: a point light, so subtract the surface point to get the direction.
+                        vec3 surface_to_light_vector = light_positions_or_vectors[i].xyz
+                                                     - light_positions_or_vectors[i].w * vertex_worldspace;
+                        float distance_to_light = length(surface_to_light_vector);
+                        vec3 L = normalize(surface_to_light_vector);
+                        vec3 H = normalize(L + E);
+                        float diffuse  = max(dot(N, L), 0.0);
+                        float specular = diffuse > 0.0 ? pow(max(dot(N, H), 0.0), smoothness) : 0.0;
+                        float attenuation = 1.0 / (1.0 + light_attenuation_factors[i] * distance_to_light * distance_to_light);
                         vec3 light_contribution = shape_color.xyz * light_colors[i].xyz * diffusivity * diffuse
-                                                                  + light_colors[i].xyz * specularity * specular;
+                                                + light_colors[i].xyz * specularity * specular;
                         result += attenuation * light_contribution;
-                      }
+                    }
                     return result;
-                  } `;
+                }`;
         }
 
         vertex_glsl_code() {
-            // ********* VERTEX SHADER *********
             return this.shared_glsl_code() + `
-                attribute vec3 position, normal;                            
-                // Position is expressed in object coordinates.
-                
+                in vec3 position, normal;                   // object space
                 uniform mat4 model_transform;
                 uniform mat4 projection_camera_model_transform;
-        
-                void main(){                                                                   
-                    // The vertex's final resting place (in NDCS):
-                    gl_Position = projection_camera_model_transform * vec4( position, 1.0 );
-                    // The final normal vector in screen space.
-                    N = normalize( mat3( model_transform ) * normal / squared_scale);
-                    vertex_worldspace = ( model_transform * vec4( position, 1.0 ) ).xyz;
-                  } `;
+                uniform mat3 normal_matrix;                 // inverse transpose of model_transform's 3x3
+                out vec3 N, vertex_worldspace;
+
+                void main() {
+                    gl_Position = projection_camera_model_transform * vec4(position, 1.0);
+                    N = normalize(normal_matrix * normal);
+                    vertex_worldspace = (model_transform * vec4(position, 1.0)).xyz;
+                }`;
         }
 
         fragment_glsl_code() {
-            // ********* FRAGMENT SHADER *********
-            // A fragment is a pixel that's overlapped by the current triangle.
-            // Fragments affect the final image or get discarded due to depth.
             return this.shared_glsl_code() + `
-                void main(){                                                           
-                    // Compute an initial (ambient) color:
-                    gl_FragColor = vec4( shape_color.xyz * ambient, shape_color.w );
-                    // Compute the final color with contributions from lights:
-                    gl_FragColor.xyz += phong_model_lights( normalize( N ), vertex_worldspace );
-                  } `;
+                in vec3 N, vertex_worldspace;               // interpolated per fragment
+                out vec4 frag_color;
+
+                void main() {
+                    frag_color = vec4(shape_color.xyz * ambient, shape_color.w);
+                    frag_color.xyz += phong_model_lights(normalize(N), vertex_worldspace);
+                }`;
         }
 
         send_material(gl, gpu, material) {
-            // send_material(): Send the desired shape-wide material qualities to the
-            // graphics card, where they will tweak the Phong lighting formula.
             gl.uniform4fv(gpu.shape_color, material.color);
             gl.uniform1f(gpu.ambient, material.ambient);
             gl.uniform1f(gpu.diffusivity, material.diffusivity);
@@ -669,214 +629,183 @@ const Phong_Shader = defs.Phong_Shader =
             gl.uniform1f(gpu.smoothness, material.smoothness);
         }
 
-        send_gpu_state(gl, gpu, gpu_state, model_transform) {
-            // send_gpu_state():  Send the state of our whole drawing context to the GPU.
-            const O = vec4(0, 0, 0, 1), camera_center = gpu_state.camera_transform.times(O).to3();
+        send_gpu_state(gl, gpu, program_state, model_transform) {
+            // The eye point is where the camera's own frame puts the origin: camera_transform · (0,0,0,1).
+            const camera_center = program_state.camera_transform.times(vec4(0, 0, 0, 1)).to3();
             gl.uniform3fv(gpu.camera_center, camera_center);
-            // Use the squared scale trick from "Eric's blog" instead of inverse transpose matrix:
-            const squared_scale = model_transform.reduce(
-                (acc, r) => {
-                    return acc.plus(vec4(...r).times_pairwise(r))
-                }, vec4(0, 0, 0, 0)).to3();
-            gl.uniform3fv(gpu.squared_scale, squared_scale);
-            // Send the current matrices to the shader.  Go ahead and pre-compute
-            // the products we'll need of the of the three special matrices and just
-            // cache and send those.  They will be the same throughout this draw
-            // call, and thus across each instance of the vertex shader.
-            // Transpose them since the GPU expects matrices as column-major arrays.
-            const PCM = gpu_state.projection_transform.times(gpu_state.camera_inverse).times(model_transform);
-            gl.uniformMatrix4fv(gpu.model_transform, false, Matrix.flatten_2D_to_1D(model_transform.transposed()));
-            gl.uniformMatrix4fv(gpu.projection_camera_model_transform, false, Matrix.flatten_2D_to_1D(PCM.transposed()));
+            const PVM = program_state.projection_transform.times(program_state.view_transform).times(model_transform);
+            gl.uniformMatrix4fv(gpu.model_transform, false, Matrix.column_major(model_transform));
+            gl.uniformMatrix4fv(gpu.projection_camera_model_transform, false, Matrix.column_major(PVM));
+            gl.uniformMatrix3fv(gpu.normal_matrix, false, Matrix.column_major(Mat4.normal_matrix(model_transform)));
 
-            // Omitting lights will show only the material color, scaled by the ambient term:
-            if (!gpu_state.lights.length)
-                return;
-
-            const light_positions_flattened = [], light_colors_flattened = [];
-            for (let i = 0; i < 4 * gpu_state.lights.length; i++) {
-                light_positions_flattened.push(gpu_state.lights[Math.floor(i / 4)].position[i % 4]);
-                light_colors_flattened.push(gpu_state.lights[Math.floor(i / 4)].color[i % 4]);
-            }
-            gl.uniform4fv(gpu.light_positions_or_vectors, light_positions_flattened);
-            gl.uniform4fv(gpu.light_colors, light_colors_flattened);
-            gl.uniform1fv(gpu.light_attenuation_factors, gpu_state.lights.map(l => l.attenuation));
+            const lights = (program_state.lights || []).slice(0, this.num_lights);
+            if (program_state.lights && program_state.lights.length > this.num_lights)
+                tiny.Vertex_Buffer.warn_once(`Phong_Shader(${this.num_lights}) uses only its first ${this.num_lights} lights; ${program_state.lights.length} were given.`);
+            gl.uniform1i(gpu.num_lights_in_use, lights.length);
+            if (!lights.length) return;
+            gl.uniform4fv(gpu.light_positions_or_vectors, lights.flatMap(l => [...l.position]));
+            gl.uniform4fv(gpu.light_colors, lights.flatMap(l => [...l.color]));
+            gl.uniform1fv(gpu.light_attenuation_factors, lights.map(l => l.attenuation));
         }
 
-        update_GPU(context, gpu_addresses, gpu_state, model_transform, material) {
-            // update_GPU(): Define how to synchronize our JavaScript's variables to the GPU's.  This is where the shader
-            // recieves ALL of its inputs.  Every value the GPU wants is divided into two categories:  Values that belong
-            // to individual objects being drawn (which we call "Material") and values belonging to the whole scene or
-            // program (which we call the "Program_State").  Send both a material and a program state to the shaders
-            // within this function, one data field at a time, to fully initialize the shader for a draw.
-
-            // Fill in any missing fields in the Material object with custom defaults for this shader:
+        update_GPU(gl, gpu_addresses, program_state, model_transform, material) {
+            // Every value the GPU needs comes from the Material (this shape) or the Program_State (the scene).
+            // Missing material options fall back to these defaults:
             const defaults = {color: color(0, 0, 0, 1), ambient: 0, diffusivity: 1, specularity: 1, smoothness: 40};
             material = Object.assign({}, defaults, material);
-
-            this.send_material(context, gpu_addresses, material);
-            this.send_gpu_state(context, gpu_addresses, gpu_state, model_transform);
+            this.send_material(gl, gpu_addresses, material);
+            this.send_gpu_state(gl, gpu_addresses, program_state, model_transform);
         }
-    }
+    };
 
 
 const Textured_Phong = defs.Textured_Phong =
     class Textured_Phong extends Phong_Shader {
-        // **Textured_Phong** is a Phong Shader extended to addditionally decal a
-        // texture image over the drawn shape, lined up according to the texture
-        // coordinates that are stored at each shape vertex.
+        // **Textured_Phong** — Phong_Shader that also samples an image at each fragment's
+        // interpolated texture coordinate.  Material option: texture (a Texture or Render_Target).
         vertex_glsl_code() {
-            // ********* VERTEX SHADER *********
             return this.shared_glsl_code() + `
-                varying vec2 f_tex_coord;
-                attribute vec3 position, normal;                            
-                // Position is expressed in object coordinates.
-                attribute vec2 texture_coord;
-                
+                in vec3 position, normal;
+                in vec2 texture_coord;
                 uniform mat4 model_transform;
                 uniform mat4 projection_camera_model_transform;
-        
-                void main(){                                                                   
-                    // The vertex's final resting place (in NDCS):
-                    gl_Position = projection_camera_model_transform * vec4( position, 1.0 );
-                    // The final normal vector in screen space.
-                    N = normalize( mat3( model_transform ) * normal / squared_scale);
-                    vertex_worldspace = ( model_transform * vec4( position, 1.0 ) ).xyz;
-                    // Turn the per-vertex texture coordinate into an interpolated variable.
+                uniform mat3 normal_matrix;
+                out vec3 N, vertex_worldspace;
+                out vec2 f_tex_coord;
+
+                void main() {
+                    gl_Position = projection_camera_model_transform * vec4(position, 1.0);
+                    N = normalize(normal_matrix * normal);
+                    vertex_worldspace = (model_transform * vec4(position, 1.0)).xyz;
                     f_tex_coord = texture_coord;
-                  } `;
+                }`;
         }
 
         fragment_glsl_code() {
-            // ********* FRAGMENT SHADER *********
-            // A fragment is a pixel that's overlapped by the current triangle.
-            // Fragments affect the final image or get discarded due to depth.
+            // ("texture" is a built-in GLSL function in ES 3.00, so the sampler is named texture_image.)
             return this.shared_glsl_code() + `
-                varying vec2 f_tex_coord;
-                uniform sampler2D texture;
-        
-                void main(){
-                    // Sample the texture image in the correct place:
-                    vec4 tex_color = texture2D( texture, f_tex_coord );
-                    if( tex_color.w < .01 ) discard;
-                                                                             // Compute an initial (ambient) color:
-                    gl_FragColor = vec4( ( tex_color.xyz + shape_color.xyz ) * ambient, shape_color.w * tex_color.w ); 
-                                                                             // Compute the final color with contributions from lights:
-                    gl_FragColor.xyz += phong_model_lights( normalize( N ), vertex_worldspace );
-                  } `;
+                in vec3 N, vertex_worldspace;
+                in vec2 f_tex_coord;
+                uniform sampler2D texture_image;
+                out vec4 frag_color;
+
+                void main() {
+                    vec4 tex_color = texture(texture_image, f_tex_coord);
+                    if (tex_color.w < .01) discard;
+                    frag_color = vec4((tex_color.xyz + shape_color.xyz) * ambient, shape_color.w * tex_color.w);
+                    frag_color.xyz += phong_model_lights(normalize(N), vertex_worldspace);
+                }`;
         }
 
-        update_GPU(context, gpu_addresses, gpu_state, model_transform, material) {
-            // update_GPU(): Add a little more to the base class's version of this method.
-            super.update_GPU(context, gpu_addresses, gpu_state, model_transform, material);
-
+        update_GPU(gl, gpu_addresses, program_state, model_transform, material) {
+            super.update_GPU(gl, gpu_addresses, program_state, model_transform, material);
             if (material.texture && material.texture.ready) {
-                // Select texture unit 0 for the fragment shader Sampler2D uniform called "texture":
-                context.uniform1i(gpu_addresses.texture, 0);
-                // For this draw, use the texture image from correct the GPU buffer:
-                material.texture.activate(context);
+                gl.uniform1i(gpu_addresses.texture_image, 0);     // the sampler reads texture unit 0 ...
+                material.texture.activate(gl, 0);                 // ... where we bind this draw's image
             }
         }
-    }
+    };
 
 
 const Fake_Bump_Map = defs.Fake_Bump_Map =
     class Fake_Bump_Map extends Textured_Phong {
-        // **Fake_Bump_Map** Same as Phong_Shader, except adds a line of code to
-        // compute a new normal vector, perturbed according to texture color.
+        // **Fake_Bump_Map** — Textured_Phong, but the normal is nudged by the texture color.  Real bump
+        // mapping perturbs the normal along the surface's tangent directions using a height map; this
+        // shortcut ignores tangent space, so it only looks right on some surfaces.
         fragment_glsl_code() {
-            // ********* FRAGMENT SHADER *********
             return this.shared_glsl_code() + `
-                varying vec2 f_tex_coord;
-                uniform sampler2D texture;
-        
-                void main(){
-                    // Sample the texture image in the correct place:
-                    vec4 tex_color = texture2D( texture, f_tex_coord );
-                    if( tex_color.w < .01 ) discard;
-                    // Slightly disturb normals based on sampling the same image that was used for texturing:
-                    vec3 bumped_N  = N + tex_color.rgb - .5*vec3(1,1,1);
-                    // Compute an initial (ambient) color:
-                    gl_FragColor = vec4( ( tex_color.xyz + shape_color.xyz ) * ambient, shape_color.w * tex_color.w ); 
-                    // Compute the final color with contributions from lights:
-                    gl_FragColor.xyz += phong_model_lights( normalize( bumped_N ), vertex_worldspace );
-                  } `;
+                in vec3 N, vertex_worldspace;
+                in vec2 f_tex_coord;
+                uniform sampler2D texture_image;
+                out vec4 frag_color;
+
+                void main() {
+                    vec4 tex_color = texture(texture_image, f_tex_coord);
+                    if (tex_color.w < .01) discard;
+                    vec3 bumped_N = N + tex_color.rgb - .5 * vec3(1, 1, 1);
+                    frag_color = vec4((tex_color.xyz + shape_color.xyz) * ambient, shape_color.w * tex_color.w);
+                    frag_color.xyz += phong_model_lights(normalize(bumped_N), vertex_worldspace);
+                }`;
         }
-    }
+    };
+
+// ═════════════════════════════════════════════════════════════════════════════════════════
+// Scenes that help other scenes
+// ═════════════════════════════════════════════════════════════════════════════════════════
+
+const Minimal_Webgl_Demo = defs.Minimal_Webgl_Demo =
+    class Minimal_Webgl_Demo extends Scene {
+        // **Minimal_Webgl_Demo** — about the smallest complete Scene: one colored triangle.
+        constructor() {
+            super();
+            this.widget_options = {make_controls: false, show_explanation: false};
+            this.shapes = {triangle: new Minimal_Shape()};
+            this.shader = new Basic_Shader();
+        }
+
+        display(webgl_manager, program_state) {
+            this.shapes.triangle.draw(webgl_manager, program_state, Mat4.identity(), new Material(this.shader));
+        }
+    };
 
 
 const Movement_Controls = defs.Movement_Controls =
     class Movement_Controls extends Scene {
-        // **Movement_Controls** is a Scene that can be attached to a canvas, like any other
-        // Scene, but it is a Secondary Scene Component -- meant to stack alongside other
-        // scenes.  Rather than drawing anything it embeds both first-person and third-
-        // person style controls into the website.  These can be used to manually move your
-        // camera or other objects smoothly through your scene using key, mouse, and HTML
-        // button controls to help you explore what's in it.
+        // **Movement_Controls** — add as a child scene to fly the camera: WASD / space / z to move,
+        // drag on the canvas to orbit, and buttons for preset views.  It edits the camera stored in
+        // program_state (or any matrix pair you give set_recipient()).
         constructor() {
             super();
-            const data_members = {
+            Object.assign(this, {
                 roll: 0, look_around_locked: true,
                 thrust: vec3(0, 0, 0), pos: vec3(0, 0, 0), z_axis: vec3(0, 0, 0),
                 radians_per_frame: 1 / 200, meters_per_frame: 20, speed_multiplier: 1
-            };
-            Object.assign(this, data_members);
-
+            });
             this.mouse_enabled_canvases = new Set();
-            this.will_take_over_graphics_state = true;
+            this.will_take_over_camera = true;
+            // Until the first display() attaches to a real camera, buttons act on a scratch pair.
+            const [scratch, scratch_inverse] = [Mat4.identity(), Mat4.identity()];
+            this.set_recipient(() => scratch, () => scratch_inverse);
+            this.mouse = {"from_center": vec(0, 0)};
         }
 
+        // set_recipient(): track an external pair of matrices, given as closures so they stay live:
+        // matrix() is camera → world, inverse() is world → camera.
         set_recipient(matrix_closure, inverse_closure) {
-            // set_recipient(): The camera matrix is not actually stored here inside Movement_Controls;
-            // instead, track an external target matrix to modify.  Targets must be pointer references
-            // made using closures.
             this.matrix = matrix_closure;
             this.inverse = inverse_closure;
         }
 
-        reset(graphics_state) {
-            // reset(): Initially, the default target is the camera matrix that Shaders use, stored in the
-            // encountered program_state object.  Targets must be pointer references made using closures.
-            this.set_recipient(() => graphics_state.camera_transform,
-                () => graphics_state.camera_inverse);
+        reset(program_state) {
+            this.set_recipient(() => program_state.camera_transform, () => program_state.view_transform);
         }
 
         add_mouse_controls(canvas) {
-            // add_mouse_controls():  Attach HTML mouse events to the drawing canvas.
-            // First, measure mouse steering, for rotating the flyaround camera:
             this.mouse = {"from_center": vec(0, 0)};
             const mouse_position = (e, rect = canvas.getBoundingClientRect()) =>
                 vec(e.clientX - (rect.left + rect.right) / 2, e.clientY - (rect.bottom + rect.top) / 2);
-            // Set up mouse response.  The last one stops us from reacting if the mouse leaves the canvas:
-            document.addEventListener("mouseup", e => {
-                this.mouse.anchor = undefined;
-            });
-            canvas.addEventListener("mousedown", e => {
+            document.addEventListener("pointerup", () => this.mouse.anchor = undefined);
+            canvas.addEventListener("pointerdown", e => {
                 e.preventDefault();
                 this.mouse.anchor = mouse_position(e);
             });
-            canvas.addEventListener("mousemove", e => {
+            canvas.addEventListener("pointermove", e => {
                 e.preventDefault();
                 this.mouse.from_center = mouse_position(e);
             });
-            canvas.addEventListener("mouseout", e => {
-                if (!this.mouse.anchor) this.mouse.from_center.scale_by(0)
+            canvas.addEventListener("pointerout", () => {
+                if (!this.mouse.anchor) this.mouse.from_center.scale_by(0);
             });
         }
 
-        show_explanation(document_element) {
-        }
-
         make_control_panel() {
-            // make_control_panel(): Sets up a panel of interactive HTML elements, including
-            // buttons with key bindings for affecting this scene, and live info readouts.
-            this.control_panel.innerHTML += "Click and drag the scene to spin your viewpoint around it.<br>";
-            this.live_string(box => box.textContent = "- Position: " + this.pos[0].toFixed(2) + ", " + this.pos[1].toFixed(2)
+            this.control_panel.innerHTML += "Drag the canvas to orbit; keys below to fly.<br>";
+            this.live_string(box => box.textContent = "Position: " + this.pos[0].toFixed(2) + ", " + this.pos[1].toFixed(2)
                 + ", " + this.pos[2].toFixed(2));
             this.new_line();
-            // The facing directions are surprisingly affected by the left hand rule:
-            this.live_string(box => box.textContent = "- Facing: " + ((this.z_axis[0] > 0 ? "West " : "East ")
+            // The camera looks down its own −z axis, so "facing" reports the opposite of its z axis:
+            this.live_string(box => box.textContent = "Facing: " + ((this.z_axis[0] > 0 ? "West " : "East ")
                 + (this.z_axis[1] > 0 ? "Down " : "Up ") + (this.z_axis[2] > 0 ? "North" : "South")));
-            this.new_line();
             this.new_line();
 
             this.key_triggered_button("Up", [" "], () => this.thrust[1] = -1, undefined, () => this.thrust[1] = 0);
@@ -889,132 +818,94 @@ const Movement_Controls = defs.Movement_Controls =
             this.key_triggered_button("Down", ["z"], () => this.thrust[1] = 1, undefined, () => this.thrust[1] = 0);
 
             const speed_controls = this.control_panel.appendChild(document.createElement("span"));
-            speed_controls.style.margin = "30px";
-            this.key_triggered_button("-", ["o"], () =>
-                this.speed_multiplier /= 1.2, undefined, undefined, undefined, speed_controls);
-            this.live_string(box => {
-                box.textContent = "Speed: " + this.speed_multiplier.toFixed(2)
-            }, speed_controls);
-            this.key_triggered_button("+", ["p"], () =>
-                this.speed_multiplier *= 1.2, undefined, undefined, undefined, speed_controls);
+            speed_controls.style.margin = "0 12px";
+            this.key_triggered_button("−", ["o"], () => this.speed_multiplier /= 1.2, undefined, undefined, undefined, speed_controls);
+            this.live_string(box => box.textContent = " speed " + this.speed_multiplier.toFixed(2) + " ", speed_controls);
+            this.key_triggered_button("+", ["p"], () => this.speed_multiplier *= 1.2, undefined, undefined, undefined, speed_controls);
             this.new_line();
             this.key_triggered_button("Roll left", [","], () => this.roll = 1, undefined, () => this.roll = 0);
             this.key_triggered_button("Roll right", ["."], () => this.roll = -1, undefined, () => this.roll = 0);
             this.new_line();
-            this.key_triggered_button("(Un)freeze mouse look around", ["f"], () => this.look_around_locked ^= 1, "#8B8885");
+            this.key_triggered_button("(Un)freeze mouse look", ["f"], () => this.look_around_locked ^= 1, "#8B8885");
             this.new_line();
             this.key_triggered_button("Go to world origin", ["r"], () => {
                 this.matrix().set_identity(4, 4);
-                this.inverse().set_identity(4, 4)
+                this.inverse().set_identity(4, 4);
             }, "#8B8885");
             this.new_line();
-
-            this.key_triggered_button("Look at origin from front", ["1"], () => {
-                this.inverse().set(Mat4.look_at(vec3(0, 0, 10), vec3(0, 0, 0), vec3(0, 1, 0)));
+            const look_from = (eye, label, key) => this.key_triggered_button(label, [key], () => {
+                this.inverse().set(Mat4.look_at(eye, vec3(0, 0, 0), vec3(0, 1, 0)));
                 this.matrix().set(Mat4.inverse(this.inverse()));
             }, "#8B8885");
+            look_from(vec3(0, 0, 10), "Look at origin from front", "1");
             this.new_line();
-            this.key_triggered_button("from right", ["2"], () => {
-                this.inverse().set(Mat4.look_at(vec3(10, 0, 0), vec3(0, 0, 0), vec3(0, 1, 0)));
-                this.matrix().set(Mat4.inverse(this.inverse()));
-            }, "#8B8885");
-            this.key_triggered_button("from rear", ["3"], () => {
-                this.inverse().set(Mat4.look_at(vec3(0, 0, -10), vec3(0, 0, 0), vec3(0, 1, 0)));
-                this.matrix().set(Mat4.inverse(this.inverse()));
-            }, "#8B8885");
-            this.key_triggered_button("from left", ["4"], () => {
-                this.inverse().set(Mat4.look_at(vec3(-10, 0, 0), vec3(0, 0, 0), vec3(0, 1, 0)));
-                this.matrix().set(Mat4.inverse(this.inverse()));
-            }, "#8B8885");
+            look_from(vec3(10, 0, 0), "from right", "2");
+            look_from(vec3(0, 0, -10), "from rear", "3");
+            look_from(vec3(-10, 0, 0), "from left", "4");
             this.new_line();
-            this.key_triggered_button("Attach to global camera", ["Shift", "R"],
-                () => {
-                    this.will_take_over_graphics_state = true
-                }, "#8B8885");
-            this.new_line();
+            this.key_triggered_button("Attach to global camera", ["Shift", "R"], () => this.will_take_over_camera = true, "#8B8885");
         }
 
         first_person_flyaround(radians_per_frame, meters_per_frame, leeway = 70) {
-            // (Internal helper function)
-            // Compare mouse's location to all four corners of a dead box:
             const offsets_from_dead_box = {
                 plus: [this.mouse.from_center[0] + leeway, this.mouse.from_center[1] + leeway],
                 minus: [this.mouse.from_center[0] - leeway, this.mouse.from_center[1] - leeway]
             };
-            // Apply a camera rotation movement, but only when the mouse is
-            // past a minimum distance (leeway) from the canvas's center:
             if (!this.look_around_locked)
-                // If steering, steer according to "mouse_from_center" vector, but don't
-                // start increasing until outside a leeway window from the center.
-                for (let i = 0; i < 2; i++) {                                     // The &&'s in the next line might zero the vectors out:
-                    let o = offsets_from_dead_box,
+                for (let i = 0; i < 2; i++) {
+                    const o = offsets_from_dead_box,
                         velocity = ((o.minus[i] > 0 && o.minus[i]) || (o.plus[i] < 0 && o.plus[i])) * radians_per_frame;
-                    // On X step, rotate around Y axis, and vice versa.
                     this.matrix().post_multiply(Mat4.rotation(-velocity, i, 1 - i, 0));
                     this.inverse().pre_multiply(Mat4.rotation(+velocity, i, 1 - i, 0));
                 }
             this.matrix().post_multiply(Mat4.rotation(-.1 * this.roll, 0, 0, 1));
             this.inverse().pre_multiply(Mat4.rotation(+.1 * this.roll, 0, 0, 1));
-            // Now apply translation movement of the camera, in the newest local coordinate frame.
+            // Translate in the camera's newest local frame.  A change to one matrix is always mirrored
+            // by the inverse change on the other, so the pair stays exact inverses without re-inverting.
             this.matrix().post_multiply(Mat4.translation(...this.thrust.times(-meters_per_frame)));
             this.inverse().pre_multiply(Mat4.translation(...this.thrust.times(+meters_per_frame)));
         }
 
         third_person_arcball(radians_per_frame) {
-            // (Internal helper function)
-            // Spin the scene around a point on an axis determined by user mouse drag:
             const dragging_vector = this.mouse.from_center.minus(this.mouse.anchor);
-            if (dragging_vector.norm() <= 0)
-                return;
+            if (dragging_vector.norm() <= 0) return;
             this.matrix().post_multiply(Mat4.translation(0, 0, -25));
             this.inverse().pre_multiply(Mat4.translation(0, 0, +25));
-
-            const rotation = Mat4.rotation(radians_per_frame * dragging_vector.norm(),
-                dragging_vector[1], dragging_vector[0], 0);
+            const rotation = Mat4.rotation(radians_per_frame * dragging_vector.norm(), dragging_vector[1], dragging_vector[0], 0);
             this.matrix().post_multiply(rotation);
-            this.inverse().pre_multiply(rotation);
-
+            this.inverse().pre_multiply(Mat4.inverse(rotation));
             this.matrix().post_multiply(Mat4.translation(0, 0, +25));
             this.inverse().pre_multiply(Mat4.translation(0, 0, -25));
         }
 
-        display(context, graphics_state, dt = graphics_state.animation_delta_time / 1000) {
-            // The whole process of acting upon controls begins here.
+        display(webgl_manager, program_state, dt = program_state.animation_delta_time / 1000) {
             const m = this.speed_multiplier * this.meters_per_frame,
                 r = this.speed_multiplier * this.radians_per_frame;
-
-            if (this.will_take_over_graphics_state) {
-                this.reset(graphics_state);
-                this.will_take_over_graphics_state = false;
+            if (this.will_take_over_camera) {
+                this.reset(program_state);
+                this.will_take_over_camera = false;
             }
-
-            if (!this.mouse_enabled_canvases.has(context.canvas)) {
-                this.add_mouse_controls(context.canvas);
-                this.mouse_enabled_canvases.add(context.canvas)
+            if (!this.mouse_enabled_canvases.has(webgl_manager.canvas)) {
+                this.add_mouse_controls(webgl_manager.canvas);
+                this.mouse_enabled_canvases.add(webgl_manager.canvas);
             }
-            // Move in first-person.  Scale the normal camera aiming speed by dt for smoothness:
             this.first_person_flyaround(dt * r, dt * m);
-            // Also apply third-person "arcball" camera mode if a mouse drag is occurring:
-            if (this.mouse.anchor)
-                this.third_person_arcball(dt * r);
-            // Log some values:
-            this.pos = this.inverse().times(vec4(0, 0, 0, 1));
-            this.z_axis = this.inverse().times(vec4(0, 0, 1, 0));
+            if (this.mouse.anchor) this.third_person_arcball(dt * r);
+            this.pos = this.matrix().times(vec4(0, 0, 0, 1));
+            this.z_axis = this.matrix().times(vec4(0, 0, 1, 0));
         }
-    }
+    };
 
 
 const Program_State_Viewer = defs.Program_State_Viewer =
     class Program_State_Viewer extends Scene {
-        // **Program_State_Viewer** just toggles, monitors, and reports some
-        // global values via its control panel.
+        // **Program_State_Viewer** — a child scene with a pause button for animation time.
         make_control_panel() {
-            // display() of this scene will replace the following object:
-            this.program_state = {};
+            this.program_state = this.program_state || {};
             this.key_triggered_button("(Un)pause animation", ["Alt", "a"], () => this.program_state.animate ^= 1);
         }
 
-        display(context, program_state) {
+        display(webgl_manager, program_state) {
             this.program_state = program_state;
         }
-    }
+    };
