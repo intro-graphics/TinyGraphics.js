@@ -23,10 +23,10 @@ export class Axes_Viewer extends Scene {
         this.selected_basis_id = 0;
         this.reset();
         this.shapes = {axes: new defs.Axis_Arrows()};
-        const bump = new defs.Fake_Bump_Map();
-        this.material = new Material(bump, {
-            color: color(0, 0, 0, 1), ambient: 1,
-            texture: new Texture("assets/rgb.jpg")
+        // Axis_Arrows picks a different third of its texture for each axis: x red, y yellow, z blue.
+        this.material = new Material(new defs.Textured_Phong(), {
+            color: color(0, 0, 0, 1), ambient: .9, diffusivity: 0, specularity: .3, smoothness: 30,
+            texture: new Texture("assets/primaries.png")
         });
     }
 
@@ -86,7 +86,7 @@ export class Axes_Viewer_Test_Scene extends Scene {
         // Scene defaults:
         this.shapes = {box: new defs.Cube()};
         const phong = new defs.Phong_Shader();
-        this.material = new Material(phong, {color: color(.8, .4, .8, 1)});
+        this.material = new Material(phong, {color: defs.palette.ink, ambient: 1, diffusivity: 0, specularity: 0});
     }
 
     make_control_panel() {
@@ -95,7 +95,7 @@ export class Axes_Viewer_Test_Scene extends Scene {
 
     display(context, program_state) {
         // display():  *********** See instructions below ***********
-        program_state.lights = [new Light(vec4(0, 0, 1, 0), color(0, 1, 1, 1), 100000)];
+        program_state.lights = [new Light(vec4(1, 2, 3, 0), color(1, 1, 1, 1), 100000)];
 
         if (!context.scratchpad.controls) {
             this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
