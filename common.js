@@ -13,13 +13,21 @@ import {widgets} from './tiny-graphics-widgets.js';
 
 const tiny = {...core, ...widgets};
 const {
-    Vector, Vector3, vec, vec3, vec4, color, Matrix, Mat4,
+    Vector, Vector3, vec, vec3, vec4, color, hex_color, Matrix, Mat4,
     Light, Shape, Material, Shader, Texture, Scene
 } = tiny;
 
 const defs = {};
 
 export {tiny, defs};
+
+// **palette** — the colours the examples share: warm paper and ink, three primaries, one signal orange.
+// Canvas_Widget clears to paper by default.  assets/grid.png and assets/primaries.png use the same values.
+//     new Material(phong, {color: defs.palette.red, ambient: .3, diffusivity: .7, specularity: .1})
+defs.palette = {
+    paper: hex_color("#e9e6df"), white: hex_color("#f7f5f0"), grey: hex_color("#8f8b84"), ink: hex_color("#16161a"),
+    red: hex_color("#e0351f"), yellow: hex_color("#f2b200"), blue: hex_color("#1f4ea3"), orange: hex_color("#ff5b1f"),
+};
 
 // ═════════════════════════════════════════════════════════════════════════════════════════
 // Shapes
@@ -458,7 +466,7 @@ const Minimal_Shape = defs.Minimal_Shape =
             super("position", "color");
             // Describe the where the points of a triangle are in space, and also describe their colors:
             this.arrays.position = [vec3(0, 0, 0), vec3(1, 0, 0), vec3(0, 1, 0)];
-            this.arrays.color = [color(1, 0, 0, 1), color(0, 1, 0, 1), color(0, 0, 1, 1)];
+            this.arrays.color = [defs.palette.red, defs.palette.yellow, defs.palette.blue];
         }
     }
 

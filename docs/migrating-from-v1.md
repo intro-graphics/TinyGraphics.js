@@ -12,7 +12,7 @@ If you are working on a course assignment built on v1, stay on v1. Its last vers
 | `import {defs, tiny} from './examples/common.js'` | `import {defs, tiny} from './common.js'` |
 | `import {defs, tiny} from './common.js'` (inside `examples/`) | `import {defs, tiny} from '../common.js'` |
 | `Object.assign(defs, {My_Scene, ...})` in `main-scene.js` | not needed; register examples in `examples/index.js` |
-| edit `Main_Scene = ...` to switch demos | `index.html?scene=Name`, or the Scene menu |
+| edit `Main_Scene = ...` to switch demos | `index.html?scene=Name`, or the scene list |
 | `server.py`, `host.bat`, `host.command` | `node tools/serve.mjs` or `python3 -m http.server` |
 
 ## 2. Shaders: GLSL ES 1.00 → 3.00
@@ -44,6 +44,9 @@ If your shader shared code through a `shared_glsl_code()` string that the vertex
 | `unsafe3`, `unsafe4` | removed | use `vec3`, `vec4` |
 | `Editor_Widget` | removed | it posted to a server that no longer exists |
 | `new Code_Widget(el, cls, additional_scenes, options)` | `new Code_Widget(el, cls, {definitions, hide_navigator})` | |
+| `background` defaulted to black | defaults to `defs.palette.paper` | pass `{background: color(0, 0, 0, 1)}` for the old look |
+| explanation shown above the canvas | shown below the canvas and controls | |
+| `key_triggered_button(..., color)` coloured the whole button | tints only the key cap | |
 | `new Texture(file, "NEAREST")` | `new Texture(file, {min_filter: "NEAREST", wrap: "CLAMP_TO_EDGE"})` | the string form still works |
 
 A shader's `update_GPU(context, ...)` now receives the WebGL2 context as its first argument; v1 passed the same thing under the name `context`. `Shader.activate()` now takes `(gl, program_state, model_transform, material)`. v1's `buffer_pointers` argument is gone, because vertex arrays are handled by the shape.
@@ -56,6 +59,7 @@ A shader's `update_GPU(context, ...)` now receives the WebGL2 context as its fir
 - **`Scene.slider(label, {min, max, step, value}, on_change)`** adds a range input.
 - **Error overlay:** exceptions and shader compile errors (with numbered source lines) appear over the canvas instead of only in the console.
 - **Responsive canvas:** it fills its container at the display's pixel density, and works on phones.
+- **Palette and page design:** `defs.palette` holds shared colours; buttons show their shortcut as a key cap; the code viewer has line numbers and a grouped class index; `index.html` lists the examples by topic.
 - **Tests:** `npm test` runs math unit tests; `npm run check` loads every example in a headless browser.
 
 ## 5. Behaviour that changed because v1 was wrong

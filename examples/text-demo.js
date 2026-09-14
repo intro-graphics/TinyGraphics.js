@@ -48,33 +48,39 @@ export class Text_Line extends Shape {                           // **Text_Line*
 export class Text_Demo extends Scene {             // **Text_Demo** is a scene with a cube, for demonstrating the Text_Line utility Shape.
     constructor() {
         super()
-        this.shapes = {cube: new defs.Cube(), text: new Text_Line(35)};
+        this.shapes = {cube: new defs.Cube(), text: new Text_Line(20)};
         // Don't create any DOM elements to control this scene:
         this.widget_options = {make_controls: false};
 
         const phong = new defs.Phong_Shader();
         const texture = new defs.Textured_Phong(1);
-        this.grey = new Material(phong, {
-            color: color(.5, .5, .5, 1), ambient: 0,
-            diffusivity: .3, specularity: .5, smoothness: 10
+        this.body = new Material(phong, {
+            color: defs.palette.white, ambient: .6,
+            diffusivity: .4, specularity: .05, smoothness: 20
         })
 
-        // To show text you need a Material like this one:
+        // To show text you need a Material like this one.  The glyphs' alpha cuts out the letters;
+        // with ambient 0 and no lighting they print in solid black ink.
         this.text_image = new Material(texture, {
-            ambient: 1, diffusivity: 0, specularity: 0,
+            ambient: 0, diffusivity: 0, specularity: 0,
             texture: new Texture("assets/text.png")
         });
+        this.accent = new Material(phong, {color: defs.palette.orange, ambient: .5, diffusivity: .5, specularity: .1});
     }
 
     display(context, program_state) {
-        program_state.lights = [new Light(vec4(3, 2, 1, 0), color(1, 1, 1, 1), 1000000),
-            new Light(vec4(3, 10, 10, 1), color(1, .7, .7, 1), 100000)];
-        program_state.set_camera(Mat4.look_at(...Vector.cast([0, 0, 4], [0, 0, 0], [0, 1, 0])));
+        program_state.lights = [new Light(vec4(3, 2, 4, 0), color(1, 1, 1, 1), 1000000),
+            new Light(vec4(-3, 10, 10, 1), color(.35, .33, .3, 1), 100000)];
+        program_state.set_camera(Mat4.look_at(...Vector.cast([0, 0, 5.5], [0, 0, 0], [0, 1, 0])));
         program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 500);
 
         const t = program_state.animation_time / 1000;
-        const funny_orbit = Mat4.rotation(Math.PI / 4 * t, Math.cos(t), Math.sin(t), .7 * Math.cos(t));
-        this.shapes.cube.draw(context, program_state, funny_orbit, this.grey);
+        // A slow turn with a slight tilt, so each printed face passes the camera in turn:
+        const funny_orbit = Mat4.rotation(.35, 1, 0, 0).times(Mat4.rotation(t / 3, 0, 1, 0));
+        this.shapes.cube.draw(context, program_state, funny_orbit, this.body);
+        // A small orange tab on one corner, like a label on a product:
+        this.shapes.cube.draw(context, program_state, funny_orbit.times(Mat4.translation(.78, .78, 1.01))
+            .times(Mat4.scale(.12, .12, .02)), this.accent);
 
 
         let strings = ["This is some text", "More text", "1234567890", "This is a line.\n\n\n" + "This is another line.",
@@ -92,9 +98,9 @@ export class Text_Demo extends Scene {             // **Text_Demo** is a scene w
                 for (let line of multi_line_string.slice(0, 30)) {             // Assign the string to Text_String, and then draw it.
                     this.shapes.text.set_string(line, context.context);
                     this.shapes.text.draw(context, program_state, funny_orbit.times(cube_side)
-                        .times(Mat4.scale(.03, .03, .03)), this.text_image);
+                        .times(Mat4.scale(.06, .06, .06)), this.text_image);
                     // Move our basis down a line.
-                    cube_side.post_multiply(Mat4.translation(0, -.06, 0));
+                    cube_side.post_multiply(Mat4.translation(0, -.12, 0));
                 }
             }
     }

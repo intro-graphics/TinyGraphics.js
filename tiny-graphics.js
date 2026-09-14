@@ -1277,7 +1277,7 @@ const Webgl_Manager = tiny.Webgl_Manager =
  * **Scene** — base class for your program.  Override:
  *   display(webgl_manager, program_state)   called every frame; draw shapes here
  *   make_control_panel()                    add buttons, sliders and readouts
- *   show_explanation(element)               optional HTML shown above the canvas
+ *   show_explanation(element)               optional HTML shown below the canvas and controls
  * Scenes may have `children` (other Scenes drawn and controlled alongside them).
  */
 const Scene = tiny.Scene =
@@ -1293,7 +1293,7 @@ const Scene = tiny.Scene =
         }
 
         new_line(parent = this.control_panel) {
-            parent.appendChild(document.createElement("br"));
+            parent.appendChild(Object.assign(document.createElement("div"), {className: "tg-break"}));
         }
 
         // live_string(callback): a text element refreshed every frame, e.g.
@@ -1303,10 +1303,11 @@ const Scene = tiny.Scene =
         }
 
         // key_triggered_button(description, ["Shift", "T"], callback, color, release_callback)
-        key_triggered_button(description, shortcut_combination, callback, color = '#6E6460',
+        // The button shows its shortcut as a key cap.  `color`, if given, tints that cap (e.g. to group buttons).
+        key_triggered_button(description, shortcut_combination, callback, color,
                              release_event, recipient = this, parent = this.control_panel) {
             const button = parent.appendChild(document.createElement("button"));
-            button.default_color = button.style.backgroundColor = color;
+            button.type = "button";
             const press = () => {
                     button.classList.add("pressed");
                     callback.call(recipient);
@@ -1315,8 +1316,13 @@ const Scene = tiny.Scene =
                     button.classList.remove("pressed");
                     if (release_event) release_event.call(recipient);
                 };
-            const key_name = shortcut_combination ? shortcut_combination.join('+').split(" ").join("Space") : "";
-            button.textContent = (key_name ? "(" + key_name + ") " : "") + description;
+            if (shortcut_combination) {
+                const names = {" ": "Space", ",": ",", ".": "."};
+                const cap = button.appendChild(Object.assign(document.createElement("kbd"),
+                    {textContent: shortcut_combination.map(k => names[k] || (k.length === 1 ? k.toUpperCase() : k)).join("+")}));
+                if (color) cap.style.background = color;
+            }
+            button.appendChild(Object.assign(document.createElement("span"), {textContent: description}));
             button.addEventListener("pointerdown", press);
             button.addEventListener("pointerup", release);
             button.addEventListener("pointerleave", () => button.classList.contains("pressed") && release());

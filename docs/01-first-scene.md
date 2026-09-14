@@ -45,7 +45,7 @@ export class Main_Scene extends Scene {
 - `tiny` holds the core library and the widgets.
 - `defs` holds ready-made shapes and shaders.
 
-The destructuring line pulls the names you use into scope. The page is black: nothing is drawn yet.
+The destructuring line pulls the names you use into scope. The canvas is plain paper colour: nothing is drawn yet.
 
 ## 3. A camera and a projection
 
@@ -133,5 +133,5 @@ When the controls are active, set the camera only on this first frame. Otherwise
 
 - Write your own shader: [03-shaders.md](03-shaders.md).
 - Build your own shape: read `Square`, `Cube` and `Subdivision_Sphere` in [`common.js`](../common.js), in that order.
-- Use a texture: `new Material(new defs.Textured_Phong(), {texture: new Texture("assets/rgb.jpg"), ambient: .5})`.
+- Use a texture: `new Material(new defs.Textured_Phong(), {texture: new Texture("assets/grid.png"), ambient: .5})`.
 - Render to a texture: [`examples/scene-to-texture-demo.js`](../examples/scene-to-texture-demo.js).

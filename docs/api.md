@@ -124,12 +124,12 @@ Override `vertex_glsl_code()`, `fragment_glsl_code()` and `update_GPU(gl, gpu_ad
 
 ### Scene
 
-Override `display(context, program_state)`, `make_control_panel()`, and optionally `show_explanation(element, webgl_manager)`.
+Override `display(context, program_state)`, `make_control_panel()`, and optionally `show_explanation(element, webgl_manager)` (HTML shown below the canvas and controls).
 
 | Member | |
 |---|---|
 | `children` | child scenes, drawn and controlled with this one |
-| `key_triggered_button(label, keys, on_press, color, on_release)` | e.g. `keys = ["Shift", "T"]`; returns the button |
+| `key_triggered_button(label, keys, on_press, color, on_release)` | e.g. `keys = ["Shift", "T"]`; the keys show as a key cap, tinted by `color` if given; returns the button |
 | `slider(label, {min, max, step, value}, on_change)` | returns the `<input>` |
 | `live_string(box => box.textContent = ...)` | refreshed every frame |
 | `new_line()` | |
@@ -139,10 +139,20 @@ Override `display(context, program_state)`, `make_control_panel()`, and optional
 
 | Class | |
 |---|---|
-| `new Canvas_Widget(element, scenes, options)` | options: `aspect` (16/9), `make_controls` (true), `show_explanation` (true), `make_code_nav` (false), `background` (black), `definitions` (for the code navigator) |
+| `new Canvas_Widget(element, scenes, options)` | options: `aspect` (16/9), `make_controls` (true), `show_explanation` (true), `make_code_nav` (false), `background` (`defs.palette.paper`), `definitions` (for the code navigator) |
 | `new Controls_Widget(element, scenes)` | used by `Canvas_Widget` |
-| `new Code_Widget(element, class_to_show, {definitions, hide_navigator})` | clickable source viewer |
+| `new Code_Widget(element, class_to_show, {definitions, hide_navigator})` | source viewer with line numbers, clickable class names, and an index grouped into Math, Rendering, Appearance, Shapes, Shaders and Scenes |
 | `new Text_Widget(element, scenes, webgl_manager)` | calls `scenes[0].show_explanation()` |
+
+## defs · palette
+
+`defs.palette` holds the colours the examples share, as `Color`s: `paper` (the default canvas background), `white`, `grey`, `ink`, `red`, `yellow`, `blue`, `orange`. `assets/grid.png` and `assets/primaries.png` use the same values; `tools/make-textures.py` regenerates them.
+
+```js
+new Material(new defs.Phong_Shader(), {color: defs.palette.red, ambient: .3, diffusivity: .7, specularity: .1})
+```
+
+The page widgets take their look from `--tg-*` CSS custom properties on `.tg-widget` (`--tg-ink`, `--tg-paper`, `--tg-orange`, …); override them to re-theme.
 
 ## defs · shapes
 

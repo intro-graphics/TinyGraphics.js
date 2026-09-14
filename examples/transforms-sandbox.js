@@ -32,9 +32,9 @@ export class Transforms_Sandbox_Base extends Scene {
         const phong = new defs.Phong_Shader();
         this.materials = {
             plastic: new Material(phong,
-                {ambient: .2, diffusivity: .8, specularity: .5, color: color(.9, .5, .9, 1)}),
+                {ambient: .3, diffusivity: .75, specularity: .15, smoothness: 20, color: defs.palette.white}),
             metal: new Material(phong,
-                {ambient: .2, diffusivity: .8, specularity: .8, color: color(.9, .5, .9, 1)})
+                {ambient: .25, diffusivity: .7, specularity: .7, smoothness: 60, color: defs.palette.white})
         };
     }
 
@@ -84,7 +84,9 @@ export class Transforms_Sandbox_Base extends Scene {
         const t = this.t = program_state.animation_time / 1000;
         const angle = Math.sin(t);
         const light_position = Mat4.rotation(angle, 1, 0, 0).times(vec4(0, -1, 1, 0));
-        program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000)];
+        // A moving key light, and a dim fixed fill light from above so no face goes fully dark:
+        program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000),
+            new Light(vec4(0, .5, 1, 0), color(.5, .5, .5, 1), 1000)];
     }
 }
 
@@ -123,8 +125,8 @@ export class Transforms_Sandbox extends Transforms_Sandbox_Base {
             // translation(), scale(), and rotation() to generate matrices, and the
             // function times(), which generates products of matrices.
 
-        // const blue = color(0, 0, 1, 1), yellow = color(1, 1, 0, 1);
-        const blue = hex_color("#1a9ffa"), yellow = hex_color("#fdc03a")
+        // Colors are 4D vectors (r, g, b, a); defs.palette holds a few that go together.
+        const {red, yellow, blue} = defs.palette;
         // Variable model_transform will be a local matrix value that helps us position shapes.
         // It starts over as the identity every single frame - coordinate axes at the origin.
         let model_transform = Mat4.identity();
@@ -171,7 +173,7 @@ export class Transforms_Sandbox extends Transforms_Sandbox_Base {
             .times(Mat4.scale(1, 2, 1))
             .times(Mat4.translation(0, -1.5, 0));
         // Draw the bottom (child) box:
-        this.shapes.box.draw(context, program_state, model_transform, this.materials.plastic.override(yellow));
+        this.shapes.box.draw(context, program_state, model_transform, this.materials.plastic.override(red));
 
         // Note that our coordinate system stored in model_transform still has non-uniform scaling
         // due to our scale() call.  This could have undesired effects for subsequent transforms;
