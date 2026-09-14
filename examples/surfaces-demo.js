@@ -22,7 +22,11 @@ export class Surfaces_Demo extends Scene {
 
         if (this.is_master) {
             const textured = new defs.Textured_Phong(1);
-            this.material = new Material(textured, {ambient: .5, texture: new Texture("assets/rgb.jpg")});
+            // grid.png is a grid with a few filled cells, so you can see how (s, t) is laid over each surface.
+            this.material = new Material(textured, {
+                color: color(0, 0, 0, 1), ambient: .8, diffusivity: 0, specularity: .5, smoothness: 25,
+                texture: new Texture("assets/grid.png")
+            });
 
             for (let i = 0; i < this.num_scenes; i++)
                 this.sections.push(new Surfaces_Demo(i, this.material));
@@ -71,10 +75,15 @@ export class Surfaces_Demo extends Scene {
         this.shapes = {bullet: new defs.Surface_Of_Revolution(9, 9, points)};
 
         const phong = new defs.Phong_Shader(1);
-        this.solid = new Material(phong, {diffusivity: .5, smoothness: 800, color: color(.7, .8, .6, 1)});
+        this.solid = new Material(phong, {ambient: .3, diffusivity: .7, specularity: .6, smoothness: 80, color: defs.palette.red});
     }
 
     construct_scene_4() {
+        // Axis_Arrows takes a third of its texture per axis; primaries.png makes those x red, y yellow, z blue.
+        this.material = new Material(new defs.Textured_Phong(1), {
+            color: color(0, 0, 0, 1), ambient: .9, diffusivity: 0, specularity: .3, smoothness: 30,
+            texture: new Texture("assets/primaries.png")
+        });
         this.shapes = {
             axis: new defs.Axis_Arrows(),
             ball: new defs.Subdivision_Sphere(3),

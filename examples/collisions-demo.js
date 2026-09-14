@@ -194,15 +194,16 @@ export class Inertia_Demo extends Simulation {
         this.data = new Test_Data();
         this.shapes = Object.assign({}, this.data.shapes);
         this.shapes.square = new defs.Square();
-        const shader = new defs.Fake_Bump_Map(1);
-        this.material = new Material(shader, {
-            color: color(.4, .8, .4, 1),
-            ambient: .4, texture: this.data.textures.stars
+        this.material = new Material(new defs.Phong_Shader(1), {
+            color: defs.palette.white,
+            ambient: .35, diffusivity: .7, specularity: .2, smoothness: 25
         })
     }
 
     random_color() {
-        return this.material.override(color(.6, .6 * Math.random(), .6 * Math.random(), 1));
+        const {red, yellow, blue, ink, white} = defs.palette;
+        const choices = [red, red, yellow, blue, blue, ink, white, white];
+        return this.material.override(choices[~~(choices.length * Math.random())]);
     }
 
     update_state(dt) {
@@ -235,11 +236,11 @@ export class Inertia_Demo extends Simulation {
             program_state.set_camera(Mat4.translation(0, 0, -50));    // Locate the camera here (inverted matrix).
         }
         program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 1, 500);
-        program_state.lights = [new Light(vec4(0, -5, -10, 1), color(1, 1, 1, 1), 100000)];
+        program_state.lights = [new Light(vec4(.5, 1, 1, 0), color(1, 1, 1, 1), 100000)];
         // Draw the ground:
         this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
                 .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(50, 50, 1)),
-            this.material.override(this.data.textures.earth));
+            this.material.override({color: defs.palette.ink, ambient: .9, specularity: 0}));
     }
 
     show_explanation(document_element) {
@@ -267,13 +268,11 @@ export class Collision_Demo extends Simulation {
         this.collider_selection = 0;
         // Materials:
         const phong = new defs.Phong_Shader(1);
-        const bump = new defs.Fake_Bump_Map(1)
-        this.inactive_color = new Material(bump, {
-            color: color(.5, .5, .5, 1), ambient: .2,
-            texture: this.data.textures.rgb
+        this.inactive_color = new Material(phong, {
+            color: defs.palette.white, ambient: .35, diffusivity: .7, specularity: .2, smoothness: 25
         });
-        this.active_color = this.inactive_color.override({color: color(.5, 0, 0, 1), ambient: .5});
-        this.bright = new Material(phong, {color: color(0, 1, 0, .5), ambient: 1});
+        this.active_color = this.inactive_color.override({color: defs.palette.red, ambient: .45});
+        this.bright = new Material(phong, {color: color(...defs.palette.blue.to3(), .5), ambient: 1, diffusivity: 0, specularity: 0});
     }
 
     make_control_panel() {
@@ -353,7 +352,7 @@ export class Collision_Demo extends Simulation {
 
     show_explanation(document_element) {
         document_element.innerHTML += `<p>This demo detects when some flying objects collide with one another, coloring them red when they do.  For a simpler demo that shows physics-based movement without objects that hit one another, see the demo called Inertia_Demo.
-                                     </p><p>Detecting intersections between pairs of stretched out, rotated volumes can be difficult, but is made easier by being in the right coordinate space.  The collision algorithm treats every shape like an ellipsoid roughly conforming to the drawn shape, and with the same transformation matrix applied.  Here these collision volumes are drawn in translucent purple alongside the real shape so that you can see them.
+                                     </p><p>Detecting intersections between pairs of stretched out, rotated volumes can be difficult, but is made easier by being in the right coordinate space.  The collision algorithm treats every shape like an ellipsoid roughly conforming to the drawn shape, and with the same transformation matrix applied.  Here these collision volumes are drawn in translucent blue alongside the real shape so that you can see them.
                                      </p><p>This particular collision method is extremely short to code, as you can observe in the method \"check_if_colliding\" in the class called Body below.  It has problems, though.  Making every collision body a stretched sphere is a hack and doesn't handle the nuances of the actual shape being drawn, such as a cube's corners that stick out.  Looping through a list of discrete sphere points to see if the volumes intersect is *really* a hack (there are perfectly good analytic expressions that can test if two ellipsoids intersect without discretizing them into points, although they involve solving a high order polynomial).   On the other hand, for non-convex shapes a real collision method cannot be exact either, and is usually going to have to loop through a list of discrete tetrahedrons defining the shape anyway.
                                      </p><p>This scene extends class Simulation, which carefully manages stepping simulation time for any scenes that subclass it.  It totally decouples the whole simulation from the frame rate, following the suggestions in the blog post <a href=\"https://gafferongames.com/post/fix_your_timestep/\" target=\"blank\">\"Fix Your Timestep\"</a> by Glenn Fielder.  Buttons allow you to speed up and slow down time to show that the simulation's answers do not change.</p>`;
     }

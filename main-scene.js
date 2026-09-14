@@ -2,7 +2,8 @@
 // Start here: change display(), reload the page, look.  See docs/01-first-scene.md.
 import {defs, tiny} from './common.js';
 
-const {vec3, vec4, color, hex_color, Mat4, Light, Material, Scene} = tiny;
+const {vec3, vec4, color, Mat4, Light, Material, Scene} = tiny;
+const {red, blue, white} = defs.palette;
 
 export class Main_Scene extends Scene {
     constructor() {
@@ -11,8 +12,9 @@ export class Main_Scene extends Scene {
         this.shapes = {box: new defs.Cube(), ball: new defs.Subdivision_Sphere(4)};
         const phong = new defs.Phong_Shader();
         this.materials = {
-            plastic: new Material(phong, {ambient: .2, diffusivity: .8, specularity: .4, color: hex_color("#e0a040")}),
-            metal: new Material(phong, {ambient: .1, diffusivity: .5, specularity: 1, color: hex_color("#5a8fd6")}),
+            matte: new Material(phong, {ambient: .35, diffusivity: .7, specularity: .05, color: white}),
+            plastic: new Material(phong, {ambient: .3, diffusivity: .75, specularity: .15, smoothness: 20, color: red}),
+            gloss: new Material(phong, {ambient: .25, diffusivity: .7, specularity: .6, smoothness: 60, color: blue}),
         };
         this.spin = true;
     }
@@ -35,11 +37,12 @@ export class Main_Scene extends Scene {
         const t = program_state.animation_time / 1000;
         const angle = this.spin ? t : 0;
 
-        // A box, and a ball orbiting it.  Read each model matrix right to left.
+        // A flat slab to stand on, a box, and a ball orbiting it.  Read each model matrix right to left.
+        this.shapes.box.draw(context, program_state, Mat4.translation(0, -1.15, 0).times(Mat4.scale(4, .15, 4)), this.materials.matte);
         this.shapes.box.draw(context, program_state, Mat4.rotation(angle, 0, 1, 0), this.materials.plastic);
         const ball = Mat4.rotation(angle, 0, 1, 0)
             .times(Mat4.translation(3, this.ball_height ?? 2, 0))
             .times(Mat4.scale(.5, .5, .5));
-        this.shapes.ball.draw(context, program_state, ball, this.materials.metal);
+        this.shapes.ball.draw(context, program_state, ball, this.materials.gloss);
     }
 }

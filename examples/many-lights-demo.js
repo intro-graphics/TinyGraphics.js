@@ -14,15 +14,13 @@ export class Many_Lights_Demo extends Scene {                             // **M
         Object.assign(this, {rows: 20, columns: 35});
 
         this.shapes = {cube: new defs.Cube()};
-        const shader = new defs.Fake_Bump_Map();
-        this.brick = new Material(shader, {
-            color: color(1, 1, 1, 1),
-            ambient: .05, diffusivity: .5, specularity: .5, smoothness: 10,
-            texture: new Texture("assets/rgb.jpg")
+        this.brick = new Material(new defs.Phong_Shader(), {
+            color: defs.palette.white,
+            ambient: .08, diffusivity: 1, specularity: .4, smoothness: 20
         });
 
-        // Don't create any DOM elements to control this scene:
-        this.widget_options = {make_controls: false};
+        // Don't create any DOM elements to control this scene, and draw it at night:
+        this.widget_options = {make_controls: false, background: defs.palette.ink};
 
         this.box_positions = [];
         this.row_lights = {};
@@ -47,8 +45,9 @@ export class Many_Lights_Demo extends Scene {                             // **M
         // To draw each individual box, select the two lights sharing
         // a row and column with it, and draw using those.
         this.box_positions.forEach((p, i, a) => {
-            program_state.lights = [new Light(this.row_lights   [~~p[2]].to4(1), color(p[2] % 1, 1, 1, 1), 9),
-                new Light(this.column_lights[~~p[0]].to4(1), color(1, 1, p[0] % 1, 1), 9)];
+            // Row lights are warm (orange to yellow), column lights cool (blue to white):
+            program_state.lights = [new Light(this.row_lights   [~~p[2]].to4(1), color(1, .35 + .35 * (p[2] % 1), .12, 1), 9),
+                new Light(this.column_lights[~~p[0]].to4(1), color(.25 + .5 * (p[0] % 1), .45 + .4 * (p[0] % 1), 1, 1), 9)];
             // Draw the box:
             this.shapes.cube.draw(context, program_state, Mat4.translation(...p).times(Mat4.scale(.3, 1, .3)), this.brick)
         });

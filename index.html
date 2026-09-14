@@ -6,45 +6,150 @@
     <link href="assets/fav.ico" rel="icon">
     <title>TinyGraphics.js</title>
     <style>
-        body { margin: 0; padding: 12px 16px 40px; background: #fafaf8; color: #1d1d1f;
-            font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        header { max-width: 1080px; margin: 0 auto 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
-        header h1 { font-size: 17px; margin: 0; }
-        header select { font: inherit; padding: 3px 4px; }
-        header p { flex-basis: 100%; margin: 0; color: #6b6b70; }
-        header a { color: #2f6fdd; }
+        :root {
+            --paper: #f1efea; --surface: #fbfaf7; --ink: #16161a; --muted: #6f6b64; --hair: #dcd8cf;
+            --red: #e0351f; --yellow: #f2b200; --blue: #1f4ea3; --orange: #ff5b1f;
+            --sans: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+            --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+            color-scheme: light;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.5 var(--sans); }
+        a { color: inherit; }
+        .label { font: 600 10.5px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+
+        /* Top bar */
+        .bar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 14px; height: 52px; padding: 0 20px;
+            background: var(--paper); border-bottom: 1.5px solid var(--ink); }
+        .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .brand svg { display: block; }
+        .brand b { font-size: 16px; letter-spacing: -.01em; }
+        .brand b span { font-weight: 400; color: var(--muted); }
+        .chip { padding: 3px 6px; border: 1px solid var(--ink); }
+        .bar nav { margin-left: auto; display: flex; gap: 4px; }
+        .bar nav a { padding: 6px 10px; text-decoration: none; }
+        .bar nav a:hover { background: var(--ink); color: var(--surface); }
+
+        /* Layout: scene index | stage */
+        .layout { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: calc(100vh - 52px); }
+        .scenes { position: sticky; top: 52px; height: calc(100vh - 52px); overflow: auto;
+            padding: 18px 0 24px; border-right: 1.5px solid var(--ink); }
+        .scenes h2 { margin: 16px 20px 6px; display: flex; align-items: center; gap: 8px; color: var(--muted); }
+        .scenes h2:first-child { margin-top: 0; }
+        .scenes h2 i { width: 9px; height: 9px; background: var(--marker); }
+        .scenes ul { margin: 0; padding: 0; list-style: none; }
+        .scenes a { display: grid; grid-template-columns: 26px 1fr; align-items: baseline; padding: 5px 20px; text-decoration: none; }
+        .scenes a .n { font: 11px/1 var(--mono); color: var(--muted); }
+        .scenes a:hover { background: #fff6d6; }
+        .scenes a[aria-current] { background: var(--ink); color: var(--surface); }
+        .scenes a[aria-current] .n { color: var(--marker); }
+
+        .stage { padding: 28px 32px 56px; min-width: 0; }
+        .stage .inner { max-width: 1080px; margin: 0 auto; }
+        .scene-head { display: grid; grid-template-columns: auto 1fr; column-gap: 16px; align-items: end; margin-bottom: 16px; }
+        .scene-head .n { grid-row: span 2; font: 500 44px/0.9 var(--sans); letter-spacing: -.04em; }
+        .scene-head .meta { display: flex; gap: 10px; align-items: center; color: var(--muted); }
+        .scene-head .meta i { width: 9px; height: 9px; background: var(--marker); }
+        .scene-head h1 { margin: 4px 0 0; font-size: 26px; line-height: 1.1; letter-spacing: -.02em; font-weight: 600; }
+        .teaches { margin: 0 0 18px; max-width: 70ch; color: #3d3b37; font-size: 15px; }
+        .teaches code, .hint code { font: .92em var(--mono); }
+        .hint { margin: 14px 0 0; color: var(--muted); font-size: 12.5px; }
+        footer { padding: 18px 32px; border-top: 1.5px solid var(--ink); color: var(--muted); font-size: 12px; }
+
+        @media (max-width: 900px) {
+            .layout { grid-template-columns: minmax(0, 1fr); }
+            .scenes { position: static; height: auto; display: flex; gap: 0; overflow-x: auto; padding: 0;
+                border-right: 0; border-bottom: 1.5px solid var(--ink); }
+            .scenes h2 { display: none; }
+            .scenes ul { display: contents; }
+            .scenes a { display: flex; gap: 6px; white-space: nowrap; padding: 10px 14px; }
+            .stage { padding: 20px 16px 40px; }
+            .scene-head .n { font-size: 34px; }
+            .bar nav a:not(:last-child) { display: none; }
+        }
     </style>
 </head>
 <body>
-<header>
-    <h1>TinyGraphics.js</h1>
-    <label>Scene <select id="scene-picker"><option value="">Main_Scene (your main-scene.js)</option></select></label>
-    <p id="teaches">Pick an example, or edit <code>main-scene.js</code> and reload.
-        <a href="https://github.com/intro-graphics/TinyGraphics.js/tree/v2/docs">Docs</a></p>
+<header class="bar">
+    <a class="brand" href="./">
+        <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
+            <rect width="22" height="22" fill="#fbfaf7"/>
+            <rect x="0" y="0" width="13" height="13" fill="#e0351f"/>
+            <rect x="15" y="15" width="7" height="7" fill="#1f4ea3"/>
+            <rect x="0" y="15" width="6" height="7" fill="#f2b200"/>
+            <path d="M13 0v22M0 13h22M6 13v9M13 15h9" stroke="#16161a" stroke-width="2" fill="none"/>
+            <rect x="1" y="1" width="20" height="20" fill="none" stroke="#16161a" stroke-width="2"/>
+        </svg>
+        <b>TinyGraphics<span>.js</span></b>
+    </a>
+    <span class="chip label">v2 · WebGL 2</span>
+    <nav class="label">
+        <a href="https://github.com/intro-graphics/TinyGraphics.js/tree/main/docs">Docs</a>
+        <a href="https://github.com/intro-graphics/TinyGraphics.js/blob/main/docs/api.md">API</a>
+        <a href="https://github.com/intro-graphics/TinyGraphics.js">GitHub</a>
+    </nav>
 </header>
-<div id="main-canvas"></div>
+<div class="layout">
+    <aside class="scenes" id="scene-list" aria-label="Scenes"></aside>
+    <main class="stage"><div class="inner">
+        <div class="scene-head">
+            <span class="n" id="scene-number">00</span>
+            <div class="meta label"><i></i><span id="scene-group">Your scene</span><span id="scene-class"></span></div>
+            <h1 id="scene-title">Main Scene</h1>
+        </div>
+        <p class="teaches" id="teaches">Your own scene. Edit <code>main-scene.js</code> and reload.</p>
+        <div id="main-canvas"></div>
+        <p class="hint">Drag the canvas to orbit where a scene has camera controls. Every key cap is also a keyboard shortcut.</p>
+    </div></main>
+</div>
+<footer>TinyGraphics.js was created by Garett Ridge for UCLA CS 174A. Version 2 is a WebGL 2 rewrite for learning graphics foundations.</footer>
 <script type="module">
     import {tiny, defs} from './common.js';
     import {examples} from './examples/index.js';
     import {Main_Scene} from './main-scene.js';
 
-    // ?scene=Name selects an example; no parameter shows your own Main_Scene.
-    const requested = new URLSearchParams(location.search).get("scene");
-    const picker = document.getElementById("scene-picker");
-    for (const name of Object.keys(examples))
-        picker.appendChild(Object.assign(document.createElement("option"), {value: name, textContent: name}));
-    picker.value = requested && examples[requested] ? requested : "";
-    picker.addEventListener("change", () => {
-        const url = new URL(location.href);
-        if (picker.value) url.searchParams.set("scene", picker.value); else url.searchParams.delete("scene");
-        location.href = url.href;
-    });
+    const markers = {"Your scene": "var(--ink)", Start: "var(--muted)", Transforms: "var(--red)", Shapes: "var(--yellow)",
+        "Light & texture": "var(--blue)", Motion: "var(--orange)"};
+    const entries = [["", {group: "Your scene", scene: Main_Scene,
+        teaches: "Your own scene. Edit <code>main-scene.js</code> and reload."}], ...Object.entries(examples)];
 
-    const entry = examples[requested];
-    if (requested && !entry) document.getElementById("teaches").textContent = `No example named "${requested}".`;
-    if (entry) document.getElementById("teaches").textContent = entry.teaches;
-    const Scene_Class = entry ? entry.scene : Main_Scene;
-    new tiny.Canvas_Widget(document.getElementById("main-canvas"), [new Scene_Class()],
+    // ?scene=Name selects an example; no parameter shows your own Main_Scene.
+    const requested = new URLSearchParams(location.search).get("scene") || "";
+    const index = Math.max(0, entries.findIndex(([name]) => name === requested));
+    const [name, entry] = entries[index];
+
+    // The scene index, grouped.
+    const list = document.getElementById("scene-list");
+    let current_group, ul;
+    entries.forEach(([n, e], i) => {
+        if (e.group !== current_group) {
+            current_group = e.group;
+            const h = list.appendChild(Object.assign(document.createElement("h2"), {className: "label"}));
+            h.style.setProperty("--marker", markers[e.group]);
+            h.append(document.createElement("i"), e.group);
+            ul = list.appendChild(document.createElement("ul"));
+        }
+        const a = ul.appendChild(document.createElement("li")).appendChild(document.createElement("a"));
+        a.href = n ? "?scene=" + n : "./";
+        a.style.setProperty("--marker", markers[e.group]);
+        a.append(Object.assign(document.createElement("span"), {className: "n", textContent: String(i).padStart(2, "0")}),
+            (n || "Main_Scene").replaceAll("_", " "));
+        if (i === index) a.setAttribute("aria-current", "page");
+    });
+    list.querySelector("[aria-current]")?.scrollIntoView({block: "nearest", inline: "center"});
+
+    // The heading for the current scene.
+    const class_name = name || "Main_Scene";
+    document.querySelector(".scene-head").style.setProperty("--marker", markers[entry.group]);
+    document.getElementById("scene-number").textContent = String(index).padStart(2, "0");
+    document.getElementById("scene-group").textContent = entry.group;
+    document.getElementById("scene-class").textContent = "· " + class_name;
+    document.getElementById("scene-title").textContent = class_name.replaceAll("_", " ");
+    document.getElementById("teaches").innerHTML = requested && !index
+        ? `No example named “${requested.replace(/[<>&]/g, "")}”. Showing your own scene.` : entry.teaches;
+    document.title = `${class_name.replaceAll("_", " ")} · TinyGraphics.js`;
+
+    new tiny.Canvas_Widget(document.getElementById("main-canvas"), [new entry.scene()],
         {make_code_nav: true, definitions: defs});
 </script>
 </body>

@@ -117,13 +117,13 @@ export class Obj_File_Demo extends Scene {                           // **Obj_Fi
         this.widget_options = {make_controls: false};
         // Non bump mapped:
         this.stars = new Material(new defs.Textured_Phong(1), {
-            color: color(.5, .5, .5, 1),
-            ambient: .3, diffusivity: .5, specularity: .5, texture: new Texture("assets/stars.png")
+            color: color(0, 0, 0, 1),
+            ambient: .75, diffusivity: 0, specularity: .6, smoothness: 30, texture: new Texture("assets/grid.png")
         });
         // Bump mapped:
         this.bumps = new Material(new defs.Fake_Bump_Map(1), {
-            color: color(.5, .5, .5, 1),
-            ambient: .3, diffusivity: .5, specularity: .5, texture: new Texture("assets/stars.png")
+            color: color(0, 0, 0, 1),
+            ambient: .75, diffusivity: 0, specularity: .6, smoothness: 30, texture: new Texture("assets/grid.png")
         });
     }
 
@@ -135,7 +135,7 @@ export class Obj_File_Demo extends Scene {                           // **Obj_Fi
         // A spinning light to show off the bump map:
         program_state.lights = [new Light(
             Mat4.rotation(t / 300, 1, 0, 0).times(vec4(3, 2, 10, 1)),
-            color(1, .7, .7, 1), 100000)];
+            color(1, 1, 1, 1), 100000)];
 
         for (let i of [-1, 1]) {                                       // Spin the 3D model shapes as well.
             const model_transform = Mat4.rotation(t / 2000, 0, 2, 1)
